@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+</head>
+
+<body>
+
+<h1>Welcome, {{ request.user.username }}</h1>
+
+<hr>
+
+<h2>Available Skills</h2>
+
+{% if skills %}
+
+    {% for skill in skills %}
+
+        <div>
+            <h3>{{ skill.name }}</h3>
+
+            <p>
+                {{ skill.description }}
+            </p>
+
+            <p>
+                Passing Score:
+                {{ skill.passing_score }}
+            </p>
+
+            <a href="{% url 'skill_detail' skill.id %}">
+                View Skill
+            </a>
+        </div>
+
+        <hr>
+
+    {% endfor %}
+
+{% else %}
+
+    <p>No skills available.</p>
+
+{% endif %}
+
+
+<h2>Previous Assessments</h2>
+
+{% if assessments %}
+
+    {% for assessment in assessments %}
+
+        <p>
+            {{ assessment.skill.name }}
+
+            -
+
+            {% if assessment.completed_at %}
+                Score: {{ assessment.score }}/100
+
+                {% if assessment.passed %}
+                    ✅ Passed
+                {% else %}
+                    ❌ Failed
+                {% endif %}
+            {% else %}
+                ⏳ In Progress
+            {% endif %}
+        </p>
+
+    {% endfor %}
+
+{% else %}
+
+    <p>No assessments yet.</p>
+
+{% endif %}
+
+
+<h2>Certificates</h2>
+
+{% if certificates %}
+
+    {% for certificate in certificates %}
+
+        <p>
+            {{ certificate.skill.name }}
+            -
+            Issued {{ certificate.issued_at }}
+        </p>
+
+    {% endfor %}
+
+{% else %}
+
+    <p>No certificates yet.</p>
+
+{% endif %}
+
+
+</body>
+</html>

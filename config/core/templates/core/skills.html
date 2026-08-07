@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Skills</title>
+</head>
+
+<body>
+
+<h1>Choose a Skill</h1>
+
+{% for skill in skills %}
+
+    <div>
+
+        <h2>{{ skill.name }}</h2>
+
+        <p>
+            {{ skill.description }}
+        </p>
+
+        <p>
+            Passing score:
+            {{ skill.passing_score }}
+        </p>
+
+        <a href="{% url 'skill_detail' skill.id %}">
+            View Skill
+        </a>
+
+    </div>
+
+    <hr>
+
+{% empty %}
+
+    <p>No skills available.</p>
+
+{% endfor %}
+
+</body>
+</html>

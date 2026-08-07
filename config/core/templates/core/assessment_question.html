@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Assessment</title>
+</head>
+
+<body>
+
+<h1>
+    {{ assessment.skill.name }} Assessment
+</h1>
+
+<h3>
+    Question {{ question_number }}
+    / {{ total_questions }}
+</h3>
+
+<hr>
+
+<h2>
+    {{ task.title }}
+</h2>
+
+<p>
+    <strong>Topic:</strong>
+    {{ task.topic }}
+</p>
+
+<p>
+    <strong>Difficulty:</strong>
+    {{ task.difficulty }}
+</p>
+
+<hr>
+
+<h3>Question</h3>
+
+<p>
+    {{ task.question }}
+</p>
+
+<hr>
+
+{% if error %}
+
+    <p style="color:red;">
+        {{ error }}
+    </p>
+
+{% endif %}
+
+<form method="POST">
+
+    {% csrf_token %}
+
+    <textarea
+        name="answer"
+        rows="15"
+        cols="80"
+        placeholder="Write your answer here..."
+        required
+    ></textarea>
+
+    <br><br>
+
+    <button type="submit">
+
+        {% if question_number == 5 %}
+            Submit Assessment
+        {% else %}
+            Next Question
+        {% endif %}
+
+    </button>
+
+</form>
+
+<br>
+
+<p>
+    Question {{ question_number }} of 5
+</p>
+
+</body>
+</html>
