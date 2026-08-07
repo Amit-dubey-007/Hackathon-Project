@@ -25,7 +25,7 @@ class Task(models.Model):
     )
 
     title = models.CharField(
-        max_length=200
+        max_length=500
     )
 
     question = models.TextField()
@@ -45,7 +45,7 @@ class Task(models.Model):
     )
 
     topic = models.CharField(
-        max_length=100,
+        max_length=300,
         blank=True
     )
 

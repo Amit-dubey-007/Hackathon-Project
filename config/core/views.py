@@ -116,7 +116,7 @@ def start_assessment(request, skill_id):
 
             task = Task.objects.create(
                 skill=skill,
-                title=item["title"],
+                title=item["title"][:500],
                 question=item["question"],
                 difficulty=item.get(
                     "difficulty",
@@ -125,7 +125,7 @@ def start_assessment(request, skill_id):
                 topic=item.get(
                     "topic",
                     ""
-                ),
+                )[:300],
                 max_score=100,
             )
 
