@@ -71,14 +71,21 @@
                             placeholder="Write your comprehensive code and explanation here...&#10;&#10;// You can write several thousand words or large code snippets.&#10;// Do not worry about length limits." 
                             required
                             style="resize: vertical; font-size: 14px; line-height: 1.6;"
-                        ></textarea>
+                        >{{ existing_answer|default:"" }}</textarea>
                         <div class="d-flex justify-content-between mt-2">
                             <small class="text-muted">Take your time. Provide robust and complete solutions.</small>
                             <small class="text-muted" id="wordCount">0 words</small>
                         </div>
                     </div>
 
-                    <div class="d-flex justify-content-end mt-5">
+                    <div class="d-flex justify-content-between mt-5">
+                        <div>
+                            {% if question_number > 1 %}
+                            <a href="{% url 'assessment_question' assessment.id question_number|add:'-1' %}" class="btn btn-outline-secondary btn-lg rounded-pill px-4 py-3 fw-bold d-flex align-items-center gap-2 hover-lift transition-transform">
+                                <i class="bi bi-arrow-left fs-4"></i> Previous
+                            </a>
+                            {% endif %}
+                        </div>
                         <button type="submit" id="submitBtn" class="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-bold d-flex align-items-center gap-2 shadow hover-lift transition-transform">
                             {% if question_number == 5 %}
                                 Submit & Evaluate Assessment <i class="bi bi-cpu-fill fs-4"></i>

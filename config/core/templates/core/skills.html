@@ -2,54 +2,318 @@
 
 {% block title %}Skills Catalog | AI Skills Platform{% endblock %}
 
-{% block content %}
-<div class="row mb-5 mt-4">
-    <div class="col-12 text-center">
-        <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill fw-bold mb-3">SKILL ASSESSMENTS</span>
-        <h1 class="display-6 fw-bold text-dark mb-3">Choose a Skill</h1>
-        <p class="text-muted lead mx-auto" style="max-width: 600px;">
-            Explore our curated list of skills, take AI-powered assessments, and earn blockchain-verified certificates.
-        </p>
-    </div>
-</div>
+{% block extra_css %}
+<!-- Load Tailwind CSS via CDN without Preflight to avoid breaking Bootstrap -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    corePlugins: {
+      preflight: false,
+      visibility: false,
+    }
+  }
+</script>
+<style>
+    /* Clean custom styling leveraging global theme variables */
+    .theme-card {
+        background-color: var(--cards) !important;
+        border: 1px solid var(--borders) !important;
+        color: var(--text-main) !important;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .theme-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+        border-color: var(--primary) !important;
+    }
+    .theme-select {
+        background-color: var(--cards) !important;
+        color: var(--text-main) !important;
+        border: 1px solid var(--borders) !important;
+        border-radius: 0.5rem;
+    }
+    .theme-select:focus {
+        border-color: var(--primary) !important;
+        outline: none;
+    }
+</style>
+{% endblock %}
 
-<div class="row g-4 mb-5">
-    {% for skill in skills %}
-    <div class="col-md-6 col-lg-4">
-        <div class="card h-100 border-0 shadow-sm rounded-2xl hover-lift">
-            <div class="card-body p-4 d-flex flex-column">
-                <div class="d-flex justify-content-between align-items-start mb-4">
-                    <div class="bg-primary bg-opacity-10 text-primary rounded-xl d-flex align-items-center justify-content-center" style="width: 54px; height: 54px;">
-                        <i class="bi bi-code-square fs-3"></i>
+{% block content %}
+<div class="container py-4">
+
+    <!-- Hero Section -->
+    <div class="mb-10 text-center py-8 px-6 rounded-3xl bg-[var(--cards)] border border-[var(--borders)] shadow-sm flex flex-col items-center">
+        <div class="max-w-4xl w-full">
+            <span class="inline-block px-3 py-1.5 rounded-full bg-blue-500/10 text-blue-500 dark:text-blue-400 font-semibold text-xs mb-3 border border-blue-500/20 uppercase tracking-wider">
+                Skill Verification
+            </span>
+            <h1 class="text-3xl md:text-4xl font-extrabold mb-3 tracking-tight text-[var(--text-main)]">
+                Browse Skills Catalog
+            </h1>
+            <p class="text-sm md:text-base text-[var(--text-muted)] mb-8 max-w-2xl leading-relaxed mx-auto">
+                Choose a practical skill, complete an AI-powered assessment, and earn a secure, blockchain-verified credential.
+            </p>
+
+            <!-- Statistics Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 pt-6 border-t border-[var(--borders)] w-full">
+                <div>
+                    <div class="text-2xl md:text-3xl font-bold text-[var(--text-main)] mb-0.5">{{ stats.total_skills }}</div>
+                    <div class="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Total Skills</div>
+                </div>
+                <div>
+                    <div class="text-2xl md:text-3xl font-bold text-blue-500 mb-0.5">
+                        {% if request.user.is_authenticated %}{{ stats.completed_skills }}{% else %}0{% endif %}
                     </div>
-                    <span class="badge badge-primary fw-semibold rounded-pill d-flex align-items-center gap-1 px-3 py-2">
-                        <i class="bi bi-bullseye"></i> Pass: {{ skill.passing_score }}
+                    <div class="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Completed Skills</div>
+                </div>
+                <div>
+                    <div class="text-2xl md:text-3xl font-bold text-emerald-500 mb-0.5">
+                        {% if request.user.is_authenticated %}{{ stats.available_certs }}{% else %}0{% endif %}
+                    </div>
+                    <div class="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Certificates</div>
+                </div>
+                <div>
+                    <div class="text-2xl md:text-3xl font-bold text-purple-500 mb-0.5">{{ stats.total_assessments }}</div>
+                    <div class="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Total Assessments</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search & Filter Controls -->
+    <form method="GET" id="searchFilterForm" class="mb-8">
+        <div class="bg-[var(--cards)] p-5 rounded-2xl border border-[var(--borders)] shadow-sm mb-5">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+                <!-- Search Input -->
+                <div class="lg:col-span-4 relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-[var(--text-muted)]">
+                        <i class="bi bi-search fs-6"></i>
+                    </span>
+                    <input 
+                        type="text" 
+                        name="search" 
+                        id="searchInput"
+                        value="{{ search_query }}"
+                        class="w-full bg-[var(--background)] border border-[var(--borders)] rounded-lg pl-10 pr-4 py-2.5 text-[var(--text-main)] focus:outline-none focus:border-blue-500 transition-colors text-sm"
+                        placeholder="Search skills or descriptions..."
+                    >
+                </div>
+
+                <!-- Dropdowns -->
+                <div class="lg:col-span-8 grid grid-cols-1 sm:grid-cols-4 gap-3">
+                    <!-- Category -->
+                    <div>
+                        <select name="category" onchange="this.form.submit()" class="w-full theme-select px-3 py-2.5 text-xs font-medium">
+                            <option value="All" {% if category_filter == 'All' or not category_filter %}selected{% endif %}>All Categories</option>
+                            {% for cat in categories %}
+                                <option value="{{ cat }}" {% if category_filter == cat %}selected{% endif %}>{{ cat }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Difficulty -->
+                    <div>
+                        <select name="difficulty" onchange="this.form.submit()" class="w-full theme-select px-3 py-2.5 text-xs font-medium">
+                            <option value="All" {% if difficulty_filter == 'All' or not difficulty_filter %}selected{% endif %}>All Difficulties</option>
+                            <option value="Easy" {% if difficulty_filter == 'Easy' %}selected{% endif %}>Easy</option>
+                            <option value="Medium" {% if difficulty_filter == 'Medium' %}selected{% endif %}>Medium</option>
+                            <option value="Hard" {% if difficulty_filter == 'Hard' %}selected{% endif %}>Hard</option>
+                        </select>
+                    </div>
+
+                    <!-- Status -->
+                    <div>
+                        {% if request.user.is_authenticated %}
+                        <select name="status" onchange="this.form.submit()" class="w-full theme-select px-3 py-2.5 text-xs font-medium">
+                            <option value="All" {% if status_filter == 'All' or not status_filter %}selected{% endif %}>All Status</option>
+                            <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Completed</option>
+                            <option value="passed" {% if status_filter == 'passed' %}selected{% endif %}>Passed & Certified</option>
+                            <option value="not_completed" {% if status_filter == 'not_completed' %}selected{% endif %}>Not Attempted</option>
+                        </select>
+                        {% else %}
+                        <select class="w-full theme-select px-3 py-2.5 text-xs font-medium opacity-50" disabled>
+                            <option>Login to Filter Status</option>
+                        </select>
+                        {% endif %}
+                    </div>
+
+                    <!-- Sorting -->
+                    <div>
+                        <select name="sort" onchange="this.form.submit()" class="w-full theme-select px-3 py-2.5 text-xs font-medium">
+                            <option value="" {% if not sort_by %}selected{% endif %}>Sort By</option>
+                            <option value="az" {% if sort_by == 'az' %}selected{% endif %}>Alphabetical A-Z</option>
+                            <option value="za" {% if sort_by == 'za' %}selected{% endif %}>Alphabetical Z-A</option>
+                            <option value="score_low" {% if sort_by == 'score_low' %}selected{% endif %}>Lowest Passing Score</option>
+                            <option value="score_high" {% if sort_by == 'score_high' %}selected{% endif %}>Highest Passing Score</option>
+                            <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Newest</option>
+                            <option value="oldest" {% if sort_by == 'oldest' %}selected{% endif %}>Oldest</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Filter Chips -->
+        <div class="flex flex-wrap gap-2 items-center justify-start">
+            <span class="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mr-2">Quick Filters:</span>
+            <button type="button" onclick="setQuickFilter('category', 'Frontend')" class="px-3.5 py-1.5 rounded-full border text-xs font-bold transition-all {% if category_filter == 'Frontend' %}bg-blue-600 border-blue-600 text-white{% else %}bg-[var(--cards)] border-[var(--borders)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:border-slate-400{% endif %}">Frontend</button>
+            <button type="button" onclick="setQuickFilter('category', 'Backend')" class="px-3.5 py-1.5 rounded-full border text-xs font-bold transition-all {% if category_filter == 'Backend' %}bg-blue-600 border-blue-600 text-white{% else %}bg-[var(--cards)] border-[var(--borders)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:border-slate-400{% endif %}">Backend</button>
+            <button type="button" onclick="setQuickFilter('category', 'AI')" class="px-3.5 py-1.5 rounded-full border text-xs font-bold transition-all {% if category_filter == 'AI' %}bg-blue-600 border-blue-600 text-white{% else %}bg-[var(--cards)] border-[var(--borders)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:border-slate-400{% endif %}">AI</button>
+            <button type="button" onclick="setQuickFilter('category', 'Cloud')" class="px-3.5 py-1.5 rounded-full border text-xs font-bold transition-all {% if category_filter == 'Cloud' %}bg-blue-600 border-blue-600 text-white{% else %}bg-[var(--cards)] border-[var(--borders)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:border-slate-400{% endif %}">Cloud</button>
+            <button type="button" onclick="setQuickFilter('category', 'Blockchain')" class="px-3.5 py-1.5 rounded-full border text-xs font-bold transition-all {% if category_filter == 'Blockchain' %}bg-blue-600 border-blue-600 text-white{% else %}bg-[var(--cards)] border-[var(--borders)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:border-slate-400{% endif %}">Blockchain</button>
+            <button type="button" onclick="setQuickFilter('search', 'Python')" class="px-3.5 py-1.5 rounded-full border text-xs font-bold transition-all {% if search_query == 'Python' %}bg-blue-600 border-blue-600 text-white{% else %}bg-[var(--cards)] border-[var(--borders)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:border-slate-400{% endif %}">Python</button>
+            <button type="button" onclick="setQuickFilter('search', 'JavaScript')" class="px-3.5 py-1.5 rounded-full border text-xs font-bold transition-all {% if search_query == 'JavaScript' %}bg-blue-600 border-blue-600 text-white{% else %}bg-[var(--cards)] border-[var(--borders)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:border-slate-400{% endif %}">JavaScript</button>
+            
+            {% if search_query or category_filter != 'All' or difficulty_filter != 'All' or status_filter != 'All' or sort_by %}
+            <a href="{% url 'skill_list' %}" class="ml-auto px-3 py-1.5 rounded-full text-xs font-bold text-rose-500 bg-rose-500/10 border border-rose-500/20 hover:bg-rose-500 hover:text-white transition-colors flex items-center gap-1">
+                <i class="bi bi-x-circle"></i> Reset Filters
+            </a>
+            {% endif %}
+        </div>
+    </form>
+
+    <!-- Skills Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        {% for item in page_obj %}
+        <div class="theme-card p-5 rounded-2xl flex flex-column justify-between shadow-sm">
+            <div>
+                <!-- Card Header -->
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-12 h-12 rounded-xl bg-[var(--background)] flex items-center justify-center text-2xl border border-[var(--borders)]">
+                        <i class="bi {{ item.icon }}"></i>
+                    </div>
+                    
+                    <div class="flex flex-column items-end gap-1">
+                        <span class="badge bg-[var(--background)] border border-[var(--borders)] text-[var(--text-main)] font-semibold px-2.5 py-1 text-[10px]">
+                            {{ item.category }}
+                        </span>
+                        <span class="badge bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold px-2.5 py-1 text-[10px] border border-blue-500/20">
+                            Pass: {{ item.passing_score }}%
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Skill Meta -->
+                <h3 class="text-lg font-bold text-[var(--text-main)] mb-1 tracking-tight">{{ item.name }}</h3>
+                
+                <div class="flex gap-2 mb-3">
+                    <span class="badge text-[10px] font-semibold px-2 py-0.5 border
+                        {% if item.difficulty == 'Easy' %}bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20
+                        {% elif item.difficulty == 'Medium' %}bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20
+                        {% else %}bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20{% endif %}">
+                        {{ item.difficulty }}
+                    </span>
+                    <span class="badge bg-[var(--background)] border border-[var(--borders)] text-[var(--text-muted)] text-[10px] px-2 py-0.5">
+                        <i class="bi bi-clock-history mr-0.5"></i> {% if item.difficulty == 'Easy' %}30m{% elif item.difficulty == 'Medium' %}45m{% else %}60m{% endif %}
                     </span>
                 </div>
-                
-                <h4 class="card-title fw-bold text-dark mb-3">{{ skill.name }}</h4>
-                <p class="card-text text-muted mb-4 flex-grow-1" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
-                    {{ skill.description }}
+
+                <p class="text-[var(--text-muted)] text-sm leading-relaxed mb-5" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                    {{ item.description }}
                 </p>
+            </div>
+
+            <!-- Footer Action -->
+            <div class="mt-auto pt-3 border-t border-[var(--borders)] flex items-center justify-between">
+                <span class="text-[var(--text-muted)] text-xs"><i class="bi bi-card-checklist mr-0.5"></i> 5 Tasks</span>
                 
-                <a href="{% url 'skill_detail' skill.id %}" class="btn btn-primary w-100 rounded-pill fw-medium py-2 mt-auto d-flex justify-content-center align-items-center gap-2">
-                    View Skill <i class="bi bi-arrow-right-short fs-4"></i>
-                </a>
+                {% if item.status == 'passed' %}
+                    <a href="{% url 'skill_detail' item.id %}" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-1">
+                        <i class="bi bi-award-fill"></i> View Certificate
+                    </a>
+                {% elif item.status == 'completed' %}
+                    <a href="{% url 'skill_detail' item.id %}" class="px-3.5 py-1.5 bg-amber-600 hover:bg-amber-500 text-slate-900 text-xs font-bold rounded-lg transition-colors flex items-center gap-1">
+                        <i class="bi bi-arrow-counterclockwise"></i> Retake
+                    </a>
+                {% else %}
+                    <a href="{% url 'skill_detail' item.id %}" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-1">
+                        Start <i class="bi bi-chevron-right"></i>
+                    </a>
+                {% endif %}
             </div>
         </div>
-    </div>
-    {% empty %}
-    <div class="col-12">
-        <div class="card border-0 shadow-sm rounded-2xl">
-            <div class="card-body p-5 text-center text-muted py-5">
-                <div class="d-inline-flex bg-light rounded-circle p-4 mb-3">
-                    <i class="bi bi-search fs-1 text-secondary opacity-50"></i>
-                </div>
-                <h5 class="fw-bold text-dark">No skills available</h5>
-                <p class="mb-0">Check back later for new skill assessments.</p>
+        {% empty %}
+        <!-- Empty State -->
+        <div class="col-span-full py-12 text-center bg-[var(--cards)] rounded-2xl border border-[var(--borders)]">
+            <div class="w-16 h-16 bg-[var(--background)] border border-[var(--borders)] rounded-full flex items-center justify-center text-3xl text-[var(--text-muted)] mx-auto mb-4">
+                <i class="bi bi-binoculars"></i>
             </div>
+            <h3 class="text-xl font-bold text-[var(--text-main)] mb-1">No matching skills found</h3>
+            <p class="text-[var(--text-muted)] text-sm mb-6 max-w-xs mx-auto">Try refining your search terms or clearing your current filter categories.</p>
+            <a href="{% url 'skill_list' %}" class="inline-flex px-5 py-2.5 bg-[var(--background)] hover:bg-[var(--borders)] text-[var(--text-main)] font-bold rounded-xl border border-[var(--borders)] transition-colors gap-2 items-center text-sm">
+                <i class="bi bi-x-circle"></i> Clear Filters
+            </a>
         </div>
+        {% endfor %}
     </div>
-    {% endfor %}
+
+    <!-- Pagination -->
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div class="d-flex flex-column align-items-center gap-2 mt-8">
+        <nav aria-label="Skills pagination">
+            <ul class="inline-flex items-center space-x-1 bg-[var(--cards)] p-1.5 rounded-xl border border-[var(--borders)]">
+                <li>
+                    {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if difficulty_filter %}&difficulty={{ difficulty_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" class="w-9 h-9 flex items-center justify-center rounded-lg bg-[var(--background)] hover:bg-[var(--borders)] border border-[var(--borders)] text-[var(--text-main)] transition-colors">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    {% else %}
+                        <span class="w-9 h-9 flex items-center justify-center rounded-lg bg-[var(--background)] border border-[var(--borders)] text-[var(--text-muted)] cursor-not-allowed opacity-50">
+                            <i class="bi bi-chevron-left"></i>
+                        </span>
+                    {% endif %}
+                </li>
+
+                {% for num in page_obj.paginator.page_range %}
+                    <li>
+                        {% if page_obj.number == num %}
+                            <span class="w-9 h-9 flex items-center justify-center rounded-lg bg-blue-600 text-white font-bold border border-blue-600 shadow-sm">
+                                {{ num }}
+                            </span>
+                        {% else %}
+                            <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if difficulty_filter %}&difficulty={{ difficulty_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" class="w-9 h-9 flex items-center justify-center rounded-lg bg-[var(--background)] hover:bg-[var(--borders)] border border-[var(--borders)] text-[var(--text-main)] transition-colors font-medium">
+                                {{ num }}
+                            </a>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+
+                <li>
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if difficulty_filter %}&difficulty={{ difficulty_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" class="w-9 h-9 flex items-center justify-center rounded-lg bg-[var(--background)] hover:bg-[var(--borders)] border border-[var(--borders)] text-[var(--text-main)] transition-colors">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    {% else %}
+                        <span class="w-9 h-9 flex items-center justify-center rounded-lg bg-[var(--background)] border border-[var(--borders)] text-[var(--text-muted)] cursor-not-allowed opacity-50">
+                            <i class="bi bi-chevron-right"></i>
+                        </span>
+                    {% endif %}
+                </li>
+            </ul>
+        </nav>
+        <span class="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        </span>
+    </div>
+    {% endif %}
+
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function setQuickFilter(key, value) {
+    const form = document.getElementById('searchFilterForm');
+    if (key === 'category') {
+        const catSelect = form.querySelector('select[name="category"]');
+        catSelect.value = value;
+    } else if (key === 'search') {
+        const searchInput = document.getElementById('searchInput');
+        searchInput.value = value;
+    }
+    form.submit();
+}
+</script>
 {% endblock %}

@@ -5,11 +5,17 @@ from django.contrib.auth.models import User
 
 class Skill(models.Model):
     name = models.CharField(max_length=100)
-
     description = models.TextField()
-
-    passing_score = models.IntegerField(
-        default=70
+    passing_score = models.IntegerField(default=70)
+    category = models.CharField(max_length=100, default='Programming Languages')
+    difficulty = models.CharField(
+        max_length=20,
+        choices=[
+            ("Easy", "Easy"),
+            ("Medium", "Medium"),
+            ("Hard", "Hard"),
+        ],
+        default="Medium"
     )
 
     def __str__(self):

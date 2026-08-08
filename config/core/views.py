@@ -29,7 +29,7 @@ def home(request):
 @login_required
 def dashboard(request):
 
-    skills = Skill.objects.all()
+    skills = Skill.objects.all()[:6]
 
     assessments = Assessment.objects.filter(
         user=request.user
@@ -52,18 +52,159 @@ def dashboard(request):
     )
 
 
-@login_required
+from django.db.models import Q
+from django.core.paginator import Paginator
+
+ICON_MAPPING = {
+    'html': 'bi-filetype-html text-orange-500',
+    'css': 'bi-filetype-css text-blue-500',
+    'javascript': 'bi-filetype-js text-yellow-500',
+    'js': 'bi-filetype-js text-yellow-500',
+    'typescript': 'bi-filetype-tsx text-blue-400',
+    'python': 'bi-filetype-py text-blue-500',
+    'django': 'bi-terminal-fill text-green-600',
+    'react': 'bi-filetype-jsx text-cyan-400',
+    'node': 'bi-box-seam-fill text-green-500',
+    'docker': 'bi-box-fill text-blue-400',
+    'git': 'bi-git text-orange-600',
+    'aws': 'bi-cloud-fill text-orange-400',
+    'ethereum': 'bi-database-fill-gear text-purple-400',
+    'solidity': 'bi-safe-fill text-purple-500',
+    'mongodb': 'bi-database-fill text-green-500',
+    'postgresql': 'bi-database-fill text-blue-600',
+    'postgres': 'bi-database-fill text-blue-600',
+    'tenser': 'bi-cpu-fill text-red-500',
+    'tensor': 'bi-cpu-fill text-red-500',
+    'machine learning': 'bi-brain text-purple-400',
+    'cybersecurity': 'bi-shield-lock-fill text-red-500',
+    'security': 'bi-shield-lock-fill text-red-500',
+}
+
+def get_skill_icon(skill):
+    name_lower = skill.name.lower()
+    for key, val in ICON_MAPPING.items():
+        if key in name_lower:
+            return val
+    category = skill.category
+    if category == 'Frontend':
+        return 'bi-display text-blue-400'
+    elif category == 'Backend':
+        return 'bi-server text-indigo-400'
+    elif category == 'Database':
+        return 'bi-database text-cyan-400'
+    elif category == 'AI':
+        return 'bi-cpu text-purple-400'
+    elif category == 'Blockchain':
+        return 'bi-box text-pink-400'
+    elif category == 'Cloud':
+        return 'bi-cloud text-blue-400'
+    elif category == 'Cybersecurity':
+        return 'bi-shield-check text-red-400'
+    return 'bi-terminal text-slate-400'
+
 def skill_list(request):
+    search_query = request.GET.get('search', '').strip()
+    category_filter = request.GET.get('category', '').strip()
+    difficulty_filter = request.GET.get('difficulty', '').strip()
+    status_filter = request.GET.get('status', '').strip()
+    sort_by = request.GET.get('sort', '').strip()
 
     skills = Skill.objects.all()
 
-    return render(
-        request,
-        "core/skills.html",
-        {
-            "skills": skills
-        }
-    )
+    passed_skills_ids = set()
+    completed_skills_ids = set()
+    has_cert_skills_ids = set()
+
+    if request.user.is_authenticated:
+        assessments = Assessment.objects.filter(user=request.user)
+        completed_assessments = assessments.filter(completed_at__isnull=False)
+        completed_skills_ids = set(completed_assessments.values_list('skill_id', flat=True))
+        passed_skills_ids = set(completed_assessments.filter(passed=True).values_list('skill_id', flat=True))
+        
+        certs = Certificate.objects.filter(user=request.user)
+        has_cert_skills_ids = set(certs.values_list('skill_id', flat=True))
+
+    if search_query:
+        skills = skills.filter(
+            Q(name__icontains=search_query) |
+            Q(description__icontains=search_query) |
+            Q(category__icontains=search_query)
+        )
+
+    if category_filter and category_filter != 'All':
+        skills = skills.filter(category__iexact=category_filter)
+
+    if difficulty_filter and difficulty_filter != 'All':
+        skills = skills.filter(difficulty__iexact=difficulty_filter)
+
+    if status_filter and status_filter != 'All' and request.user.is_authenticated:
+        if status_filter == 'completed':
+            skills = skills.filter(id__in=completed_skills_ids)
+        elif status_filter == 'passed':
+            skills = skills.filter(id__in=passed_skills_ids)
+        elif status_filter == 'not_completed':
+            skills = skills.exclude(id__in=completed_skills_ids)
+
+    if sort_by == 'az':
+        skills = skills.order_by('name')
+    elif sort_by == 'za':
+        skills = skills.order_by('-name')
+    elif sort_by == 'score_low':
+        skills = skills.order_by('passing_score')
+    elif sort_by == 'score_high':
+        skills = skills.order_by('-passing_score')
+    elif sort_by == 'newest':
+        skills = skills.order_by('-id')
+    elif sort_by == 'oldest':
+        skills = skills.order_by('id')
+
+    annotated_skills = []
+    for skill in skills:
+        status = 'not_completed'
+        if skill.id in passed_skills_ids:
+            status = 'passed'
+        elif skill.id in completed_skills_ids:
+            status = 'completed'
+            
+        annotated_skills.append({
+            'obj': skill,
+            'id': skill.id,
+            'name': skill.name,
+            'description': skill.description,
+            'passing_score': skill.passing_score,
+            'category': skill.category,
+            'difficulty': skill.difficulty,
+            'status': status,
+            'has_certificate': skill.id in has_cert_skills_ids,
+            'icon': get_skill_icon(skill)
+        })
+
+    stats = {
+        'total_skills': Skill.objects.count(),
+        'completed_skills': len(completed_skills_ids),
+        'available_certs': len(has_cert_skills_ids),
+        'total_assessments': Assessment.objects.count()
+    }
+
+    per_page = 12
+    paginator = Paginator(annotated_skills, per_page)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+
+    categories = ['Frontend', 'Backend', 'AI', 'Blockchain', 'Cloud', 'Cybersecurity', 'Database', 'Programming Languages']
+
+    context = {
+        'page_obj': page_obj,
+        'search_query': search_query,
+        'category_filter': category_filter,
+        'difficulty_filter': difficulty_filter,
+        'status_filter': status_filter,
+        'sort_by': sort_by,
+        'stats': stats,
+        'categories': categories,
+    }
+
+    return render(request, "core/skills.html", context)
 
 
 @login_required
@@ -238,13 +379,15 @@ def assessment_question(
         ).first()
 
         if not existing_submission:
-
             Submission.objects.create(
                 assessment=assessment,
                 user=request.user,
                 task=task,
                 answer=answer
             )
+        else:
+            existing_submission.answer = answer
+            existing_submission.save()
 
         # Go to next question
         if question_number < 5:
@@ -261,6 +404,11 @@ def assessment_question(
             assessment_id=assessment.id
         )
 
+    existing_submission = Submission.objects.filter(
+        assessment=assessment,
+        task=task
+    ).first()
+
     return render(
         request,
         "core/assessment_question.html",
@@ -269,7 +417,8 @@ def assessment_question(
             "task": task,
             "question_number": question_number,
             "total_questions": 5,
-            "estimated_time": estimated_time
+            "estimated_time": estimated_time,
+            "existing_answer": existing_submission.answer if existing_submission else ""
         }
     )
 

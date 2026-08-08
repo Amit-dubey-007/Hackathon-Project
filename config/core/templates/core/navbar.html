@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand-lg glass-navbar sticky-top py-3">
     <div class="container">
         <!-- Brand / Logo -->
-        <a class="navbar-brand d-flex align-items-center fw-bold text-dark gap-2" href="{% url 'dashboard' %}">
+        <a class="navbar-brand d-flex align-items-center fw-bold text-theme-main gap-2" href="{% url 'dashboard' %}">
             <div class="bg-primary text-white rounded d-flex align-items-center justify-content-center shadow-sm" style="width: 36px; height: 36px;">
                 <i class="bi bi-layers-half fs-5"></i>
             </div>
@@ -10,38 +10,43 @@
 
         <!-- Mobile Toggle -->
         <button class="navbar-toggler border-0 shadow-none px-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
-            <i class="bi bi-list fs-1 text-dark"></i>
+            <i class="bi bi-list fs-1 text-theme-main"></i>
         </button>
 
         <!-- Navbar Links -->
         <div class="collapse navbar-collapse" id="mainNavbar">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 fw-medium ms-lg-4">
                 <li class="nav-item">
-                    <a class="nav-link px-3 text-dark hover-text-primary" href="{% url 'dashboard' %}">Dashboard</a>
+                    <a class="nav-link px-3 text-theme-main hover-text-primary" href="{% url 'dashboard' %}">Dashboard</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link px-3 text-dark hover-text-primary" href="{% url 'skill_list' %}">Skills Catalog</a>
+                    <a class="nav-link px-3 text-theme-main hover-text-primary" href="{% url 'skill_list' %}">Skills Catalog</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link px-3 text-dark hover-text-primary" href="{% url 'wallet_guide' %}">Wallet Guide</a>
+                    <a class="nav-link px-3 text-theme-main hover-text-primary" href="{% url 'wallet_guide' %}">Wallet Guide</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link px-3 text-dark hover-text-primary" href="{% url 'about' %}">About</a>
+                    <a class="nav-link px-3 text-theme-main hover-text-primary" href="{% url 'about' %}">About</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link px-3 text-dark hover-text-primary" href="{% url 'contact' %}">Contact</a>
+                    <a class="nav-link px-3 text-theme-main hover-text-primary" href="{% url 'contact' %}">Contact</a>
                 </li>
             </ul>
             
             <!-- User Menu -->
-            <div class="d-flex align-items-center mt-3 mt-lg-0">
+            <div class="d-flex align-items-center mt-3 mt-lg-0 gap-3">
+                <!-- Global Theme Toggle -->
+                <button id="themeToggleBtn" class="btn-theme-toggle" aria-label="Toggle Theme">
+                    <i id="themeToggleIcon" class="bi bi-moon-stars fs-5"></i>
+                </button>
+
                 {% if request.user.is_authenticated %}
                 <div class="dropdown">
                     <button class="btn btn-light dropdown-toggle rounded-pill px-3 py-2 border-subtle d-flex align-items-center gap-2 shadow-sm bg-white hover-lift" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 28px; height: 28px; font-size: 13px;">
                             {{ request.user.username|make_list|first|upper }}
                         </div>
-                        <span class="fw-medium text-dark">{{ request.user.username }}</span>
+                        <span class="fw-medium text-theme-main">{{ request.user.username }}</span>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end shadow border-subtle rounded-xl mt-2 py-2">
                         <li>
@@ -62,3 +67,35 @@
         </div>
     </div>
 </nav>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    const themeToggleIcon = document.getElementById('themeToggleIcon');
+    
+    function updateToggler(theme) {
+        if (theme === 'dark') {
+            themeToggleIcon.className = 'bi bi-sun-fill text-warning fs-5';
+        } else {
+            themeToggleIcon.className = 'bi bi-moon-stars fs-5';
+        }
+    }
+    
+    const currentTheme = localStorage.getItem('theme') || 'dark';
+    updateToggler(currentTheme);
+    
+    themeToggleBtn.addEventListener('click', function() {
+        const theme = localStorage.getItem('theme') || 'dark';
+        const newTheme = theme === 'dark' ? 'light' : 'dark';
+        
+        localStorage.setItem('theme', newTheme);
+        document.documentElement.setAttribute('data-bs-theme', newTheme);
+        if (newTheme === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        updateToggler(newTheme);
+    });
+});
+</script>

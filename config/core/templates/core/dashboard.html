@@ -7,7 +7,7 @@
     <div class="col-12">
         <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
             <div>
-                <h1 class="h2 mb-1 fw-bold text-dark">Welcome back, {{ request.user.username }}! 👋</h1>
+                <h1 class="h2 mb-1 fw-bold">Welcome back, {{ request.user.username }}! 👋</h1>
                 <p class="text-muted mb-0 fs-5">Here's an overview of your skills and assessments.</p>
             </div>
             <a href="{% url 'skill_list' %}" class="btn btn-primary rounded-pill px-4 py-2 d-flex align-items-center gap-2 shadow-sm">
@@ -29,27 +29,25 @@
                 {% if assessments %}
                     <div class="list-group list-group-flush rounded-2xl">
                         {% for assessment in assessments %}
+                        {% if assessment.completed_at %}
                         <div class="list-group-item list-group-item-action p-4 border-subtle">
                             <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                                 <div>
-                                    <h5 class="mb-1 fw-bold text-dark">{{ assessment.skill.name }}</h5>
+                                    <h5 class="mb-1 fw-bold">{{ assessment.skill.name }}</h5>
                                     <div class="d-flex align-items-center gap-3 mt-2">
-                                        {% if assessment.completed_at %}
-                                            <span class="badge {% if assessment.passed %}badge-success{% else %}badge-danger{% endif %} fw-semibold">
-                                                {% if assessment.passed %}
-                                                    <i class="bi bi-check-circle-fill me-1"></i> Passed
-                                                {% else %}
-                                                    <i class="bi bi-x-circle-fill me-1"></i> Failed
-                                                {% endif %}
-                                            </span>
-                                            <span class="text-muted small fw-medium">
-                                                <i class="bi bi-star-fill text-warning me-1"></i> Score: {{ assessment.score }}/100
-                                            </span>
-                                        {% else %}
-                                            <span class="badge badge-warning fw-semibold">
-                                                <i class="bi bi-hourglass-split me-1"></i> In Progress
-                                            </span>
-                                        {% endif %}
+                            
+                                        <span class="badge {% if assessment.passed %}badge-success{% else %}badge-danger{% endif %} fw-semibold">
+                                            {% if assessment.passed %}
+                                                <i class="bi bi-check-circle-fill me-1"></i> Passed
+                                            {% else %}
+                                                <i class="bi bi-x-circle-fill me-1"></i> Failed
+                                            {% endif %}
+                                        </span>
+                                        <span class="text-muted small fw-medium">
+                                            <i class="bi bi-star-fill text-warning me-1"></i> Score: {{ assessment.score }}/100
+                                        </span>
+    
+                                        
                                     </div>
                                 </div>
                                 {% if not assessment.completed_at %}
@@ -57,6 +55,7 @@
                                 {% endif %}
                             </div>
                         </div>
+                        {% endif %}
                         {% endfor %}
                     </div>
                 {% else %}
@@ -64,7 +63,7 @@
                         <div class="mb-3 d-inline-flex bg-light rounded-circle p-4">
                             <i class="bi bi-journal-x fs-1 text-secondary opacity-50"></i>
                         </div>
-                        <p class="mb-0 fw-medium fs-5 text-dark">You haven't taken any assessments yet.</p>
+                        <p class="mb-0 fw-medium fs-5">You haven't taken any assessments yet.</p>
                         <p class="small">Start an assessment to test your knowledge.</p>
                         <a href="{% url 'skill_list' %}" class="btn btn-outline-primary mt-3 rounded-pill px-4 fw-medium">Explore Skills</a>
                     </div>
@@ -90,7 +89,7 @@
                                     <i class="bi bi-patch-check-fill fs-4"></i>
                                 </div>
                                 <div>
-                                    <h6 class="mb-1 fw-bold text-dark">{{ certificate.skill.name }}</h6>
+                                    <h6 class="mb-1 fw-bold">{{ certificate.skill.name }}</h6>
                                     <p class="mb-0 text-muted small fw-medium d-flex align-items-center gap-1">
                                         <i class="bi bi-calendar-event"></i> Issued {{ certificate.issued_at }}
                                     </p>
@@ -104,7 +103,7 @@
                         <div class="mb-3">
                             <i class="bi bi-shield-x fs-1 text-secondary opacity-50"></i>
                         </div>
-                        <p class="mb-0 fw-medium text-dark">No certificates yet.</p>
+                        <p class="mb-0 fw-medium">No certificates yet.</p>
                         <p class="small mb-0">Pass an assessment to earn one.</p>
                     </div>
                 {% endif %}
@@ -132,7 +131,7 @@
                             </div>
                             <span class="badge badge-secondary fw-semibold rounded-pill">Passing: {{ skill.passing_score }}%</span>
                         </div>
-                        <h5 class="card-title fw-bold text-dark mb-2">{{ skill.name }}</h5>
+                        <h5 class="card-title fw-bold mb-2">{{ skill.name }}</h5>
                         <p class="card-text text-muted small flex-grow-1">{{ skill.description }}</p>
                         <a href="{% url 'skill_detail' skill.id %}" class="btn btn-outline-secondary btn-sm rounded-pill mt-4 fw-medium w-100 py-2">View Skill</a>
                     </div>
@@ -149,5 +148,13 @@
             </div>
         {% endif %}
     </div>
+
+    {% if skills %}
+    <div class="text-center mt-5">
+        <a href="{% url 'skill_list' %}" class="btn btn-outline-primary rounded-pill px-5 py-2 fw-medium d-inline-flex align-items-center gap-2">
+            View Full Skills Catalog <i class="bi bi-arrow-right"></i>
+        </a>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}
