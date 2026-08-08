@@ -1,0 +1,340 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Web3 Wallet Guide{% endblock %}
+
+{% block extra_css %}
+<!-- Load Tailwind CSS via CDN without Preflight to avoid breaking Bootstrap -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    corePlugins: {
+      preflight: false,
+      visibility: false,
+    }
+  }
+</script>
+<style>
+    /* Dark Theme Override for this page */
+    body {
+        background-color: #0f172a !important;
+        color: #f1f5f9 !important;
+    }
+    .glass-card {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .gradient-text {
+        background: linear-gradient(to right, #a855f7, #ec4899);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    /* FAQ Accordion overrides for dark theme */
+    .dark-accordion .accordion-item {
+        background-color: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 1rem;
+        border-radius: 1rem !important;
+        overflow: hidden;
+    }
+    .dark-accordion .accordion-button {
+        background-color: rgba(30, 41, 59, 0.7);
+        color: #f1f5f9;
+        font-weight: 600;
+        box-shadow: none;
+    }
+    .dark-accordion .accordion-button:not(.collapsed) {
+        background-color: rgba(168, 85, 247, 0.1);
+        color: #c084fc;
+    }
+    .dark-accordion .accordion-button::after {
+        filter: invert(1) grayscale(100%) brightness(200%);
+    }
+    .dark-accordion .accordion-body {
+        background-color: rgba(15, 23, 42, 0.9);
+        color: #94a3b8;
+    }
+
+    .timeline-line::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 2rem;
+        width: 2px;
+        background: rgba(255, 255, 255, 0.1);
+        z-index: 0;
+    }
+    @media (min-width: 768px) {
+        .timeline-line::before {
+            left: 50%;
+            transform: translateX(-50%);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="font-sans antialiased pb-20 pt-10">
+
+    <!-- Hero -->
+    <div class="max-w-4xl mx-auto text-center mb-24 px-4">
+        <div class="inline-block px-4 py-2 rounded-full bg-purple-500/20 text-purple-400 font-bold text-sm mb-6 border border-purple-500/30">
+            Web3 Integration
+        </div>
+        <h1 class="text-4xl md:text-6xl font-extrabold mb-6 text-white tracking-tight">
+            Complete <span class="gradient-text">Wallet Guide</span>
+        </h1>
+        <p class="text-lg text-slate-400 leading-relaxed max-w-2xl mx-auto">
+            Everything you need to know about setting up MetaMask, connecting to the platform, and minting your skill assessment certificates as NFTs.
+        </p>
+    </div>
+
+    <!-- Why Connect Wallet -->
+    <section class="max-w-6xl mx-auto px-4 mb-32">
+        <h2 class="text-3xl font-bold text-white mb-10 text-center">Why Connect a Web3 Wallet?</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="glass-card p-6 rounded-2xl hover:bg-slate-800/50 transition-colors">
+                <i class="bi bi-gem text-4xl text-purple-400 mb-4 block"></i>
+                <h4 class="text-xl font-bold text-white mb-2">NFT Certificate</h4>
+                <p class="text-slate-400 text-sm">Your achievement is minted as a permanent, soulbound NFT token on the blockchain.</p>
+            </div>
+            <div class="glass-card p-6 rounded-2xl hover:bg-slate-800/50 transition-colors">
+                <i class="bi bi-patch-check text-4xl text-blue-400 mb-4 block"></i>
+                <h4 class="text-xl font-bold text-white mb-2">Blockchain Verification</h4>
+                <p class="text-slate-400 text-sm">Employers can cryptographically verify that you, and only you, earned this specific score.</p>
+            </div>
+            <div class="glass-card p-6 rounded-2xl hover:bg-slate-800/50 transition-colors">
+                <i class="bi bi-key text-4xl text-green-400 mb-4 block"></i>
+                <h4 class="text-xl font-bold text-white mb-2">True Ownership</h4>
+                <p class="text-slate-400 text-sm">You hold the private keys. The platform cannot revoke or alter your certificate once minted.</p>
+            </div>
+            <div class="glass-card p-6 rounded-2xl hover:bg-slate-800/50 transition-colors">
+                <i class="bi bi-cloud-download text-4xl text-cyan-400 mb-4 block"></i>
+                <h4 class="text-xl font-bold text-white mb-2">Downloadable Credential</h4>
+                <p class="text-slate-400 text-sm">Alongside the NFT, you get a beautiful PDF certificate with an embedded verification QR code.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Step-by-Step Guide -->
+    <section class="max-w-4xl mx-auto px-4 mb-32 relative">
+        <h2 class="text-3xl font-bold text-white mb-16 text-center">How to Mint Your Certificate</h2>
+        
+        <div class="timeline-line space-y-12 relative">
+            
+            <!-- Step 1 -->
+            <div class="relative flex flex-col md:flex-row items-center justify-between w-full z-10 group">
+                <div class="w-full md:w-5/12 text-left md:text-right mb-4 md:mb-0 pl-16 md:pl-0 md:pr-10">
+                    <h3 class="text-xl font-bold text-white mb-2">1. Install MetaMask</h3>
+                    <p class="text-slate-400 text-sm">Download the official MetaMask extension for Chrome, Firefox, or Brave.</p>
+                </div>
+                <div class="absolute left-4 md:left-1/2 -translate-x-1/2 w-10 h-10 bg-slate-900 border-4 border-slate-700 group-hover:border-purple-500 rounded-full flex items-center justify-center font-bold text-white transition-colors">1</div>
+                <div class="w-full md:w-5/12 hidden md:block pl-10"></div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="relative flex flex-col md:flex-row-reverse items-center justify-between w-full z-10 group">
+                <div class="w-full md:w-5/12 text-left mb-4 md:mb-0 pl-16 md:pl-10">
+                    <h3 class="text-xl font-bold text-white mb-2">2. Create Wallet</h3>
+                    <p class="text-slate-400 text-sm">Follow the setup instructions to create a new wallet and secure it with a strong password.</p>
+                </div>
+                <div class="absolute left-4 md:left-1/2 -translate-x-1/2 w-10 h-10 bg-slate-900 border-4 border-slate-700 group-hover:border-purple-500 rounded-full flex items-center justify-center font-bold text-white transition-colors">2</div>
+                <div class="w-full md:w-5/12 hidden md:block pr-10"></div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="relative flex flex-col md:flex-row items-center justify-between w-full z-10 group">
+                <div class="w-full md:w-5/12 text-left md:text-right mb-4 md:mb-0 pl-16 md:pl-0 md:pr-10">
+                    <h3 class="text-xl font-bold text-white mb-2">3. Backup Secret Phrase</h3>
+                    <p class="text-slate-400 text-sm">Write down your 12-word seed phrase on paper. Never share this with anyone, including us.</p>
+                </div>
+                <div class="absolute left-4 md:left-1/2 -translate-x-1/2 w-10 h-10 bg-slate-900 border-4 border-slate-700 group-hover:border-red-500 rounded-full flex items-center justify-center font-bold text-white transition-colors">3</div>
+                <div class="w-full md:w-5/12 hidden md:block pl-10"></div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="relative flex flex-col md:flex-row-reverse items-center justify-between w-full z-10 group">
+                <div class="w-full md:w-5/12 text-left mb-4 md:mb-0 pl-16 md:pl-10">
+                    <h3 class="text-xl font-bold text-white mb-2">4. Add Sepolia Network</h3>
+                    <p class="text-slate-400 text-sm">In MetaMask settings, enable 'Show test networks' and switch to the Sepolia test network.</p>
+                </div>
+                <div class="absolute left-4 md:left-1/2 -translate-x-1/2 w-10 h-10 bg-slate-900 border-4 border-slate-700 group-hover:border-purple-500 rounded-full flex items-center justify-center font-bold text-white transition-colors">4</div>
+                <div class="w-full md:w-5/12 hidden md:block pr-10"></div>
+            </div>
+
+            <!-- Step 5 -->
+            <div class="relative flex flex-col md:flex-row items-center justify-between w-full z-10 group">
+                <div class="w-full md:w-5/12 text-left md:text-right mb-4 md:mb-0 pl-16 md:pl-0 md:pr-10">
+                    <h3 class="text-xl font-bold text-white mb-2">5. Get Test ETH</h3>
+                    <p class="text-slate-400 text-sm">You need Sepolia ETH to pay for minting gas. Use a public faucet like Alchemy or Infura to get free test ETH.</p>
+                </div>
+                <div class="absolute left-4 md:left-1/2 -translate-x-1/2 w-10 h-10 bg-slate-900 border-4 border-slate-700 group-hover:border-cyan-500 rounded-full flex items-center justify-center font-bold text-white transition-colors">5</div>
+                <div class="w-full md:w-5/12 hidden md:block pl-10"></div>
+            </div>
+
+            <!-- Step 6 -->
+            <div class="relative flex flex-col md:flex-row-reverse items-center justify-between w-full z-10 group">
+                <div class="w-full md:w-5/12 text-left mb-4 md:mb-0 pl-16 md:pl-10">
+                    <h3 class="text-xl font-bold text-white mb-2">6. Connect Wallet</h3>
+                    <p class="text-slate-400 text-sm">Go to your Dashboard on our platform and click 'Connect MetaMask' to link your address.</p>
+                </div>
+                <div class="absolute left-4 md:left-1/2 -translate-x-1/2 w-10 h-10 bg-slate-900 border-4 border-slate-700 group-hover:border-purple-500 rounded-full flex items-center justify-center font-bold text-white transition-colors">6</div>
+                <div class="w-full md:w-5/12 hidden md:block pr-10"></div>
+            </div>
+
+            <!-- Step 7 -->
+            <div class="relative flex flex-col md:flex-row items-center justify-between w-full z-10 group">
+                <div class="w-full md:w-5/12 text-left md:text-right mb-4 md:mb-0 pl-16 md:pl-0 md:pr-10">
+                    <h3 class="text-xl font-bold text-white mb-2">7. Pass Assessment</h3>
+                    <p class="text-slate-400 text-sm">Take a practical AI skill assessment and score above the required threshold.</p>
+                </div>
+                <div class="absolute left-4 md:left-1/2 -translate-x-1/2 w-10 h-10 bg-slate-900 border-4 border-slate-700 group-hover:border-green-500 rounded-full flex items-center justify-center font-bold text-white transition-colors">7</div>
+                <div class="w-full md:w-5/12 hidden md:block pl-10"></div>
+            </div>
+
+            <!-- Step 8 -->
+            <div class="relative flex flex-col md:flex-row-reverse items-center justify-between w-full z-10 group">
+                <div class="w-full md:w-5/12 text-left mb-4 md:mb-0 pl-16 md:pl-10">
+                    <h3 class="text-xl font-bold text-white mb-2">8. Mint Certificate</h3>
+                    <p class="text-slate-400 text-sm">Click 'Mint NFT' on your results page. MetaMask will prompt you to confirm the transaction and pay gas.</p>
+                </div>
+                <div class="absolute left-4 md:left-1/2 -translate-x-1/2 w-10 h-10 bg-slate-900 border-4 border-slate-700 group-hover:border-purple-500 rounded-full flex items-center justify-center font-bold text-white transition-colors">8</div>
+                <div class="w-full md:w-5/12 hidden md:block pr-10"></div>
+            </div>
+
+            <!-- Step 9 -->
+            <div class="relative flex flex-col md:flex-row items-center justify-between w-full z-10 group">
+                <div class="w-full md:w-5/12 text-left md:text-right mb-4 md:mb-0 pl-16 md:pl-0 md:pr-10">
+                    <h3 class="text-xl font-bold text-white mb-2">9. View NFT</h3>
+                    <p class="text-slate-400 text-sm">Once confirmed, you can view your NFT on Sepolia Etherscan and download the PDF version.</p>
+                </div>
+                <div class="absolute left-4 md:left-1/2 -translate-x-1/2 w-10 h-10 bg-blue-600 border-4 border-slate-900 rounded-full flex items-center justify-center font-bold text-white shadow-[0_0_15px_rgba(37,99,235,0.6)]">9</div>
+                <div class="w-full md:w-5/12 hidden md:block pl-10"></div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Lower Section Grid -->
+    <div class="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-8 mb-24">
+        
+        <!-- Troubleshooting -->
+        <div class="lg:col-span-2">
+            <h2 class="text-2xl font-bold text-white mb-6">Troubleshooting</h2>
+            <div class="accordion dark-accordion" id="troubleshootingAccordion">
+                
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="ts-heading-1">
+                        <button class="accordion-button py-4" type="button" data-bs-toggle="collapse" data-bs-target="#ts-collapse-1" aria-expanded="true" aria-controls="ts-collapse-1">
+                            Wallet Not Detected
+                        </button>
+                    </h2>
+                    <div id="ts-collapse-1" class="accordion-collapse collapse show" aria-labelledby="ts-heading-1" data-bs-parent="#troubleshootingAccordion">
+                        <div class="accordion-body text-sm">
+                            Make sure the MetaMask extension is installed and unlocked. Try refreshing the page. If you are using Brave browser, ensure the default Web3 wallet is set to MetaMask or Brave Wallet.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="ts-heading-2">
+                        <button class="accordion-button collapsed py-4" type="button" data-bs-toggle="collapse" data-bs-target="#ts-collapse-2" aria-expanded="false" aria-controls="ts-collapse-2">
+                            Wrong Network Error
+                        </button>
+                    </h2>
+                    <div id="ts-collapse-2" class="accordion-collapse collapse" aria-labelledby="ts-heading-2" data-bs-parent="#troubleshootingAccordion">
+                        <div class="accordion-body text-sm">
+                            Our smart contracts are deployed on Sepolia. Open MetaMask, click the network dropdown at the top, toggle "Show test networks", and select Sepolia.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="ts-heading-3">
+                        <button class="accordion-button collapsed py-4" type="button" data-bs-toggle="collapse" data-bs-target="#ts-collapse-3" aria-expanded="false" aria-controls="ts-collapse-3">
+                            Insufficient Funds (No ETH)
+                        </button>
+                    </h2>
+                    <div id="ts-collapse-3" class="accordion-collapse collapse" aria-labelledby="ts-heading-3" data-bs-parent="#troubleshootingAccordion">
+                        <div class="accordion-body text-sm">
+                            Minting requires a tiny amount of ETH to pay the network gas fee. You can get free Sepolia ETH from the official Sepolia Faucet or Alchemy Faucet.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="ts-heading-4">
+                        <button class="accordion-button collapsed py-4" type="button" data-bs-toggle="collapse" data-bs-target="#ts-collapse-4" aria-expanded="false" aria-controls="ts-collapse-4">
+                            Transaction Failed / Pending
+                        </button>
+                    </h2>
+                    <div id="ts-collapse-4" class="accordion-collapse collapse" aria-labelledby="ts-heading-4" data-bs-parent="#troubleshootingAccordion">
+                        <div class="accordion-body text-sm">
+                            If your transaction is pending for more than 5 minutes, you can speed it up in MetaMask by increasing the gas fee. If it failed, check Etherscan for the revert reason (usually out of gas).
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security & Wallets -->
+        <div class="space-y-8">
+            <div>
+                <h2 class="text-2xl font-bold text-white mb-6">Security Tips</h2>
+                <div class="glass-card p-6 rounded-2xl space-y-4">
+                    <div class="flex items-start gap-3">
+                        <i class="bi bi-shield-exclamation text-red-500 mt-1"></i>
+                        <p class="text-sm text-slate-300"><strong>Never share your seed phrase.</strong> Support will never ask for it.</p>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <i class="bi bi-shield-check text-green-500 mt-1"></i>
+                        <p class="text-sm text-slate-300"><strong>Verify URLs.</strong> Always ensure you are on the correct domain before connecting.</p>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <i class="bi bi-patch-check text-blue-500 mt-1"></i>
+                        <p class="text-sm text-slate-300"><strong>Use official wallets.</strong> Only download MetaMask from metamask.io.</p>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <i class="bi bi-x-octagon text-orange-500 mt-1"></i>
+                        <p class="text-sm text-slate-300"><strong>Don't approve unknown contracts.</strong> Read transactions carefully before signing.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h2 class="text-2xl font-bold text-white mb-6">Supported Wallets</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-slate-800/80 p-4 rounded-xl text-center border border-slate-700">
+                        <div class="text-orange-500 font-bold mb-1"><i class="bi bi-box-fill"></i></div>
+                        <span class="text-sm text-white">MetaMask</span>
+                    </div>
+                    <div class="bg-slate-800/80 p-4 rounded-xl text-center border border-slate-700">
+                        <div class="text-blue-500 font-bold mb-1"><i class="bi bi-wallet-fill"></i></div>
+                        <span class="text-sm text-white">Rabby</span>
+                    </div>
+                    <div class="bg-slate-800/80 p-4 rounded-xl text-center border border-slate-700">
+                        <div class="text-cyan-500 font-bold mb-1"><i class="bi bi-circle-fill"></i></div>
+                        <span class="text-sm text-white">Coinbase</span>
+                    </div>
+                    <div class="bg-slate-800/80 p-4 rounded-xl text-center border border-slate-700">
+                        <div class="text-red-500 font-bold mb-1"><i class="bi bi-browser-chrome"></i></div>
+                        <span class="text-sm text-white">Brave</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- CTA -->
+    <div class="text-center pb-10">
+        <a href="{% url 'dashboard' %}" class="inline-flex px-10 py-5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-lg rounded-full transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(37,99,235,0.4)] items-center gap-3">
+            Go to Dashboard <i class="bi bi-arrow-right"></i>
+        </a>
+    </div>
+
+</div>
+{% endblock %}

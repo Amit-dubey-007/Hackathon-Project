@@ -740,3 +740,28 @@ def loading_questions_view(request, skill_id):
 def loading_evaluation_view(request, assessment_id):
     assessment = get_object_or_404(Assessment, id=assessment_id, user=request.user)
     return render(request, "core/loading_evaluation.html", {"assessment": assessment})
+
+def about(request):
+    return render(request, "core/about.html")
+
+import json
+from django.http import JsonResponse
+from .models import ContactMessage
+
+def contact(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            ContactMessage.objects.create(
+                name=data.get('name', ''),
+                email=data.get('email', ''),
+                subject=data.get('subject', ''),
+                message=data.get('message', '')
+            )
+            return JsonResponse({"status": "success"})
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=400)
+    return render(request, "core/contact.html")
+
+def wallet_guide(request):
+    return render(request, "core/wallet_guide.html")

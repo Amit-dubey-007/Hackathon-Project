@@ -1,0 +1,395 @@
+{% extends 'core/base.html' %}
+
+{% block title %}About Us{% endblock %}
+
+{% block extra_css %}
+<!-- Load Tailwind CSS via CDN without Preflight to avoid breaking Bootstrap -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    corePlugins: {
+      preflight: false,
+      visibility: false,
+    },
+    theme: {
+      extend: {
+        colors: {
+          darkBg: '#0f172a',
+          darkCard: '#1e293b',
+          primaryAccent: '#3b82f6',
+          cyanAccent: '#06b6d4',
+        }
+      }
+    }
+  }
+</script>
+<style>
+    /* Dark Theme Override for this page */
+    body {
+        background-color: #0f172a !important;
+        color: #f1f5f9 !important;
+    }
+    .glass-card {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .gradient-text {
+        background: linear-gradient(to right, #60a5fa, #22d3ee);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .hover-glow:hover {
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="font-sans antialiased pb-20">
+    
+    <!-- 1. Hero Section -->
+    <section class="relative pt-20 pb-32 overflow-hidden text-center">
+        <!-- Animated Background Gradients -->
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-5xl z-0 pointer-events-none opacity-30">
+            <div class="absolute top-20 left-20 w-72 h-72 bg-blue-600 rounded-full mix-blend-screen filter blur-3xl animate-pulse"></div>
+            <div class="absolute top-40 right-20 w-72 h-72 bg-cyan-500 rounded-full mix-blend-screen filter blur-3xl animate-pulse" style="animation-delay: 2s;"></div>
+        </div>
+
+        <div class="relative z-10 max-w-4xl mx-auto px-4">
+            <h1 class="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight text-white">
+                AI Powered <br />
+                <span class="gradient-text">Skill Assessment Platform</span>
+            </h1>
+            <p class="text-lg md:text-xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
+                Prove your technical abilities through realistic, long-form practical tasks evaluated by advanced AI. Secure your achievements on the blockchain with immutable NFT certificates.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="{% url 'skill_list' %}" class="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-full transition-all hover-glow shadow-lg flex items-center justify-center gap-2">
+                    <i class="bi bi-rocket-takeoff"></i> View Skills
+                </a>
+                <a href="{% url 'wallet_guide' %}" class="px-8 py-4 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-full border border-slate-700 transition-all flex items-center justify-center gap-2">
+                    <i class="bi bi-wallet2"></i> Wallet Guide
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. Statistics -->
+    <section class="max-w-6xl mx-auto px-4 -mt-16 relative z-20 mb-24">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div class="glass-card p-8 rounded-3xl text-center transform hover:-translate-y-2 transition-transform duration-300">
+                <div class="text-4xl md:text-5xl font-black text-white mb-2">50+</div>
+                <div class="text-sm font-semibold tracking-wider text-slate-400 uppercase">Skills Available</div>
+            </div>
+            <div class="glass-card p-8 rounded-3xl text-center transform hover:-translate-y-2 transition-transform duration-300" style="transition-delay: 100ms;">
+                <div class="text-4xl md:text-5xl font-black text-white mb-2">10k+</div>
+                <div class="text-sm font-semibold tracking-wider text-slate-400 uppercase">Assessments</div>
+            </div>
+            <div class="glass-card p-8 rounded-3xl text-center transform hover:-translate-y-2 transition-transform duration-300" style="transition-delay: 200ms;">
+                <div class="text-4xl md:text-5xl font-black text-white mb-2">100%</div>
+                <div class="text-sm font-semibold tracking-wider text-blue-400 uppercase">AI Powered</div>
+            </div>
+            <div class="glass-card p-8 rounded-3xl text-center transform hover:-translate-y-2 transition-transform duration-300" style="transition-delay: 300ms;">
+                <div class="text-4xl md:text-5xl font-black text-white mb-2">Web3</div>
+                <div class="text-sm font-semibold tracking-wider text-cyan-400 uppercase">Blockchain Verified</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Mission -->
+    <section class="max-w-4xl mx-auto px-4 mb-32 text-center">
+        <h2 class="text-3xl md:text-4xl font-bold mb-8 text-white">Our Mission</h2>
+        <p class="text-lg text-slate-300 leading-relaxed mb-6">
+            We believe that technical hiring and skill verification should be fair, practical, and transparent. Traditional multiple-choice tests fail to measure real-world engineering capability.
+        </p>
+        <p class="text-lg text-slate-300 leading-relaxed">
+            By combining advanced AI evaluation with realistic coding environments and immutable blockchain credentials, we empower developers to showcase their true potential while giving employers cryptographically verifiable proof of those skills.
+        </p>
+    </section>
+
+    <!-- 4. How It Works -->
+    <section class="max-w-5xl mx-auto px-4 mb-32">
+        <h2 class="text-3xl md:text-4xl font-bold mb-16 text-center text-white">How It Works</h2>
+        <div class="relative">
+            <!-- Connecting Line -->
+            <div class="hidden md:block absolute left-1/2 top-0 bottom-0 w-1 bg-slate-800 -translate-x-1/2 rounded-full"></div>
+            
+            <div class="space-y-12">
+                <!-- Step 1 -->
+                <div class="flex flex-col md:flex-row items-center justify-between w-full">
+                    <div class="w-full md:w-5/12 text-center md:text-right mb-4 md:mb-0 pr-0 md:pr-8">
+                        <h3 class="text-2xl font-bold text-white mb-2">1. Choose a Skill</h3>
+                        <p class="text-slate-400">Select from our catalog of over 50 technical skills covering frontend, backend, cloud, and AI.</p>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center font-bold text-xl z-10 shadow-[0_0_15px_rgba(37,99,235,0.6)]">1</div>
+                    <div class="w-full md:w-5/12 hidden md:block pl-8"></div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="flex flex-col md:flex-row-reverse items-center justify-between w-full">
+                    <div class="w-full md:w-5/12 text-center md:text-left mb-4 md:mb-0 pl-0 md:pl-8">
+                        <h3 class="text-2xl font-bold text-white mb-2">2. Generate AI Assessment</h3>
+                        <p class="text-slate-400">Gemini AI generates a unique, un-cheatable set of 5 practical challenges tailored to the skill.</p>
+                    </div>
+                    <div class="w-12 h-12 bg-slate-800 border-2 border-blue-500 rounded-full flex items-center justify-center font-bold text-xl z-10">2</div>
+                    <div class="w-full md:w-5/12 hidden md:block pr-8"></div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="flex flex-col md:flex-row items-center justify-between w-full">
+                    <div class="w-full md:w-5/12 text-center md:text-right mb-4 md:mb-0 pr-0 md:pr-8">
+                        <h3 class="text-2xl font-bold text-white mb-2">3. Complete Practical Tasks</h3>
+                        <p class="text-slate-400">Write real code, architecture designs, or technical explanations in our long-form editor.</p>
+                    </div>
+                    <div class="w-12 h-12 bg-slate-800 border-2 border-blue-500 rounded-full flex items-center justify-center font-bold text-xl z-10">3</div>
+                    <div class="w-full md:w-5/12 hidden md:block pl-8"></div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="flex flex-col md:flex-row-reverse items-center justify-between w-full">
+                    <div class="w-full md:w-5/12 text-center md:text-left mb-4 md:mb-0 pl-0 md:pl-8">
+                        <h3 class="text-2xl font-bold text-white mb-2">4. AI Evaluation</h3>
+                        <p class="text-slate-400">Our AI acts as a Senior Engineer, batch-evaluating your entire assessment for correctness, logic, and best practices.</p>
+                    </div>
+                    <div class="w-12 h-12 bg-slate-800 border-2 border-cyan-500 rounded-full flex items-center justify-center font-bold text-xl z-10">4</div>
+                    <div class="w-full md:w-5/12 hidden md:block pr-8"></div>
+                </div>
+
+                <!-- Step 5 -->
+                <div class="flex flex-col md:flex-row items-center justify-between w-full">
+                    <div class="w-full md:w-5/12 text-center md:text-right mb-4 md:mb-0 pr-0 md:pr-8">
+                        <h3 class="text-2xl font-bold text-white mb-2">5. Certificate Generation</h3>
+                        <p class="text-slate-400">Pass the assessment and receive a beautifully designed, downloadable PDF certificate.</p>
+                    </div>
+                    <div class="w-12 h-12 bg-slate-800 border-2 border-cyan-500 rounded-full flex items-center justify-center font-bold text-xl z-10">5</div>
+                    <div class="w-full md:w-5/12 hidden md:block pl-8"></div>
+                </div>
+
+                <!-- Step 6 -->
+                <div class="flex flex-col md:flex-row-reverse items-center justify-between w-full">
+                    <div class="w-full md:w-5/12 text-center md:text-left mb-4 md:mb-0 pl-0 md:pl-8">
+                        <h3 class="text-2xl font-bold text-white mb-2">6. Blockchain Minting</h3>
+                        <p class="text-slate-400">Connect MetaMask and mint your certificate directly to the Sepolia Ethereum testnet as an NFT.</p>
+                    </div>
+                    <div class="w-12 h-12 bg-slate-800 border-2 border-purple-500 rounded-full flex items-center justify-center font-bold text-xl z-10">6</div>
+                    <div class="w-full md:w-5/12 hidden md:block pr-8"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. Features Grid -->
+    <section class="max-w-6xl mx-auto px-4 mb-32">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Platform Features</h2>
+            <p class="text-slate-400">Built for scale, security, and developer experience.</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="glass-card p-6 rounded-2xl hover:bg-slate-800/50 transition-colors">
+                <i class="bi bi-robot text-4xl text-blue-400 mb-4 block"></i>
+                <h4 class="text-xl font-bold text-white mb-2">AI Generation</h4>
+                <p class="text-slate-400 text-sm">Dynamic, unique tasks generated on-the-fly preventing answer sharing.</p>
+            </div>
+            <div class="glass-card p-6 rounded-2xl hover:bg-slate-800/50 transition-colors">
+                <i class="bi bi-cpu text-4xl text-cyan-400 mb-4 block"></i>
+                <h4 class="text-xl font-bold text-white mb-2">AI Evaluation</h4>
+                <p class="text-slate-400 text-sm">Deep analysis of logic, best practices, and edge cases, not just correct output.</p>
+            </div>
+            <div class="glass-card p-6 rounded-2xl hover:bg-slate-800/50 transition-colors">
+                <i class="bi bi-shield-check text-4xl text-green-400 mb-4 block"></i>
+                <h4 class="text-xl font-bold text-white mb-2">Anti-Cheating</h4>
+                <p class="text-slate-400 text-sm">Custom generated questions and AI semantic analysis prevent traditional plagiarism.</p>
+            </div>
+            <div class="glass-card p-6 rounded-2xl hover:bg-slate-800/50 transition-colors">
+                <i class="bi bi-boxes text-4xl text-purple-400 mb-4 block"></i>
+                <h4 class="text-xl font-bold text-white mb-2">Blockchain Certs</h4>
+                <p class="text-slate-400 text-sm">Cryptographically secure, tamper-proof proof of skill on Ethereum.</p>
+            </div>
+            <div class="glass-card p-6 rounded-2xl hover:bg-slate-800/50 transition-colors">
+                <i class="bi bi-qr-code text-4xl text-pink-400 mb-4 block"></i>
+                <h4 class="text-xl font-bold text-white mb-2">QR Verification</h4>
+                <p class="text-slate-400 text-sm">Instant mobile scanning to verify the authenticity of a printed certificate.</p>
+            </div>
+            <div class="glass-card p-6 rounded-2xl hover:bg-slate-800/50 transition-colors">
+                <i class="bi bi-hexagon text-4xl text-orange-400 mb-4 block"></i>
+                <h4 class="text-xl font-bold text-white mb-2">NFT Minting</h4>
+                <p class="text-slate-400 text-sm">Own your credential in your Web3 wallet and display it across the metaverse.</p>
+            </div>
+            <div class="glass-card p-6 rounded-2xl hover:bg-slate-800/50 transition-colors">
+                <i class="bi bi-building-check text-4xl text-teal-400 mb-4 block"></i>
+                <h4 class="text-xl font-bold text-white mb-2">Employer Proof</h4>
+                <p class="text-slate-400 text-sm">Public verification links allow recruiters to verify your score instantly.</p>
+            </div>
+            <div class="glass-card p-6 rounded-2xl hover:bg-slate-800/50 transition-colors">
+                <i class="bi bi-graph-up-arrow text-4xl text-yellow-400 mb-4 block"></i>
+                <h4 class="text-xl font-bold text-white mb-2">Analytics</h4>
+                <p class="text-slate-400 text-sm">Get detailed breakdowns of your strengths and weaknesses to improve faster.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. Supported Skills -->
+    <section class="max-w-6xl mx-auto px-4 mb-32">
+        <h2 class="text-3xl md:text-4xl font-bold text-center text-white mb-12">Supported Skills</h2>
+        <div class="flex flex-wrap gap-4 justify-center">
+            <span class="px-6 py-3 rounded-full glass-card text-white font-medium border border-blue-500/30">Frontend</span>
+            <span class="px-6 py-3 rounded-full glass-card text-white font-medium border border-cyan-500/30">Backend</span>
+            <span class="px-6 py-3 rounded-full glass-card text-white font-medium border border-green-500/30">Database</span>
+            <span class="px-6 py-3 rounded-full glass-card text-white font-medium border border-purple-500/30">DevOps</span>
+            <span class="px-6 py-3 rounded-full glass-card text-white font-medium border border-pink-500/30">Cloud</span>
+            <span class="px-6 py-3 rounded-full glass-card text-white font-medium border border-red-500/30">Cybersecurity</span>
+            <span class="px-6 py-3 rounded-full glass-card text-white font-medium border border-yellow-500/30">Blockchain</span>
+            <span class="px-6 py-3 rounded-full glass-card text-white font-medium border border-indigo-500/30">AI & Machine Learning</span>
+            <span class="px-6 py-3 rounded-full glass-card text-white font-medium border border-teal-500/30">Programming Languages</span>
+        </div>
+    </section>
+
+    <!-- 7. Tech Stack & 8. Why Choose Us -->
+    <div class="bg-slate-900/50 py-20 border-y border-slate-800 mb-32">
+        <section class="max-w-6xl mx-auto px-4">
+            
+            <h2 class="text-3xl md:text-4xl font-bold text-center text-white mb-16">Technology Stack</h2>
+            <div class="flex flex-wrap justify-center gap-3 mb-32">
+                <span class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg text-sm font-mono border border-slate-700">Django</span>
+                <span class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg text-sm font-mono border border-slate-700">Python</span>
+                <span class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg text-sm font-mono border border-slate-700">TailwindCSS</span>
+                <span class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg text-sm font-mono border border-slate-700">JavaScript</span>
+                <span class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg text-sm font-mono border border-slate-700">Gemini AI</span>
+                <span class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg text-sm font-mono border border-slate-700">Web3.py</span>
+                <span class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg text-sm font-mono border border-slate-700">Solidity</span>
+                <span class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg text-sm font-mono border border-slate-700">Ethereum</span>
+                <span class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg text-sm font-mono border border-slate-700">MetaMask</span>
+                <span class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg text-sm font-mono border border-slate-700">PostgreSQL</span>
+                <span class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg text-sm font-mono border border-slate-700">Render</span>
+            </div>
+
+            <h2 class="text-3xl md:text-4xl font-bold text-center text-white mb-12">Why Choose Us</h2>
+            <div class="glass-card rounded-3xl overflow-hidden max-w-4xl mx-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-800/80">
+                            <th class="p-5 font-bold text-slate-300 w-1/3">Feature</th>
+                            <th class="p-5 font-bold text-slate-400 w-1/3">Traditional Certification</th>
+                            <th class="p-5 font-bold text-blue-400 w-1/3">AI Assessment Platform</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800">
+                        <tr>
+                            <td class="p-5 text-white font-medium">Question Format</td>
+                            <td class="p-5 text-slate-400">Multiple Choice</td>
+                            <td class="p-5 text-cyan-400 font-medium">Long-form Practical Coding</td>
+                        </tr>
+                        <tr>
+                            <td class="p-5 text-white font-medium">Evaluation Speed</td>
+                            <td class="p-5 text-slate-400">Days/Weeks (if human)</td>
+                            <td class="p-5 text-cyan-400 font-medium">Seconds (AI Batch Eval)</td>
+                        </tr>
+                        <tr>
+                            <td class="p-5 text-white font-medium">Credential Security</td>
+                            <td class="p-5 text-slate-400">PDFs (Easily forged)</td>
+                            <td class="p-5 text-cyan-400 font-medium">Blockchain NFTs</td>
+                        </tr>
+                        <tr>
+                            <td class="p-5 text-white font-medium">Uniqueness</td>
+                            <td class="p-5 text-slate-400">Static Question Banks</td>
+                            <td class="p-5 text-cyan-400 font-medium">100% Unique per user</td>
+                        </tr>
+                        <tr>
+                            <td class="p-5 text-white font-medium">Feedback Detail</td>
+                            <td class="p-5 text-slate-400">Pass/Fail Score</td>
+                            <td class="p-5 text-cyan-400 font-medium">In-depth strengths & weaknesses</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <!-- 9. Security & Trust -->
+    <section class="max-w-6xl mx-auto px-4 mb-32">
+        <h2 class="text-3xl md:text-4xl font-bold text-center text-white mb-12">Security & Trust</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="glass-card p-8 rounded-3xl text-center border-t-4 border-t-blue-500">
+                <i class="bi bi-shield-lock text-5xl text-blue-400 mb-6 block"></i>
+                <h4 class="text-xl font-bold text-white mb-3">Secure Authentication</h4>
+                <p class="text-slate-400">Industry-standard password hashing, CSRF protection, and session security powered by Django.</p>
+            </div>
+            <div class="glass-card p-8 rounded-3xl text-center border-t-4 border-t-green-500">
+                <i class="bi bi-link-45deg text-5xl text-green-400 mb-6 block"></i>
+                <h4 class="text-xl font-bold text-white mb-3">Blockchain Integrity</h4>
+                <p class="text-slate-400">Certificates are minted on the Ethereum testnet, ensuring they can never be altered or deleted.</p>
+            </div>
+            <div class="glass-card p-8 rounded-3xl text-center border-t-4 border-t-purple-500">
+                <i class="bi bi-wallet2 text-5xl text-purple-400 mb-6 block"></i>
+                <h4 class="text-xl font-bold text-white mb-3">Wallet Integration</h4>
+                <p class="text-slate-400">Self-custody of your credentials. You own the NFT in your Web3 wallet permanently.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 10. Roadmap -->
+    <section class="max-w-4xl mx-auto px-4 mb-32">
+        <h2 class="text-3xl md:text-4xl font-bold text-center text-white mb-12">Product Roadmap</h2>
+        <div class="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-700 before:to-transparent">
+            
+            <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-slate-900 bg-blue-500 text-slate-900 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
+                    <i class="bi bi-check font-bold text-xl text-white"></i>
+                </div>
+                <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] glass-card p-6 rounded-2xl">
+                    <h4 class="font-bold text-white text-lg mb-1">AI Batch Evaluation</h4>
+                    <p class="text-sm text-slate-400">Live</p>
+                </div>
+            </div>
+
+            <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
+                <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-slate-900 bg-slate-700 text-slate-400 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
+                    <i class="bi bi-circle-fill text-[8px]"></i>
+                </div>
+                <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] glass-card p-6 rounded-2xl border-dashed">
+                    <h4 class="font-bold text-white text-lg mb-1">AI Voice Interviews</h4>
+                    <p class="text-sm text-slate-400">Q4 2026</p>
+                </div>
+            </div>
+
+            <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
+                <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-slate-900 bg-slate-700 text-slate-400 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
+                    <i class="bi bi-circle-fill text-[8px]"></i>
+                </div>
+                <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] glass-card p-6 rounded-2xl border-dashed">
+                    <h4 class="font-bold text-white text-lg mb-1">Company Dashboard & Recruiter Portal</h4>
+                    <p class="text-sm text-slate-400">Q1 2027</p>
+                </div>
+            </div>
+
+            <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
+                <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-slate-900 bg-slate-700 text-slate-400 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
+                    <i class="bi bi-circle-fill text-[8px]"></i>
+                </div>
+                <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] glass-card p-6 rounded-2xl border-dashed">
+                    <h4 class="font-bold text-white text-lg mb-1">Multi-chain Support (Polygon, Solana)</h4>
+                    <p class="text-sm text-slate-400">Q2 2027</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 11. CTA -->
+    <section class="max-w-4xl mx-auto px-4 text-center">
+        <div class="glass-card p-12 rounded-[2.5rem] relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-cyan-500/20 z-0"></div>
+            <div class="relative z-10">
+                <h2 class="text-4xl md:text-5xl font-black text-white mb-6">Ready to prove your skills?</h2>
+                <p class="text-xl text-slate-300 mb-10">Join thousands of developers earning verifiable credentials.</p>
+                <a href="{% url 'skill_list' %}" class="inline-flex px-10 py-5 bg-white text-slate-900 font-bold text-lg rounded-full transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] items-center gap-3">
+                    Start Assessment <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+</div>
+{% endblock %}

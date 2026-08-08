@@ -1,0 +1,305 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Contact Us{% endblock %}
+
+{% block extra_css %}
+<!-- Load Tailwind CSS via CDN without Preflight to avoid breaking Bootstrap -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    corePlugins: {
+      preflight: false,
+      visibility: false,
+    }
+  }
+</script>
+<style>
+    /* Dark Theme Override for this page */
+    body {
+        background-color: #0f172a !important;
+        color: #f1f5f9 !important;
+    }
+    .glass-card {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .gradient-text {
+        background: linear-gradient(to right, #60a5fa, #22d3ee);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    /* Toast Animation */
+    @keyframes slideInUp {
+        from { transform: translateY(100%); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+    .toast-anim {
+        animation: slideInUp 0.3s ease-out forwards;
+    }
+    
+    /* FAQ Accordion overrides for dark theme */
+    .dark-accordion .accordion-item {
+        background-color: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 1rem;
+        border-radius: 1rem !important;
+        overflow: hidden;
+    }
+    .dark-accordion .accordion-button {
+        background-color: rgba(30, 41, 59, 0.7);
+        color: #f1f5f9;
+        font-weight: 600;
+        box-shadow: none;
+    }
+    .dark-accordion .accordion-button:not(.collapsed) {
+        background-color: rgba(59, 130, 246, 0.1);
+        color: #60a5fa;
+    }
+    .dark-accordion .accordion-button::after {
+        filter: invert(1) grayscale(100%) brightness(200%);
+    }
+    .dark-accordion .accordion-body {
+        background-color: rgba(15, 23, 42, 0.9);
+        color: #94a3b8;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="font-sans antialiased pb-20 pt-10">
+
+    <!-- Toast Notification -->
+    <div id="successToast" class="fixed bottom-10 right-10 z-50 hidden">
+        <div class="glass-card flex items-center gap-3 px-6 py-4 rounded-xl border-l-4 border-l-green-500 shadow-2xl toast-anim">
+            <i class="bi bi-check-circle-fill text-green-500 text-2xl"></i>
+            <div>
+                <h4 class="text-white font-bold m-0">Message Sent!</h4>
+                <p class="text-slate-400 text-sm m-0">We will get back to you shortly.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero -->
+    <div class="max-w-3xl mx-auto text-center mb-20 px-4">
+        <h1 class="text-4xl md:text-6xl font-extrabold mb-6 text-white tracking-tight">
+            Get in <span class="gradient-text">Touch</span>
+        </h1>
+        <p class="text-lg text-slate-400 leading-relaxed">
+            Have a question about your assessment, need help minting a certificate, or want to discuss enterprise solutions? We're here to help.
+        </p>
+    </div>
+
+    <!-- Contact Cards -->
+    <div class="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-24">
+        <div class="glass-card p-8 rounded-3xl text-center transform hover:-translate-y-2 transition-transform">
+            <div class="w-16 h-16 mx-auto bg-blue-500/20 text-blue-400 rounded-full flex items-center justify-center text-2xl mb-6">
+                <i class="bi bi-envelope-paper"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">General Support</h3>
+            <p class="text-slate-400 text-sm mb-4">Account issues and general questions.</p>
+            <a href="mailto:support@platform.com" class="text-blue-400 font-medium hover:text-blue-300">support@platform.com</a>
+        </div>
+
+        <div class="glass-card p-8 rounded-3xl text-center transform hover:-translate-y-2 transition-transform">
+            <div class="w-16 h-16 mx-auto bg-cyan-500/20 text-cyan-400 rounded-full flex items-center justify-center text-2xl mb-6">
+                <i class="bi bi-braces-asterisk"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Technical Support</h3>
+            <p class="text-slate-400 text-sm mb-4">Assessment environment and code errors.</p>
+            <a href="mailto:tech@platform.com" class="text-cyan-400 font-medium hover:text-cyan-300">tech@platform.com</a>
+        </div>
+
+        <div class="glass-card p-8 rounded-3xl text-center transform hover:-translate-y-2 transition-transform">
+            <div class="w-16 h-16 mx-auto bg-purple-500/20 text-purple-400 rounded-full flex items-center justify-center text-2xl mb-6">
+                <i class="bi bi-currency-bitcoin"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Blockchain Support</h3>
+            <p class="text-slate-400 text-sm mb-4">MetaMask, Sepolia, and NFT minting.</p>
+            <a href="mailto:web3@platform.com" class="text-purple-400 font-medium hover:text-purple-300">web3@platform.com</a>
+        </div>
+
+        <div class="glass-card p-8 rounded-3xl text-center transform hover:-translate-y-2 transition-transform">
+            <div class="w-16 h-16 mx-auto bg-green-500/20 text-green-400 rounded-full flex items-center justify-center text-2xl mb-6">
+                <i class="bi bi-briefcase"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Business Enquiries</h3>
+            <p class="text-slate-400 text-sm mb-4">Enterprise hiring and API integration.</p>
+            <a href="mailto:enterprise@platform.com" class="text-green-400 font-medium hover:text-green-300">enterprise@platform.com</a>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-16 mb-20">
+        
+        <!-- Contact Form -->
+        <div>
+            <h2 class="text-3xl font-bold text-white mb-8">Send a Message</h2>
+            <div class="glass-card p-8 md:p-10 rounded-[2rem]">
+                <form id="contactForm" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-400 mb-2">Your Name</label>
+                            <input type="text" id="contactName" required class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors" placeholder="John Doe">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-400 mb-2">Email Address</label>
+                            <input type="email" id="contactEmail" required class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors" placeholder="john@example.com">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-400 mb-2">Subject</label>
+                        <select id="contactSubject" required class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors appearance-none">
+                            <option value="" disabled selected>Select a topic...</option>
+                            <option value="assessment">Assessment Issue</option>
+                            <option value="wallet">Wallet Connection / MetaMask</option>
+                            <option value="certificate">Certificate Generation</option>
+                            <option value="business">Business / Enterprise</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-400 mb-2">Message</label>
+                        <textarea id="contactMessage" required rows="5" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors" placeholder="How can we help you?"></textarea>
+                    </div>
+                    <button type="submit" id="submitBtn" class="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-colors shadow-lg flex justify-center items-center gap-2">
+                        Send Message <i class="bi bi-send"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- FAQ -->
+        <div>
+            <h2 class="text-3xl font-bold text-white mb-8">Frequently Asked Questions</h2>
+            <div class="accordion dark-accordion" id="faqAccordion">
+                
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faq-heading-1">
+                        <button class="accordion-button py-4" type="button" data-bs-toggle="collapse" data-bs-target="#faq-collapse-1" aria-expanded="true" aria-controls="faq-collapse-1">
+                            Wallet Connection Issues
+                        </button>
+                    </h2>
+                    <div id="faq-collapse-1" class="accordion-collapse collapse show" aria-labelledby="faq-heading-1" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body leading-relaxed">
+                            Ensure you have the MetaMask browser extension installed. Our certificates are currently minted on the <strong>Sepolia Testnet</strong>. Make sure your wallet is set to this network, or the connection request may fail. See our <a href="{% url 'wallet_guide' %}" class="text-blue-400 hover:underline">Wallet Guide</a> for detailed steps.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faq-heading-2">
+                        <button class="accordion-button collapsed py-4" type="button" data-bs-toggle="collapse" data-bs-target="#faq-collapse-2" aria-expanded="false" aria-controls="faq-collapse-2">
+                            Certificate Not Generating
+                        </button>
+                    </h2>
+                    <div id="faq-collapse-2" class="accordion-collapse collapse" aria-labelledby="faq-heading-2" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body leading-relaxed">
+                            If you passed the assessment but cannot see your PDF certificate, please wait up to 60 seconds. Our PDF rendering engine occasionally experiences high load. If it persists, try refreshing the page.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faq-heading-3">
+                        <button class="accordion-button collapsed py-4" type="button" data-bs-toggle="collapse" data-bs-target="#faq-collapse-3" aria-expanded="false" aria-controls="faq-collapse-3">
+                            Assessment Submission Failed
+                        </button>
+                    </h2>
+                    <div id="faq-collapse-3" class="accordion-collapse collapse" aria-labelledby="faq-heading-3" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body leading-relaxed">
+                            Your answers are automatically saved locally in your browser as you type. If your submission fails due to network issues, simply refresh the page. Your drafted answers will be restored automatically.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faq-heading-4">
+                        <button class="accordion-button collapsed py-4" type="button" data-bs-toggle="collapse" data-bs-target="#faq-collapse-4" aria-expanded="false" aria-controls="faq-collapse-4">
+                            AI Evaluation Delays
+                        </button>
+                    </h2>
+                    <div id="faq-collapse-4" class="accordion-collapse collapse" aria-labelledby="faq-heading-4" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body leading-relaxed">
+                            We use advanced models (Gemini Pro) to evaluate your practical answers thoroughly. This batch evaluation can take anywhere from 10 to 30 seconds depending on API rate limits. Please do not close the loading screen.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('contactForm');
+    const toast = document.getElementById('successToast');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    if (form) {
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault(); 
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Sending... <i class="bi bi-hourglass-split"></i>';
+            
+            const payload = {
+                name: document.getElementById('contactName').value,
+                email: document.getElementById('contactEmail').value,
+                subject: document.getElementById('contactSubject').value,
+                message: document.getElementById('contactMessage').value
+            };
+            
+            try {
+                const response = await fetch('{% url "contact" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                if(response.ok) {
+                    // Show toast
+                    toast.classList.remove('hidden');
+                    form.reset();
+                    
+                    // Hide toast after 4 seconds
+                    setTimeout(() => {
+                        toast.classList.add('hidden');
+                    }, 4000);
+                } else {
+                    alert("Failed to send message. Please try again.");
+                }
+            } catch (err) {
+                console.error(err);
+            }
+            
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Send Message <i class="bi bi-send"></i>';
+        });
+    }
+});
+</script>
+{% endblock %}
