@@ -45,4 +45,10 @@ urlpatterns = [
         views.assessment_result,
         name="assessment_result"
     ),
+
+    path(
+        "certificate/<int:certificate_id>/",
+        views.certificate_detail,
+        name="certificate_detail"
+    ),
 ]

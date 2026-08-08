@@ -466,18 +466,35 @@ def assessment_result(
         }
     )
 
-@login_required
-def certificates(request):
+# @login_required
+# def certificates(request):
 
-    certificates = Certificate.objects.filter(
+#     certificates = Certificate.objects.filter(
+#         user=request.user
+#     )
+
+#     return HttpResponse(
+#         "<h1>Certificates</h1>"
+#         + "".join(
+#             f"<p>{certificate.skill.name} - "
+#             f"{certificate.minted}</p>"
+#             for certificate in certificates
+#         )
+#     )
+
+@login_required
+def certificate_detail(request, certificate_id):
+
+    certificate = get_object_or_404(
+        Certificate,
+        id=certificate_id,
         user=request.user
     )
 
-    return HttpResponse(
-        "<h1>Certificates</h1>"
-        + "".join(
-            f"<p>{certificate.skill.name} - "
-            f"{certificate.minted}</p>"
-            for certificate in certificates
-        )
+    return render(
+        request,
+        "core/certificate.html",
+        {
+            "certificate": certificate
+        }
     )

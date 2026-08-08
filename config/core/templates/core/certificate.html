@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Certificate</title>
+
+    <style>
+
+        body{
+
+            background:#f5f5f5;
+            font-family:Arial;
+
+        }
+
+        .certificate{
+
+            width:900px;
+
+            margin:40px auto;
+
+            background:white;
+
+            border:10px solid #1d4ed8;
+
+            padding:50px;
+
+            text-align:center;
+
+        }
+
+        h1{
+
+            font-size:42px;
+
+        }
+
+        h2{
+
+            color:#1d4ed8;
+
+        }
+
+        table{
+
+            margin:auto;
+
+            margin-top:30px;
+
+            border-collapse:collapse;
+
+        }
+
+        td{
+
+            padding:10px 30px;
+
+            border:1px solid #ddd;
+
+        }
+
+        .pass{
+
+            color:green;
+
+            font-size:22px;
+
+        }
+
+        .pending{
+
+            color:orange;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="certificate">
+
+<h1>
+AI VERIFIED SKILL CERTIFICATE
+</h1>
+
+<h2>
+Proof of Practical Skill
+</h2>
+
+<hr>
+
+<h2>
+
+{{ certificate.user.get_full_name|default:certificate.user.username }}
+
+</h2>
+
+<p>
+
+has successfully demonstrated practical knowledge in
+
+</p>
+
+<h2>
+
+{{ certificate.skill.name }}
+
+</h2>
+
+<table>
+
+<tr>
+
+<td>
+Certificate ID
+</td>
+
+<td>
+
+CERT-{{ certificate.id }}
+
+</td>
+
+</tr>
+
+<tr>
+
+<td>
+
+Issued
+
+</td>
+
+<td>
+
+{{ certificate.issued_at }}
+
+</td>
+
+</tr>
+
+<tr>
+
+<td>
+
+Final Score
+
+</td>
+
+<td>
+
+{{ certificate.assessment.score }}/100
+
+</td>
+
+</tr>
+
+<tr>
+
+<td>
+
+Status
+
+</td>
+
+<td class="pass">
+
+PASSED
+
+</td>
+
+</tr>
+
+<tr>
+
+<td>
+
+Wallet
+
+</td>
+
+<td>
+
+{{ certificate.wallet_address|default:"Not Connected" }}
+
+</td>
+
+</tr>
+
+<tr>
+
+<td>
+
+Blockchain
+
+</td>
+
+<td>
+
+{% if certificate.minted %}
+
+Minted ✅
+
+{% else %}
+
+<span class="pending">
+
+Pending Mint
+
+</span>
+
+{% endif %}
+
+</td>
+
+</tr>
+
+<tr>
+
+<td>
+
+Token ID
+
+</td>
+
+<td>
+
+{{ certificate.token_id|default:"Not Minted" }}
+
+</td>
+
+</tr>
+
+<tr>
+
+<td>
+
+Transaction
+
+</td>
+
+<td>
+
+{{ certificate.transaction_hash|default:"Not Available" }}
+
+</td>
+
+</tr>
+
+</table>
+
+<br><br>
+
+{% if not certificate.minted %}
+
+<button>
+
+Mint on Blockchain
+
+</button>
+
+{% endif %}
+
+</div>
+
+</body>
+
+</html>
