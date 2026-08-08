@@ -388,23 +388,13 @@ def evaluate_assessment(
     # Create certificate if passed
     if passed:
 
-        evaluations = Evaluation.objects.filter(
-            submission__assessment=assessment
-        ).order_by(
-            "created_at"
-        )
-
-        # Certificate currently requires ONE evaluation.
-        # Use the final/overall evaluation record for now.
-        final_evaluation = evaluations.last()
-        
-
         Certificate.objects.get_or_create(
-            user=request.user,
-            skill=assessment.skill,
-            
+            assessment=assessment,
+            defaults={
+                "user": request.user,
+                "skill": assessment.skill,
+            }
         )
-
     # Remove temporary session data
     request.session.pop(
         f"assessment_{assessment.id}_tasks",
@@ -491,10 +481,100 @@ def certificate_detail(request, certificate_id):
         user=request.user
     )
 
+    profile = request.user.profile
+
     return render(
         request,
         "core/certificate.html",
         {
-            "certificate": certificate
+            "certificate": certificate,
+            "profile": profile
         }
     )
+
+from django.contrib import messages
+from .models import Certificate
+from .blockchain import mint_certificate
+
+
+@login_required
+def mint_certificate_view(request, certificate_id):
+
+    certificate = get_object_or_404(
+        Certificate,
+        id=certificate_id,
+        user=request.user,
+    )
+
+    if certificate.minted:
+        messages.info(
+            request,
+            "Certificate already minted."
+        )
+        return redirect(
+            "certificate_detail",
+            certificate.id,
+        )
+
+    wallet = request.user.profile.wallet_address
+    
+
+    if not wallet:
+        messages.error(
+            request,
+            "Wallet address not found."
+        )
+        return redirect(
+            "certificate_detail",
+            certificate.id,
+        )
+
+    result = mint_certificate(
+        recipient_wallet=wallet,
+        candidate_name=request.user.get_full_name() or request.user.username,
+        skill=certificate.skill.name,
+        score=certificate.assessment.score,
+    )
+
+    certificate.token_id = str(
+        result["token_id"]
+    )
+
+    certificate.transaction_hash = result[
+        "transaction_hash"
+    ]
+
+    certificate.minted = True
+
+    certificate.wallet_address = wallet
+
+    certificate.save()
+
+    messages.success(
+        request,
+        "🎉 Certificate minted successfully on Sepolia Blockchain."
+    )
+    return redirect(
+        "certificate_detail",
+        certificate.id,
+    )
+
+import json
+from django.http import JsonResponse
+
+@login_required
+def save_wallet(request):
+
+    data = json.loads(request.body)
+
+    wallet = data["wallet"]
+
+    profile = request.user.profile
+
+    profile.wallet_address = wallet
+
+    profile.save()
+
+    return JsonResponse({
+        "success": True
+    })

@@ -1,80 +1,112 @@
 <!DOCTYPE html>
 <html>
-
 <head>
 
-    <title>Certificate</title>
+<title>Certificate</title>
 
-    <style>
+<style>
 
-        body{
+body{
+    background:#eef2ff;
+    font-family:Arial,Helvetica,sans-serif;
+}
 
-            background:#f5f5f5;
-            font-family:Arial;
+.certificate{
 
-        }
+    width:900px;
+    margin:40px auto;
+    background:white;
+    border:10px solid #1d4ed8;
+    padding:50px;
+    text-align:center;
+    box-shadow:0 10px 25px rgba(0,0,0,.15);
 
-        .certificate{
+}
 
-            width:900px;
+h1{
 
-            margin:40px auto;
+    font-size:42px;
+    margin-bottom:10px;
 
-            background:white;
+}
 
-            border:10px solid #1d4ed8;
+h2{
 
-            padding:50px;
+    color:#1d4ed8;
 
-            text-align:center;
+}
 
-        }
+p{
 
-        h1{
+    font-size:18px;
 
-            font-size:42px;
+}
 
-        }
+table{
 
-        h2{
+    margin:auto;
+    margin-top:35px;
+    border-collapse:collapse;
+    width:80%;
 
-            color:#1d4ed8;
+}
 
-        }
+td{
 
-        table{
+    padding:14px;
+    border:1px solid #ddd;
 
-            margin:auto;
+}
 
-            margin-top:30px;
+.pass{
 
-            border-collapse:collapse;
+    color:green;
+    font-weight:bold;
+    font-size:20px;
 
-        }
+}
 
-        td{
+.pending{
 
-            padding:10px 30px;
+    color:#d97706;
+    font-weight:bold;
 
-            border:1px solid #ddd;
+}
 
-        }
+button{
 
-        .pass{
+    padding:12px 25px;
+    margin-top:25px;
+    background:#1d4ed8;
+    color:white;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:16px;
 
-            color:green;
+}
 
-            font-size:22px;
+button:hover{
 
-        }
+    background:#1e40af;
 
-        .pending{
+}
 
-            color:orange;
+.wallet{
 
-        }
+    color:green;
+    font-weight:bold;
+    word-break:break-all;
 
-    </style>
+}
+
+.tx{
+
+    font-size:14px;
+    word-break:break-all;
+}
+
+</style>
 
 </head>
 
@@ -82,135 +114,80 @@
 
 <div class="certificate">
 
-<h1>
-AI VERIFIED SKILL CERTIFICATE
-</h1>
+<h1>Skill Certificate</h1>
 
-<h2>
-Proof of Practical Skill
-</h2>
-
-<hr>
-
-<h2>
-
-{{ certificate.user.get_full_name|default:certificate.user.username }}
-
-</h2>
+<h2>Certificate of Achievement</h2>
 
 <p>
 
+This certifies that
+
+<br><br>
+
+<b style="font-size:28px;">
+{{ certificate.user.get_full_name|default:certificate.user.username }}
+</b>
+
+<br><br>
+
 has successfully demonstrated practical knowledge in
 
-</p>
+<br><br>
 
-<h2>
-
+<b style="font-size:24px;color:#1d4ed8;">
 {{ certificate.skill.name }}
+</b>
 
-</h2>
+</p>
 
 <table>
 
 <tr>
+<td>Certificate ID</td>
+<td>CERT-{{ certificate.id }}</td>
+</tr>
 
-<td>
-Certificate ID
+<tr>
+<td>Issued</td>
+<td>{{ certificate.issued_at }}</td>
+</tr>
+
+<tr>
+<td>Final Score</td>
+<td>{{ certificate.assessment.score }}/100</td>
+</tr>
+
+<tr>
+<td>Status</td>
+<td class="pass">PASSED</td>
+</tr>
+
+<tr>
+<td>Wallet</td>
+<td class="wallet">
+
+{% if profile.wallet_address %}
+{{ profile.wallet_address }}
+{% else %}
+Not Connected
+{% endif %}
+
 </td>
-
-<td>
-
-CERT-{{ certificate.id }}
-
-</td>
-
 </tr>
 
 <tr>
 
-<td>
-
-Issued
-
-</td>
-
-<td>
-
-{{ certificate.issued_at }}
-
-</td>
-
-</tr>
-
-<tr>
-
-<td>
-
-Final Score
-
-</td>
-
-<td>
-
-{{ certificate.assessment.score }}/100
-
-</td>
-
-</tr>
-
-<tr>
-
-<td>
-
-Status
-
-</td>
-
-<td class="pass">
-
-PASSED
-
-</td>
-
-</tr>
-
-<tr>
-
-<td>
-
-Wallet
-
-</td>
-
-<td>
-
-{{ certificate.wallet_address|default:"Not Connected" }}
-
-</td>
-
-</tr>
-
-<tr>
-
-<td>
-
-Blockchain
-
-</td>
+<td>Blockchain</td>
 
 <td>
 
 {% if certificate.minted %}
 
-Minted ✅
+<span class="pass">Minted ✅</span>
 
 {% else %}
 
-<span class="pending">
-
-Pending Mint
-
-</span>
+<span class="pending">Pending Mint</span>
 
 {% endif %}
 
@@ -220,11 +197,7 @@ Pending Mint
 
 <tr>
 
-<td>
-
-Token ID
-
-</td>
+<td>Token ID</td>
 
 <td>
 
@@ -235,26 +208,51 @@ Token ID
 </tr>
 
 <tr>
+    <td>Transaction</td>
+    <td>
 
-<td>
+    {% if certificate.transaction_hash %}
 
-Transaction
+        <a
+            href="https://sepolia.etherscan.io/tx/{{ certificate.transaction_hash }}"
+            target="_blank"
+        >
+            View on Sepolia Etherscan
+        </a>
 
-</td>
+        <br><br>
 
-<td>
+        <small>{{ certificate.transaction_hash }}</small>
 
-{{ certificate.transaction_hash|default:"Not Available" }}
+    {% else %}
 
-</td>
+        Not Available
 
+    {% endif %}
+
+    </td>
 </tr>
 
 </table>
 
-<br><br>
+<br>
 
-{% if not certificate.minted %}
+{% if not profile.wallet_address %}
+
+<button id="connectWallet">
+
+Connect MetaMask
+
+</button>
+
+<p id="walletStatus"></p>
+
+{% endif %}
+
+
+{% if profile.wallet_address and not certificate.minted %}
+
+<a href="{% url 'mint_certificate' certificate.id %}">
 
 <button>
 
@@ -262,9 +260,96 @@ Mint on Blockchain
 
 </button>
 
+</a>
+
+{% endif %}
+
+
+{% if certificate.minted %}
+
+<h2 style="color:green;margin-top:30px;">
+
+🎉 Certificate Successfully Minted
+
+</h2>
+
 {% endif %}
 
 </div>
+
+<script>
+
+const connectButton=document.getElementById("connectWallet");
+
+if(connectButton){
+
+connectButton.onclick=async function(){
+
+if(typeof window.ethereum==="undefined"){
+
+alert("Please install MetaMask");
+
+return;
+
+}
+
+try{
+
+const accounts=await window.ethereum.request({
+
+method:"eth_requestAccounts"
+
+});
+
+const wallet=accounts[0];
+
+document.getElementById("walletStatus").innerHTML=
+
+"Connected : "+wallet;
+
+const response=await fetch("{% url 'save_wallet' %}",{
+
+method:"POST",
+
+headers:{
+
+"Content-Type":"application/json",
+
+"X-CSRFToken":"{{ csrf_token }}"
+
+},
+
+body:JSON.stringify({
+
+wallet:wallet
+
+})
+
+});
+
+if(response.ok){
+
+location.reload();
+
+}else{
+
+alert("Unable to save wallet.");
+
+}
+
+}
+
+catch(err){
+
+alert(err.message);
+
+}
+
+};
+
+}
+
+</script>
 
 </body>
 

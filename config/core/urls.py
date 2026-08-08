@@ -51,4 +51,14 @@ urlpatterns = [
         views.certificate_detail,
         name="certificate_detail"
     ),
+    path(
+        "certificate/<int:certificate_id>/mint/",
+        views.mint_certificate_view,
+        name="mint_certificate",
+    ),
+    path(
+        "save-wallet/",
+        views.save_wallet,
+        name="save_wallet"
+    ),
 ]
