@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Certificate Verification</title>
+
+<style>
+
+body{
+
+    background:#eef2ff;
+    font-family:Arial;
+
+}
+
+.card{
+
+    width:850px;
+
+    margin:50px auto;
+
+    background:white;
+
+    padding:40px;
+
+    border-radius:12px;
+
+    box-shadow:0 8px 25px rgba(0,0,0,.12);
+
+}
+
+h1{
+
+    text-align:center;
+
+    color:#1d4ed8;
+
+}
+
+.success{
+
+    color:green;
+
+    font-size:24px;
+
+    text-align:center;
+
+    margin-bottom:25px;
+
+}
+
+table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+}
+
+td{
+
+    border:1px solid #ddd;
+
+    padding:14px;
+
+}
+
+.label{
+
+    width:250px;
+
+    background:#f8fafc;
+
+    font-weight:bold;
+
+}
+
+.hash{
+
+    word-break:break-all;
+
+}
+
+a{
+
+    color:#2563eb;
+
+    text-decoration:none;
+
+}
+
+a:hover{
+
+    text-decoration:underline;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="card">
+
+<h1>Blockchain Certificate Verification</h1>
+
+<div class="success">
+
+✅ Certificate Verified
+
+</div>
+
+<table>
+
+<tr>
+
+<td class="label">
+
+Candidate
+
+</td>
+
+<td>
+
+{{ certificate.user.get_full_name|default:certificate.user.username }}
+
+</td>
+
+</tr>
+
+<tr>
+
+<td class="label">
+
+Skill
+
+</td>
+
+<td>
+
+{{ certificate.skill.name }}
+
+</td>
+
+</tr>
+
+<tr>
+
+<td class="label">
+
+Final Score
+
+</td>
+
+<td>
+
+{{ certificate.assessment.score }}/100
+
+</td>
+
+</tr>
+
+<tr>
+
+<td class="label">
+
+Status
+
+</td>
+
+<td>
+
+PASSED
+
+</td>
+
+</tr>
+
+<tr>
+
+<td class="label">
+
+Wallet
+
+</td>
+
+<td class="hash">
+
+{{ certificate.wallet_address }}
+
+</td>
+
+</tr>
+
+<tr>
+
+<td class="label">
+
+Token ID
+
+</td>
+
+<td>
+
+{{ certificate.token_id }}
+
+</td>
+
+</tr>
+
+<tr>
+
+<td class="label">
+
+Transaction
+
+</td>
+
+<td class="hash">
+
+{{ certificate.transaction_hash }}
+
+<br><br>
+
+<a
+
+href="https://sepolia.etherscan.io/tx/{{ certificate.transaction_hash }}"
+
+target="_blank"
+
+>
+
+View Transaction on Sepolia
+
+</a>
+
+</td>
+
+</tr>
+
+<tr>
+
+<td class="label">
+
+Issued On
+
+</td>
+
+<td>
+
+{{ certificate.issued_at }}
+
+</td>
+
+</tr>
+
+<tr>
+
+<td class="label">
+
+Blockchain Status
+
+</td>
+
+<td>
+
+✅ Successfully Minted
+
+</td>
+
+</tr>
+
+</table>
+
+<a
+href="{% url 'download_certificate' certificate.id %}"
+class="btn btn-danger">
+
+Download PDF
+
+</a>
+
+</div>
+
+</body>
+
+</html>

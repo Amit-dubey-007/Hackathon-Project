@@ -136,6 +136,9 @@ USE_I18N = True
 
 USE_TZ = True
 
+MEDIA_URL = "/media/"
+
+MEDIA_ROOT = BASE_DIR / "media"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
@@ -164,3 +167,7 @@ RPC_URL = os.getenv("RPC_URL")
 PRIVATE_KEY = os.getenv("PRIVATE_KEY")
 CONTRACT_ADDRESS = os.getenv("CONTRACT_ADDRESS")
 WALLET_ADDRESS = os.getenv("WALLET_ADDRESS")
+
+LOGIN_REDIRECT_URL = 'dashboard'
+
+LOGIN_URL= 'accounts:login'

@@ -154,9 +154,14 @@
 				"internalType": "address",
 				"name": "",
 				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
 			}
 		],
-		"name": "hasCertificate",
+		"name": "hasCertificateForSkill",
 		"outputs": [
 			{
 				"internalType": "bool",

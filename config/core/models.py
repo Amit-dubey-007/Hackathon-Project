@@ -193,6 +193,12 @@ class Certificate(models.Model):
         default=False
     )
 
+    qr_code = models.ImageField(
+        upload_to="certificate_qr/",
+        blank=True,
+        null=True
+    )
+
     issued_at = models.DateTimeField(
         auto_now_add=True
     )

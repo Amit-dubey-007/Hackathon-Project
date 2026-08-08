@@ -169,7 +169,42 @@ has successfully demonstrated practical knowledge in
 {% if profile.wallet_address %}
 {{ profile.wallet_address }}
 {% else %}
-Not Connected
+
+<div class="card mt-4 p-4">
+
+    <h4>Connect Wallet</h4>
+
+    <button
+        id="connectWallet"
+        class="btn btn-primary">
+        Connect MetaMask
+    </button>
+
+    <hr>
+
+    <h5>Or enter wallet manually</h5>
+
+    <form method="post" action="{% url 'save_wallet_manual' %}">
+
+        {% csrf_token %}
+
+        <input
+            type="text"
+            name="wallet"
+            class="form-control"
+            placeholder="0x..."
+            required>
+
+        <br>
+
+        <button
+            class="btn btn-success">
+            Save Wallet
+        </button>
+
+    </form>
+
+</div>
 {% endif %}
 
 </td>
@@ -184,6 +219,18 @@ Not Connected
 {% if certificate.minted %}
 
 <span class="pass">Minted ✅</span>
+
+<br><br>
+
+<a href="{% url 'verify_certificate' certificate.id %}">
+
+<button>
+
+Verify Public Certificate
+
+</button>
+
+</a>
 
 {% else %}
 
@@ -252,13 +299,16 @@ Connect MetaMask
 
 {% if profile.wallet_address and not certificate.minted %}
 
-<a href="{% url 'mint_certificate' certificate.id %}">
+<a href="{% url 'mint_certificate' certificate.id %}"
+   class="btn btn-success">
+    Mint on Blockchain
+</a>
 
-<button>
+<!-- <button>
 
 Mint on Blockchain
 
-</button>
+</button> -->
 
 </a>
 
@@ -272,6 +322,35 @@ Mint on Blockchain
 🎉 Certificate Successfully Minted
 
 </h2>
+
+<a
+href="{% url 'download_certificate' certificate.id %}"
+class="btn btn-danger">
+
+Download PDF
+
+</a>
+
+{% endif %}
+
+
+
+{% if certificate.qr_code %}
+
+<hr>
+
+<h3>Scan to Verify</h3>
+
+<img
+src="{{ certificate.qr_code.url }}"
+width="220"
+>
+
+<p>
+
+Scan this QR code to verify the certificate.
+
+</p>
 
 {% endif %}
 
@@ -287,10 +366,18 @@ connectButton.onclick=async function(){
 
 if(typeof window.ethereum==="undefined"){
 
-alert("Please install MetaMask");
+    if(confirm(
+        "MetaMask is not installed.\n\nPress OK to install MetaMask.\nPress Cancel to enter a wallet manually."
+    )){
 
-return;
+        window.open(
+            "https://metamask.io/download/",
+            "_blank"
+        );
 
+    }
+
+    return;
 }
 
 try{

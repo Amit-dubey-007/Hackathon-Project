@@ -12,10 +12,15 @@ from .models import (
     Certificate,
 )
 
+from accounts.models import Profile
+
 from .ai import (
     generate_assessment_tasks,
     evaluate_submission,
 )
+
+from .utils import generate_qr
+from django.urls import reverse
 
 
 @login_required
@@ -529,16 +534,35 @@ def mint_certificate_view(request, certificate_id):
             certificate.id,
         )
 
-    result = mint_certificate(
-        recipient_wallet=wallet,
-        candidate_name=request.user.get_full_name() or request.user.username,
-        skill=certificate.skill.name,
-        score=certificate.assessment.score,
-    )
+    print("=== MINT STARTED ===")
 
-    certificate.token_id = str(
-        result["token_id"]
-    )
+    wallet = request.user.profile.wallet_address
+    print("Wallet:", wallet)
+
+    try:
+        result = mint_certificate(
+            recipient_wallet=wallet,
+            candidate_name=request.user.get_full_name() or request.user.username,
+            skill=certificate.skill.name,
+            score=certificate.assessment.score,
+        )
+
+    except Exception as e:
+
+        messages.error(
+            request,
+            f"Blockchain mint failed: {e}"
+        )
+        print(e)
+
+        return redirect(
+            "certificate_detail",
+            certificate.id,
+        )
+
+    
+    if result["token_id"]:
+        certificate.token_id = result["token_id"]
 
     certificate.transaction_hash = result[
         "transaction_hash"
@@ -547,6 +571,27 @@ def mint_certificate_view(request, certificate_id):
     certificate.minted = True
 
     certificate.wallet_address = wallet
+
+    verification_url = request.build_absolute_uri(
+
+        reverse(
+            "verify_certificate",
+            args=[certificate.id]
+        )
+
+    )
+
+    certificate.qr_code.save(
+
+        f"certificate_{certificate.id}.png",
+
+        generate_qr(
+            verification_url
+        ),
+
+        save=False
+
+    )
 
     certificate.save()
 
@@ -578,3 +623,123 @@ def save_wallet(request):
     return JsonResponse({
         "success": True
     })
+
+def verify_certificate(request, certificate_id):
+
+    certificate = get_object_or_404(
+        Certificate.objects.select_related(
+            "user",
+            "skill",
+            "assessment",
+        ),
+        id=certificate_id,
+        minted=True,
+    )
+
+    return render(
+        request,
+        "core/verify_certificate.html",
+        {
+            "certificate": certificate,
+        },
+    )
+
+from web3 import Web3
+
+@login_required
+def save_wallet_manual(request):
+
+    if request.method == "POST":
+
+        wallet = request.POST.get("wallet")
+
+        if not Web3.is_address(wallet):
+
+            messages.error(
+                request,
+                "Invalid wallet address."
+            )
+
+            return redirect("profile")
+
+        if Profile.objects.filter(
+            wallet_address__iexact=wallet
+        ).exclude(
+            user=request.user
+        ).exists():
+
+            messages.error(
+                request,
+                "This wallet is already linked to another account."
+            )
+
+            return redirect("profile")
+
+        profile = request.user.profile
+
+        profile.wallet_address = Web3.to_checksum_address(wallet)
+
+        profile.save()
+
+        messages.success(
+            request,
+            "Wallet saved successfully."
+        )
+
+    return redirect("accounts:profile")
+
+from io import BytesIO
+
+from django.http import HttpResponse
+
+from django.template.loader import get_template
+
+from xhtml2pdf import pisa
+
+@login_required
+def download_certificate(
+    request,
+    certificate_id
+):
+
+    certificate = get_object_or_404(
+
+        Certificate,
+
+        id=certificate_id,
+
+        user=request.user
+
+    )
+
+    template = get_template(
+        "core/certificate_pdf.html"
+    )
+
+    html = template.render({
+
+        "certificate": certificate
+
+    })
+
+    pdf = BytesIO()
+
+    pisa.CreatePDF(
+        html,
+        dest=pdf
+    )
+
+    response = HttpResponse(
+        pdf.getvalue(),
+        content_type="application/pdf"
+    )
+
+    response[
+        "Content-Disposition"
+    ] = (
+
+        f'attachment; filename="Certificate_{certificate.id}.pdf"'
+
+    )
+
+    return response

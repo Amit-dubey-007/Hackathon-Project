@@ -59,15 +59,44 @@ def mint_certificate(
         signed_tx.raw_transaction
     )
 
-    receipt = w3.eth.wait_for_transaction_receipt(
-        tx_hash
+    receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+
+    print("SENDER:", sender)
+    print("RECIPIENT:", recipient)
+    print("CHAIN:", w3.eth.chain_id)
+
+    print(
+        f"Recipient already has '{skill}' certificate:",
+        contract.functions.hasCertificateForSkill(
+            recipient,
+            skill
+        ).call()
     )
 
-    logs = contract.events.CertificateMinted().process_receipt(
-        receipt
+    print(
+        "Sender balance:",
+        w3.from_wei(w3.eth.get_balance(sender), "ether")
     )
 
-    token_id = logs[0]["args"]["tokenId"]
+    if receipt.status != 1:
+        raise Exception("Blockchain transaction failed.")
+
+    # logs = contract.events.CertificateMinted().process_receipt(receipt)
+
+    print("Receipt Status:", receipt.status)
+    print("Logs:", receipt.logs)
+
+    try:
+        logs = contract.events.CertificateMinted().process_receipt(receipt)
+        print("Decoded logs:", logs)
+    except Exception as e:
+        print("EVENT DECODING ERROR:", repr(e))
+        raise
+
+    token_id = None
+
+    if len(logs) > 0:
+        token_id = str(logs[0]["args"]["tokenId"])
 
     return {
         "token_id": token_id,

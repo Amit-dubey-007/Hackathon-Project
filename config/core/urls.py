@@ -61,4 +61,19 @@ urlpatterns = [
         views.save_wallet,
         name="save_wallet"
     ),
+    path(
+        "verify/<int:certificate_id>/",
+        views.verify_certificate,
+        name="verify_certificate",
+    ),
+    path(
+        "wallet/manual/",
+        views.save_wallet_manual,
+        name="save_wallet_manual",
+    ),
+    path(
+        "certificate/<int:certificate_id>/download/",
+        views.download_certificate,
+        name="download_certificate",
+    ),
 ]
