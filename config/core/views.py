@@ -16,7 +16,7 @@ from accounts.models import Profile
 
 from .ai import (
     generate_assessment_tasks,
-    evaluate_submission,
+    evaluate_assessment_batch,
 )
 
 from .utils import generate_qr
@@ -124,20 +124,17 @@ def start_assessment(request, skill_id):
 
             task = Task.objects.create(
                 skill=skill,
-                title=item["title"][:500],
-                question=item["question"],
-                difficulty=item.get(
-                    "difficulty",
-                    "Medium"
-                ),
-                topic=item.get(
-                    "topic",
-                    ""
-                )[:300],
+                title=item.get("title", "Practical Task")[:500],
+                question=item.get("question", ""),
+                difficulty=item.get("difficulty", "Medium"),
+                topic=item.get("topic", "")[:300],
                 max_score=100,
             )
 
             task_ids.append(task.id)
+            
+            # Save estimated time in session as UI metadata
+            request.session[f"task_{task.id}_time"] = item.get("estimated_time", "15 mins")
 
         # Store question IDs for THIS assessment
         request.session[
@@ -208,6 +205,8 @@ def assessment_question(
         id=task_id,
         skill=assessment.skill
     )
+    
+    estimated_time = request.session.get(f"task_{task.id}_time", "15 mins")
 
     # Handle answer
     if request.method == "POST":
@@ -227,6 +226,7 @@ def assessment_question(
                     "task": task,
                     "question_number": question_number,
                     "total_questions": 5,
+                    "estimated_time": estimated_time,
                     "error": "Please enter your answer."
                 }
             )
@@ -268,7 +268,8 @@ def assessment_question(
             "assessment": assessment,
             "task": task,
             "question_number": question_number,
-            "total_questions": 5
+            "total_questions": 5,
+            "estimated_time": estimated_time
         }
     )
 
@@ -308,86 +309,66 @@ def evaluate_assessment(
             "Please answer all 5 questions."
         )
 
-    total_score = 0
+    # Batch AI evaluation
+    from .ai import evaluate_assessment_batch
+    from django.contrib import messages
 
-    for submission in submissions:
+    try:
+        batch_result = evaluate_assessment_batch(assessment, submissions)
+    except Exception as e:
+        print("AI batch evaluation error:", e)
+        messages.error(request, "AI evaluation failed. Please try again later.")
+        return redirect("dashboard")
 
-        try:
+    # Overall summary
+    overall_score = int(batch_result.get("overall_score", 0))
+    overall_score = max(0, min(overall_score, 100))
+    
+    # Store overall summary in session for results page
+    request.session[f"assessment_{assessment.id}_overall"] = {
+        "score": overall_score,
+        "feedback": batch_result.get("overall_feedback", ""),
+        "strengths": batch_result.get("overall_strengths", ""),
+        "weaknesses": batch_result.get("overall_weaknesses", ""),
+        "suggestions": batch_result.get("overall_suggestions", "")
+    }
 
-            result = evaluate_submission(
-                submission.task,
-                submission.answer
-            )
-
-            score = int(
-                result.get(
-                    "score",
-                    0
-                )
-            )
-
-            # Keep score between 0 and 100
-            score = max(
-                0,
-                min(score, 100)
-            )
-
+    # Task evaluations
+    returned_tasks = batch_result.get("tasks", [])
+    
+    for i, submission in enumerate(submissions):
+        if i < len(returned_tasks):
+            t_res = returned_tasks[i]
+            score = max(0, min(int(t_res.get("score", 0)), 100))
+            
             Evaluation.objects.update_or_create(
                 submission=submission,
                 defaults={
                     "score": score,
-
-                    "feedback": result.get(
-                        "feedback",
-                        ""
-                    ),
-
-                    "strengths": result.get(
-                        "strengths",
-                        ""
-                    ),
-
-                    "weaknesses": result.get(
-                        "weaknesses",
-                        ""
-                    ),
-
-                    "suggestions": result.get(
-                        "suggestions",
-                        ""
-                    ),
-
+                    "feedback": t_res.get("feedback", ""),
+                    "strengths": t_res.get("strengths", ""),
+                    "weaknesses": t_res.get("weaknesses", ""),
+                    "suggestions": t_res.get("suggestions", ""),
+                    "integrity_score": 100,
+                }
+            )
+        else:
+            Evaluation.objects.update_or_create(
+                submission=submission,
+                defaults={
+                    "score": 0,
+                    "feedback": "Evaluation details missing.",
                     "integrity_score": 100,
                 }
             )
 
-            total_score += score
-
-        except Exception as e:
-
-            print(
-                "AI evaluation error:",
-                e
-            )
-
-            return HttpResponse(
-                "AI evaluation failed. "
-                "Please try again."
-            )
-
-    # Calculate average
-    final_score = round(
-        total_score /
-        submissions.count()
-    )
-
-    # Determine pass/fail
+    # Determine pass/fail based on overall_score
     passed = (
-        final_score >=
+        overall_score >=
         assessment.skill.passing_score
     )
 
-    assessment.score = final_score
+    assessment.score = overall_score
     assessment.passed = passed
     assessment.completed_at = timezone.now()
 
@@ -454,6 +435,8 @@ def assessment_result(
             "evaluation": evaluation,
         })
 
+    overall_summary = request.session.get(f"assessment_{assessment.id}_overall", None)
+
     return render(
         request,
         "core/assessment_result.html",
@@ -461,6 +444,7 @@ def assessment_result(
             "assessment": assessment,
             "results": results,
             "certificate": certificate,
+            "overall_summary": overall_summary,
         }
     )
 
