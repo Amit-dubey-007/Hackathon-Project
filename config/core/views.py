@@ -22,6 +22,9 @@ from .ai import (
 from .utils import generate_qr
 from django.urls import reverse
 
+def home(request):
+    return redirect("dashboard")
+
 
 @login_required
 def dashboard(request):
@@ -254,7 +257,7 @@ def assessment_question(
 
         # All 5 answered
         return redirect(
-            "evaluate_assessment",
+            "loading_evaluation",
             assessment_id=assessment.id
         )
 
@@ -743,3 +746,13 @@ def download_certificate(
     )
 
     return response
+
+@login_required
+def loading_questions_view(request, skill_id):
+    skill = get_object_or_404(Skill, id=skill_id)
+    return render(request, "core/loading_questions.html", {"skill": skill})
+
+@login_required
+def loading_evaluation_view(request, assessment_id):
+    assessment = get_object_or_404(Assessment, id=assessment_id, user=request.user)
+    return render(request, "core/loading_evaluation.html", {"assessment": assessment})

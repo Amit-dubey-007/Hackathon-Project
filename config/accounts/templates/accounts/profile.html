@@ -1,6 +1,55 @@
-{% extends 'accounts/base.html' %}
+{% extends 'core/base.html' %}
+
+{% block title %}My Profile | AI Skills Platform{% endblock %}
 
 {% block content %}
+<div class="row justify-content-center my-5">
+    <div class="col-md-8 col-lg-6">
+        <div class="card border-0 shadow-sm rounded-2xl overflow-hidden">
+            
+            <!-- Profile Header -->
+            <div class="bg-secondary position-relative text-white p-5 text-center">
+                <div class="position-absolute top-0 end-0 opacity-10 p-4" style="transform: rotate(-15deg);">
+                    <i class="bi bi-fingerprint" style="font-size: 8rem;"></i>
+                </div>
+                <div class="position-relative z-1 d-flex flex-column align-items-center py-3">
+                    <div class="bg-white text-secondary rounded-circle d-flex align-items-center justify-content-center shadow mb-3" style="width: 88px; height: 88px; font-size: 36px; font-weight: 700;">
+                        {{ user.username|make_list|first|upper }}
+                    </div>
+                    <h2 class="fw-bold mb-0 text-white">{{ user.username }}</h2>
+                    <span class="badge bg-white bg-opacity-25 mt-2 fw-medium rounded-pill px-3 py-1">Platform Member</span>
+                </div>
+            </div>
+            
+            <!-- Profile Details -->
+            <div class="card-body p-4 p-md-5">
+                <h5 class="fw-bold mb-4 border-bottom border-subtle pb-3">Account Details</h5>
+                
+                <div class="mb-4">
+                    <label class="form-label text-muted small fw-bold text-uppercase tracking-wider">Username</label>
+                    <div class="d-flex align-items-center gap-3 p-3 bg-light rounded-xl border border-subtle">
+                        <div class="bg-primary bg-opacity-10 text-primary p-2 rounded-lg">
+                            <i class="bi bi-person-badge fs-5"></i>
+                        </div>
+                        <span class="fs-5 fw-bold text-dark">{{ user.username }}</span>
+                    </div>
+                </div>
 
-{{user.username}}
+                <div class="alert bg-success bg-opacity-10 border-0 rounded-xl d-flex gap-3 align-items-start p-4 mt-5">
+                    <i class="bi bi-shield-check text-success fs-3"></i>
+                    <div>
+                        <h6 class="fw-bold text-dark mb-1">Secure Account</h6>
+                        <p class="text-muted small mb-0 fw-medium">Your account is active and secure. Explore the dashboard to take assessments and earn certificates.</p>
+                    </div>
+                </div>
+
+                <div class="d-grid mt-5">
+                    <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary rounded-pill py-3 fw-bold d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-arrow-left"></i> Return to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

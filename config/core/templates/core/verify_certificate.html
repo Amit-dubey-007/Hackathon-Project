@@ -1,289 +1,107 @@
-<!DOCTYPE html>
-<html>
+{% extends 'core/base.html' %}
 
-<head>
+{% block title %}Verify Certificate | {{ certificate.skill.name }}{% endblock %}
 
-<title>Certificate Verification</title>
+{% block content %}
+<div class="row justify-content-center my-5">
+    <div class="col-lg-8">
+        
+        <div class="text-center mb-5">
+            <span class="badge bg-success bg-opacity-10 text-success px-4 py-2 rounded-pill fw-bold mb-3 fs-6 border border-success border-opacity-25 d-inline-flex align-items-center gap-2 shadow-sm">
+                <i class="bi bi-shield-fill-check"></i> Authentic & Verified
+            </span>
+            <h1 class="display-6 fw-bold text-dark mb-2">Public Certificate Verification</h1>
+            <p class="text-muted mx-auto" style="max-width: 500px;">
+                This certificate has been issued and permanently recorded on the blockchain.
+            </p>
+        </div>
 
+        <div class="card border-0 shadow-lg rounded-2xl overflow-hidden position-relative bg-white">
+            <div class="position-absolute top-0 end-0 opacity-10 p-5" style="transform: translate(20%, -20%); pointer-events: none;">
+                <i class="bi bi-check-circle-fill text-success" style="font-size: 15rem; line-height: 1;"></i>
+            </div>
+            
+            <div class="card-body p-4 p-md-5 position-relative z-1">
+                
+                <div class="d-flex align-items-center gap-4 mb-5">
+                    <div class="bg-primary text-white rounded-2xl d-flex align-items-center justify-content-center shadow" style="width: 80px; height: 80px;">
+                        <i class="bi bi-patch-check-fill" style="font-size: 2.5rem;"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-muted fw-bold text-uppercase tracking-wider small mb-1">Credential Earned</h4>
+                        <h2 class="fw-bold text-dark mb-0">{{ certificate.skill.name }}</h2>
+                    </div>
+                </div>
+
+                <h5 class="fw-bold mb-4 border-bottom border-subtle pb-3">Certificate Details</h5>
+                
+                <div class="row g-4 mb-5">
+                    <div class="col-sm-6">
+                        <label class="form-label text-muted small fw-bold text-uppercase tracking-wider">Candidate</label>
+                        <div class="fs-5 fw-bold text-dark">{{ certificate.user.get_full_name|default:certificate.user.username }}</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="form-label text-muted small fw-bold text-uppercase tracking-wider">Issued On</label>
+                        <div class="fs-5 fw-medium text-dark">{{ certificate.issued_at }}</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="form-label text-muted small fw-bold text-uppercase tracking-wider">Final Score</label>
+                        <div class="fs-5 fw-bold text-primary">{{ certificate.assessment.score }}<span class="fs-6 text-muted">/100</span></div>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="form-label text-muted small fw-bold text-uppercase tracking-wider">Status</label>
+                        <div class="fs-5 fw-bold text-success d-flex align-items-center gap-2">
+                            <i class="bi bi-check-circle-fill"></i> PASSED
+                        </div>
+                    </div>
+                </div>
+
+                <h5 class="fw-bold mb-4 border-bottom border-subtle pb-3">Blockchain Record</h5>
+                
+                <div class="bg-light rounded-xl p-4 border border-subtle">
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <label class="form-label text-muted small fw-bold text-uppercase tracking-wider">Blockchain Status</label>
+                            <div class="d-flex align-items-center gap-2 fs-5 fw-bold text-success">
+                                ✅ Successfully Minted on Sepolia
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-6">
+                            <label class="form-label text-muted small fw-bold text-uppercase tracking-wider">Token ID</label>
+                            <div class="font-monospace fw-medium text-dark bg-white border border-subtle p-2 rounded-lg text-truncate">{{ certificate.token_id }}</div>
+                        </div>
+                        
+                        <div class="col-sm-6">
+                            <label class="form-label text-muted small fw-bold text-uppercase tracking-wider">Wallet Address</label>
+                            <div class="font-monospace fw-medium text-dark bg-white border border-subtle p-2 rounded-lg text-truncate">{{ certificate.wallet_address }}</div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label text-muted small fw-bold text-uppercase tracking-wider">Transaction</label>
+                            <div class="font-monospace fw-medium text-dark bg-white border border-subtle p-3 rounded-lg text-truncate mb-3">{{ certificate.transaction_hash }}</div>
+                            <a href="https://sepolia.etherscan.io/tx/{{ certificate.transaction_hash }}" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill fw-medium d-inline-flex align-items-center gap-2">
+                                Verify on Etherscan Explorer <i class="bi bi-box-arrow-up-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-5 d-flex justify-content-center">
+                    <a href="{% url 'download_certificate' certificate.id %}" class="btn btn-danger btn-lg rounded-pill fw-bold shadow-sm d-flex align-items-center gap-2 px-5">
+                        <i class="bi bi-file-earmark-pdf-fill fs-5"></i> Download PDF Copy
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% block extra_css %}
 <style>
-
-body{
-
-    background:#eef2ff;
-    font-family:Arial;
-
-}
-
-.card{
-
-    width:850px;
-
-    margin:50px auto;
-
-    background:white;
-
-    padding:40px;
-
-    border-radius:12px;
-
-    box-shadow:0 8px 25px rgba(0,0,0,.12);
-
-}
-
-h1{
-
-    text-align:center;
-
-    color:#1d4ed8;
-
-}
-
-.success{
-
-    color:green;
-
-    font-size:24px;
-
-    text-align:center;
-
-    margin-bottom:25px;
-
-}
-
-table{
-
-    width:100%;
-
-    border-collapse:collapse;
-
-}
-
-td{
-
-    border:1px solid #ddd;
-
-    padding:14px;
-
-}
-
-.label{
-
-    width:250px;
-
-    background:#f8fafc;
-
-    font-weight:bold;
-
-}
-
-.hash{
-
-    word-break:break-all;
-
-}
-
-a{
-
-    color:#2563eb;
-
-    text-decoration:none;
-
-}
-
-a:hover{
-
-    text-decoration:underline;
-
-}
-
+    .tracking-wider { letter-spacing: 0.05em; }
 </style>
-
-</head>
-
-<body>
-
-<div class="card">
-
-<h1>Blockchain Certificate Verification</h1>
-
-<div class="success">
-
-✅ Certificate Verified
-
-</div>
-
-<table>
-
-<tr>
-
-<td class="label">
-
-Candidate
-
-</td>
-
-<td>
-
-{{ certificate.user.get_full_name|default:certificate.user.username }}
-
-</td>
-
-</tr>
-
-<tr>
-
-<td class="label">
-
-Skill
-
-</td>
-
-<td>
-
-{{ certificate.skill.name }}
-
-</td>
-
-</tr>
-
-<tr>
-
-<td class="label">
-
-Final Score
-
-</td>
-
-<td>
-
-{{ certificate.assessment.score }}/100
-
-</td>
-
-</tr>
-
-<tr>
-
-<td class="label">
-
-Status
-
-</td>
-
-<td>
-
-PASSED
-
-</td>
-
-</tr>
-
-<tr>
-
-<td class="label">
-
-Wallet
-
-</td>
-
-<td class="hash">
-
-{{ certificate.wallet_address }}
-
-</td>
-
-</tr>
-
-<tr>
-
-<td class="label">
-
-Token ID
-
-</td>
-
-<td>
-
-{{ certificate.token_id }}
-
-</td>
-
-</tr>
-
-<tr>
-
-<td class="label">
-
-Transaction
-
-</td>
-
-<td class="hash">
-
-{{ certificate.transaction_hash }}
-
-<br><br>
-
-<a
-
-href="https://sepolia.etherscan.io/tx/{{ certificate.transaction_hash }}"
-
-target="_blank"
-
->
-
-View Transaction on Sepolia
-
-</a>
-
-</td>
-
-</tr>
-
-<tr>
-
-<td class="label">
-
-Issued On
-
-</td>
-
-<td>
-
-{{ certificate.issued_at }}
-
-</td>
-
-</tr>
-
-<tr>
-
-<td class="label">
-
-Blockchain Status
-
-</td>
-
-<td>
-
-✅ Successfully Minted
-
-</td>
-
-</tr>
-
-</table>
-
-<a
-href="{% url 'download_certificate' certificate.id %}"
-class="btn btn-danger">
-
-Download PDF
-
-</a>
-
-</div>
-
-</body>
-
-</html>
+{% endblock %}
+{% endblock %}

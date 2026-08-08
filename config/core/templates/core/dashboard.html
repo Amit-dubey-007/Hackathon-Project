@@ -1,102 +1,153 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Dashboard</title>
-</head>
+{% extends 'core/base.html' %}
 
-<body>
+{% block title %}Dashboard | AI Skills Platform{% endblock %}
 
-<h1>Welcome, {{ request.user.username }}</h1>
-
-<hr>
-
-<h2>Available Skills</h2>
-
-{% if skills %}
-
-    {% for skill in skills %}
-
-        <div>
-            <h3>{{ skill.name }}</h3>
-
-            <p>
-                {{ skill.description }}
-            </p>
-
-            <p>
-                Passing Score:
-                {{ skill.passing_score }}
-            </p>
-
-            <a href="{% url 'skill_detail' skill.id %}">
-                View Skill
+{% block content %}
+<div class="row mb-5 mt-3">
+    <div class="col-12">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div>
+                <h1 class="h2 mb-1 fw-bold text-dark">Welcome back, {{ request.user.username }}! 👋</h1>
+                <p class="text-muted mb-0 fs-5">Here's an overview of your skills and assessments.</p>
+            </div>
+            <a href="{% url 'skill_list' %}" class="btn btn-primary rounded-pill px-4 py-2 d-flex align-items-center gap-2 shadow-sm">
+                <i class="bi bi-plus-circle"></i> Browse Skills
             </a>
         </div>
+    </div>
+</div>
 
-        <hr>
-
-    {% endfor %}
-
-{% else %}
-
-    <p>No skills available.</p>
-
-{% endif %}
-
-
-<h2>Previous Assessments</h2>
-
-{% if assessments %}
-
-    {% for assessment in assessments %}
-
-        <p>
-            {{ assessment.skill.name }}
-
-            -
-
-            {% if assessment.completed_at %}
-                Score: {{ assessment.score }}/100
-
-                {% if assessment.passed %}
-                    ✅ Passed
+<div class="row g-4 mb-5">
+    <!-- Active Assessments -->
+    <div class="col-lg-8">
+        <h3 class="h5 fw-bold mb-4 d-flex align-items-center gap-2">
+            <i class="bi bi-clock-history text-primary"></i> Recent Assessments
+        </h3>
+        
+        <div class="card border-0 shadow-sm rounded-2xl">
+            <div class="card-body p-0">
+                {% if assessments %}
+                    <div class="list-group list-group-flush rounded-2xl">
+                        {% for assessment in assessments %}
+                        <div class="list-group-item list-group-item-action p-4 border-subtle">
+                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                                <div>
+                                    <h5 class="mb-1 fw-bold text-dark">{{ assessment.skill.name }}</h5>
+                                    <div class="d-flex align-items-center gap-3 mt-2">
+                                        {% if assessment.completed_at %}
+                                            <span class="badge {% if assessment.passed %}badge-success{% else %}badge-danger{% endif %} fw-semibold">
+                                                {% if assessment.passed %}
+                                                    <i class="bi bi-check-circle-fill me-1"></i> Passed
+                                                {% else %}
+                                                    <i class="bi bi-x-circle-fill me-1"></i> Failed
+                                                {% endif %}
+                                            </span>
+                                            <span class="text-muted small fw-medium">
+                                                <i class="bi bi-star-fill text-warning me-1"></i> Score: {{ assessment.score }}/100
+                                            </span>
+                                        {% else %}
+                                            <span class="badge badge-warning fw-semibold">
+                                                <i class="bi bi-hourglass-split me-1"></i> In Progress
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% if not assessment.completed_at %}
+                                    <a href="{% url 'start_assessment' assessment.skill.id %}" class="btn btn-sm btn-outline-primary fw-medium rounded-pill px-4">Continue</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
                 {% else %}
-                    ❌ Failed
+                    <div class="p-5 text-center text-muted">
+                        <div class="mb-3 d-inline-flex bg-light rounded-circle p-4">
+                            <i class="bi bi-journal-x fs-1 text-secondary opacity-50"></i>
+                        </div>
+                        <p class="mb-0 fw-medium fs-5 text-dark">You haven't taken any assessments yet.</p>
+                        <p class="small">Start an assessment to test your knowledge.</p>
+                        <a href="{% url 'skill_list' %}" class="btn btn-outline-primary mt-3 rounded-pill px-4 fw-medium">Explore Skills</a>
+                    </div>
                 {% endif %}
-            {% else %}
-                ⏳ In Progress
-            {% endif %}
-        </p>
+            </div>
+        </div>
+    </div>
 
-    {% endfor %}
+    <!-- Certificates / Stats -->
+    <div class="col-lg-4">
+        <h3 class="h5 fw-bold mb-4 d-flex align-items-center gap-2">
+            <i class="bi bi-award text-success"></i> My Certificates
+        </h3>
+        
+        <div class="card border-0 shadow-sm rounded-2xl h-100">
+            <div class="card-body p-0">
+                {% if certificates %}
+                    <div class="list-group list-group-flush rounded-2xl">
+                        {% for certificate in certificates %}
+                        <a href="{% url 'certificate_detail' certificate.id %}" class="list-group-item list-group-item-action p-4 border-subtle text-decoration-none transition-colors">
+                            <div class="d-flex align-items-start gap-3">
+                                <div class="bg-success bg-opacity-10 text-success p-2 rounded-xl">
+                                    <i class="bi bi-patch-check-fill fs-4"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1 fw-bold text-dark">{{ certificate.skill.name }}</h6>
+                                    <p class="mb-0 text-muted small fw-medium d-flex align-items-center gap-1">
+                                        <i class="bi bi-calendar-event"></i> Issued {{ certificate.issued_at }}
+                                    </p>
+                                </div>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="p-5 text-center text-muted d-flex flex-column justify-content-center h-100">
+                        <div class="mb-3">
+                            <i class="bi bi-shield-x fs-1 text-secondary opacity-50"></i>
+                        </div>
+                        <p class="mb-0 fw-medium text-dark">No certificates yet.</p>
+                        <p class="small mb-0">Pass an assessment to earn one.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
 
-{% else %}
-
-    <p>No assessments yet.</p>
-
-{% endif %}
-
-
-<h2>Certificates</h2>
-
-{% if certificates %}
-
-    {% for certificate in certificates %}
-
-        <p>
-            {{ certificate.skill.name }}
-            -
-            Issued {{ certificate.issued_at }}
-        </p>
-
-    {% endfor %}
-
-{% else %}
-
-    <p>No certificates yet.</p>
-
-{% endif %}
-
-
-</body>
-</html>
+<!-- Available Skills Preview -->
+<div class="mb-4 pt-2">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h3 class="h5 fw-bold mb-0">Available Skills</h3>
+        <a href="{% url 'skill_list' %}" class="text-primary fw-medium text-decoration-none small hover-text-primary d-flex align-items-center gap-1">View all <i class="bi bi-arrow-right"></i></a>
+    </div>
+    
+    <div class="row g-4">
+        {% if skills %}
+            {% for skill in skills %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm rounded-2xl hover-lift">
+                    <div class="card-body p-4 d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="bg-primary bg-opacity-10 text-primary p-2 rounded-xl">
+                                <i class="bi bi-lightning-charge-fill fs-5"></i>
+                            </div>
+                            <span class="badge badge-secondary fw-semibold rounded-pill">Passing: {{ skill.passing_score }}%</span>
+                        </div>
+                        <h5 class="card-title fw-bold text-dark mb-2">{{ skill.name }}</h5>
+                        <p class="card-text text-muted small flex-grow-1">{{ skill.description }}</p>
+                        <a href="{% url 'skill_detail' skill.id %}" class="btn btn-outline-secondary btn-sm rounded-pill mt-4 fw-medium w-100 py-2">View Skill</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="card border-0 shadow-sm rounded-2xl">
+                    <div class="card-body p-5 text-center text-muted">
+                        <p class="mb-0 fw-medium">No skills available right now.</p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

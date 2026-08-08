@@ -1,0 +1,79 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Evaluating Assessment...{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/loader.css' %}">
+<style>
+    /* Dark Theme override for this card only */
+    .eval-card {
+        background-color: #0f172a; /* Deep Navy */
+        color: white;
+    }
+    .eval-card .text-muted { color: #94a3b8 !important; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="eval-loader-active" data-url="{% url 'evaluate_assessment' assessment.id %}" class="row justify-content-center my-5">
+    <div class="col-lg-10 text-center">
+        <div class="card eval-card border-0 shadow-lg rounded-2xl overflow-hidden">
+            <div class="card-body p-4 p-md-5">
+                
+                <h2 class="fw-bold mb-5 text-white d-flex align-items-center justify-content-center gap-2">
+                    <i class="bi bi-stars text-accent"></i> AI Review Center
+                </h2>
+                
+                <div class="row align-items-center">
+                    <div class="col-md-6 mb-5 mb-md-0 border-end border-secondary border-opacity-25">
+                        <!-- Brain Animation -->
+                        <div class="ai-brain-container mx-auto">
+                            <i class="bi bi-cpu-fill brain-icon"></i>
+                            <div class="pulse-ring"></div>
+                            <div class="pulse-ring" style="animation-delay: 1s;"></div>
+                            <div class="scan-line"></div>
+                        </div>
+                        <div class="progress-container mt-5 mb-3" style="background: rgba(255,255,255,0.1);">
+                            <div class="progress-indeterminate" style="background: linear-gradient(90deg, #06b6d4, #2563eb);"></div>
+                        </div>
+                        <p class="text-accent small fw-medium mb-0">Processing Results...</p>
+                        <p class="text-muted small mt-1">Usually takes 5–15 seconds.</p>
+                    </div>
+                    
+                    <div class="col-md-6 ps-md-5">
+                        <!-- Checklist -->
+                        <div class="eval-checklist">
+                            <div class="check-item">
+                                <div class="check-icon"></div>
+                                <span class="fw-bold">Analyzing technical accuracy</span>
+                            </div>
+                            <div class="check-item">
+                                <div class="check-icon"></div>
+                                <span class="fw-bold">Reviewing coding logic</span>
+                            </div>
+                            <div class="check-item">
+                                <div class="check-icon"></div>
+                                <span class="fw-bold">Checking best practices</span>
+                            </div>
+                            <div class="check-item">
+                                <div class="check-icon"></div>
+                                <span class="fw-bold">Generating feedback</span>
+                            </div>
+                            <div class="check-item">
+                                <div class="check-icon"></div>
+                                <span class="fw-bold">Finalizing results & score</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/loader.js' %}"></script>
+{% endblock %}

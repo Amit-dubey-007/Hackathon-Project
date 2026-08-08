@@ -4,6 +4,8 @@ from . import views
 
 urlpatterns = [
 
+    path("",views.home,name="home"),
+    
     path(
         "dashboard/",
         views.dashboard,
@@ -75,5 +77,15 @@ urlpatterns = [
         "certificate/<int:certificate_id>/download/",
         views.download_certificate,
         name="download_certificate",
+    ),
+    path(
+        "skills/<int:skill_id>/loading/",
+        views.loading_questions_view,
+        name="loading_questions"
+    ),
+    path(
+        "assessment/<int:assessment_id>/loading-evaluation/",
+        views.loading_evaluation_view,
+        name="loading_evaluation"
     ),
 ]

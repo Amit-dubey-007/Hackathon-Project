@@ -1,443 +1,204 @@
-<!DOCTYPE html>
-<html>
-<head>
-
-<title>Certificate</title>
-
-<style>
-
-body{
-    background:#eef2ff;
-    font-family:Arial,Helvetica,sans-serif;
-}
-
-.certificate{
-
-    width:900px;
-    margin:40px auto;
-    background:white;
-    border:10px solid #1d4ed8;
-    padding:50px;
-    text-align:center;
-    box-shadow:0 10px 25px rgba(0,0,0,.15);
-
-}
-
-h1{
-
-    font-size:42px;
-    margin-bottom:10px;
-
-}
-
-h2{
-
-    color:#1d4ed8;
-
-}
-
-p{
-
-    font-size:18px;
-
-}
-
-table{
-
-    margin:auto;
-    margin-top:35px;
-    border-collapse:collapse;
-    width:80%;
-
-}
-
-td{
-
-    padding:14px;
-    border:1px solid #ddd;
-
-}
-
-.pass{
-
-    color:green;
-    font-weight:bold;
-    font-size:20px;
-
-}
-
-.pending{
-
-    color:#d97706;
-    font-weight:bold;
-
-}
-
-button{
-
-    padding:12px 25px;
-    margin-top:25px;
-    background:#1d4ed8;
-    color:white;
-    border:none;
-    border-radius:8px;
-    cursor:pointer;
-    font-size:16px;
-
-}
-
-button:hover{
-
-    background:#1e40af;
-
-}
-
-.wallet{
-
-    color:green;
-    font-weight:bold;
-    word-break:break-all;
-
-}
-
-.tx{
-
-    font-size:14px;
-    word-break:break-all;
-}
-
-</style>
-
-</head>
-
-<body>
-
-<div class="certificate">
-
-<h1>Skill Certificate</h1>
-
-<h2>Certificate of Achievement</h2>
-
-<p>
-
-This certifies that
-
-<br><br>
-
-<b style="font-size:28px;">
-{{ certificate.user.get_full_name|default:certificate.user.username }}
-</b>
-
-<br><br>
-
-has successfully demonstrated practical knowledge in
-
-<br><br>
-
-<b style="font-size:24px;color:#1d4ed8;">
-{{ certificate.skill.name }}
-</b>
-
-</p>
-
-<table>
-
-<tr>
-<td>Certificate ID</td>
-<td>CERT-{{ certificate.id }}</td>
-</tr>
-
-<tr>
-<td>Issued</td>
-<td>{{ certificate.issued_at }}</td>
-</tr>
-
-<tr>
-<td>Final Score</td>
-<td>{{ certificate.assessment.score }}/100</td>
-</tr>
-
-<tr>
-<td>Status</td>
-<td class="pass">PASSED</td>
-</tr>
-
-<tr>
-<td>Wallet</td>
-<td class="wallet">
-
-{% if profile.wallet_address %}
-{{ profile.wallet_address }}
-{% else %}
-
-<div class="card mt-4 p-4">
-
-    <h4>Connect Wallet</h4>
-
-    <button
-        id="connectWallet"
-        class="btn btn-primary">
-        Connect MetaMask
-    </button>
-
-    <hr>
-
-    <h5>Or enter wallet manually</h5>
-
-    <form method="post" action="{% url 'save_wallet_manual' %}">
-
-        {% csrf_token %}
-
-        <input
-            type="text"
-            name="wallet"
-            class="form-control"
-            placeholder="0x..."
-            required>
-
-        <br>
-
-        <button
-            class="btn btn-success">
-            Save Wallet
-        </button>
-
-    </form>
-
-</div>
-{% endif %}
-
-</td>
-</tr>
-
-<tr>
-
-<td>Blockchain</td>
-
-<td>
-
-{% if certificate.minted %}
-
-<span class="pass">Minted ✅</span>
-
-<br><br>
-
-<a href="{% url 'verify_certificate' certificate.id %}">
-
-<button>
-
-Verify Public Certificate
-
-</button>
-
-</a>
-
-{% else %}
-
-<span class="pending">Pending Mint</span>
-
-{% endif %}
-
-</td>
-
-</tr>
-
-<tr>
-
-<td>Token ID</td>
-
-<td>
-
-{{ certificate.token_id|default:"Not Minted" }}
-
-</td>
-
-</tr>
-
-<tr>
-    <td>Transaction</td>
-    <td>
-
-    {% if certificate.transaction_hash %}
-
-        <a
-            href="https://sepolia.etherscan.io/tx/{{ certificate.transaction_hash }}"
-            target="_blank"
-        >
-            View on Sepolia Etherscan
-        </a>
-
-        <br><br>
-
-        <small>{{ certificate.transaction_hash }}</small>
-
-    {% else %}
-
-        Not Available
-
-    {% endif %}
-
-    </td>
-</tr>
-
-</table>
-
-<br>
-
-{% if not profile.wallet_address %}
-
-<button id="connectWallet">
-
-Connect MetaMask
-
-</button>
-
-<p id="walletStatus"></p>
-
-{% endif %}
-
-
-{% if profile.wallet_address and not certificate.minted %}
-
-<a href="{% url 'mint_certificate' certificate.id %}"
-   class="btn btn-success">
-    Mint on Blockchain
-</a>
-
-<!-- <button>
-
-Mint on Blockchain
-
-</button> -->
-
-</a>
-
-{% endif %}
-
-
-{% if certificate.minted %}
-
-<h2 style="color:green;margin-top:30px;">
-
-🎉 Certificate Successfully Minted
-
-</h2>
-
-<a
-href="{% url 'download_certificate' certificate.id %}"
-class="btn btn-danger">
-
-Download PDF
-
-</a>
-
-{% endif %}
-
-
-
-{% if certificate.qr_code %}
-
-<hr>
-
-<h3>Scan to Verify</h3>
-
-<img
-src="{{ certificate.qr_code.url }}"
-width="220"
->
-
-<p>
-
-Scan this QR code to verify the certificate.
-
-</p>
-
-{% endif %}
-
+{% extends 'core/base.html' %}
+
+{% block title %}Certificate | {{ certificate.skill.name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center my-4">
+    <div class="col-lg-10">
+        
+        <!-- Header -->
+        <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+            <div>
+                <h2 class="fw-bold mb-0 text-dark">Certificate Details</h2>
+                <p class="text-muted mb-0">Manage your skill credential and blockchain verification.</p>
+            </div>
+            <div class="d-flex gap-2">
+                {% if certificate.minted %}
+                <a href="{% url 'download_certificate' certificate.id %}" class="btn btn-outline-danger rounded-pill px-4 fw-bold d-flex align-items-center gap-2">
+                    <i class="bi bi-file-earmark-pdf-fill"></i> Download PDF
+                </a>
+                <a href="{% url 'verify_certificate' certificate.id %}" class="btn btn-outline-success rounded-pill px-4 fw-bold d-flex align-items-center gap-2">
+                    <i class="bi bi-check-circle-fill"></i> Public Link
+                </a>
+                {% endif %}
+                <a href="{% url 'dashboard' %}" class="btn btn-light border-subtle rounded-pill px-4 fw-medium text-dark d-flex align-items-center gap-2">
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Main Certificate Card -->
+            <div class="col-md-8">
+                <div class="card border-0 shadow-sm rounded-2xl overflow-hidden h-100">
+                    <div class="card-body p-0">
+                        <div class="bg-primary text-white p-5 text-center position-relative">
+                            <div class="position-absolute top-0 end-0 opacity-10 p-4">
+                                <i class="bi bi-award-fill" style="font-size: 8rem; line-height: 1;"></i>
+                            </div>
+                            <div class="position-relative z-1">
+                                <span class="badge bg-white text-primary mb-3 px-3 py-2 rounded-pill fw-bold text-uppercase tracking-wider">Certificate of Achievement</span>
+                                <h3 class="fw-bold mb-2">This certifies that</h3>
+                                <h1 class="display-5 fw-bold mb-4">{{ certificate.user.get_full_name|default:certificate.user.username }}</h1>
+                                <h5 class="fw-medium opacity-75 mb-2">has successfully demonstrated practical knowledge in</h5>
+                                <h2 class="fw-bold mb-0 text-white">{{ certificate.skill.name }}</h2>
+                            </div>
+                        </div>
+                        
+                        <div class="p-4 p-md-5">
+                            <h5 class="fw-bold mb-4 border-bottom border-subtle pb-3">Certificate Information</h5>
+                            
+                            <div class="row g-4">
+                                <div class="col-sm-6">
+                                    <p class="text-muted small fw-bold text-uppercase tracking-wider mb-1">Certificate ID</p>
+                                    <p class="fw-medium text-dark mb-0 fs-5">CERT-{{ certificate.id }}</p>
+                                </div>
+                                <div class="col-sm-6">
+                                    <p class="text-muted small fw-bold text-uppercase tracking-wider mb-1">Issue Date</p>
+                                    <p class="fw-medium text-dark mb-0 fs-5">{{ certificate.issued_at }}</p>
+                                </div>
+                                <div class="col-sm-6">
+                                    <p class="text-muted small fw-bold text-uppercase tracking-wider mb-1">Final Score</p>
+                                    <p class="fw-medium text-dark mb-0 fs-5">{{ certificate.assessment.score }}/100</p>
+                                </div>
+                                <div class="col-sm-6">
+                                    <p class="text-muted small fw-bold text-uppercase tracking-wider mb-1">Status</p>
+                                    <p class="fw-bold text-success mb-0 fs-5 d-flex align-items-center gap-2">
+                                        <i class="bi bi-check-circle-fill"></i> PASSED
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Blockchain / Wallet Section -->
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm rounded-2xl overflow-hidden h-100">
+                    <div class="card-body p-4 p-md-5 d-flex flex-column">
+                        <h5 class="fw-bold mb-4 border-bottom border-subtle pb-3 d-flex align-items-center gap-2">
+                            <i class="bi bi-link-45deg text-primary"></i> Blockchain Status
+                        </h5>
+
+                        {% if certificate.minted %}
+                            <div class="alert bg-success bg-opacity-10 border-0 rounded-xl d-flex gap-3 align-items-center p-3 mb-4">
+                                <i class="bi bi-check-circle-fill text-success fs-3"></i>
+                                <div>
+                                    <h6 class="fw-bold text-success mb-0">Minted on Sepolia</h6>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <p class="text-muted small fw-bold text-uppercase tracking-wider mb-1">Token ID</p>
+                                <p class="fw-medium text-dark mb-0 font-monospace bg-light p-2 rounded-lg border border-subtle">{{ certificate.token_id|default:"Not Minted" }}</p>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <p class="text-muted small fw-bold text-uppercase tracking-wider mb-1">Transaction</p>
+                                {% if certificate.transaction_hash %}
+                                    <a href="https://sepolia.etherscan.io/tx/{{ certificate.transaction_hash }}" target="_blank" class="d-flex align-items-center gap-2 btn btn-outline-primary btn-sm rounded-pill fw-medium px-3 mt-1 text-truncate" style="max-width: 100%;">
+                                        View on Etherscan <i class="bi bi-box-arrow-up-right"></i>
+                                    </a>
+                                {% else %}
+                                    <p class="text-muted mb-0 font-monospace small">Not Available</p>
+                                {% endif %}
+                            </div>
+                            
+                            {% if certificate.qr_code %}
+                            <div class="mt-auto pt-3 border-top border-subtle text-center">
+                                <p class="text-muted small fw-bold text-uppercase tracking-wider mb-3">Scan to Verify</p>
+                                <img src="{{ certificate.qr_code.url }}" class="img-fluid rounded-xl border border-subtle p-2 bg-white" style="max-width: 160px;" alt="QR Code">
+                            </div>
+                            {% endif %}
+                            
+                        {% else %}
+                            <div class="alert bg-warning bg-opacity-10 border-0 rounded-xl d-flex gap-3 align-items-center p-3 mb-4">
+                                <i class="bi bi-hourglass-split text-warning fs-3"></i>
+                                <div>
+                                    <h6 class="fw-bold text-warning mb-0">Pending Mint</h6>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <p class="text-muted small fw-bold text-uppercase tracking-wider mb-2">Connected Wallet</p>
+                                
+                                {% if profile.wallet_address %}
+                                    <p class="fw-medium text-success mb-0 font-monospace bg-success bg-opacity-10 p-3 rounded-xl border border-success border-opacity-25 text-truncate">
+                                        <i class="bi bi-wallet2 me-2"></i>{{ profile.wallet_address }}
+                                    </p>
+                                    
+                                    <div class="mt-5 d-grid">
+                                        <a href="{% url 'mint_certificate' certificate.id %}" class="btn btn-success btn-lg rounded-pill fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2">
+                                            Mint on Blockchain <i class="bi bi-hammer"></i>
+                                        </a>
+                                    </div>
+                                {% else %}
+                                    <button id="connectWallet" class="btn btn-primary w-100 rounded-pill fw-bold py-2 mb-3 shadow-sm">
+                                        <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" width="20" class="me-2"> Connect MetaMask
+                                    </button>
+                                    <p id="walletStatus" class="text-center text-success fw-medium small font-monospace mb-4"></p>
+                                    
+                                    <div class="position-relative mb-4 text-center">
+                                        <hr class="border-subtle">
+                                        <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted small fw-bold">OR</span>
+                                    </div>
+
+                                    <form method="post" action="{% url 'save_wallet_manual' %}">
+                                        {% csrf_token %}
+                                        <div class="mb-3">
+                                            <input type="text" name="wallet" class="form-control rounded-pill bg-light border-subtle font-monospace text-center py-2" placeholder="Enter manual address (0x...)" required>
+                                        </div>
+                                        <button class="btn btn-outline-success w-100 rounded-pill fw-bold py-2">
+                                            Save Wallet Address
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
 </div>
 
+{% block extra_js %}
 <script>
-
-const connectButton=document.getElementById("connectWallet");
-
-if(connectButton){
-
-connectButton.onclick=async function(){
-
-if(typeof window.ethereum==="undefined"){
-
-    if(confirm(
-        "MetaMask is not installed.\n\nPress OK to install MetaMask.\nPress Cancel to enter a wallet manually."
-    )){
-
-        window.open(
-            "https://metamask.io/download/",
-            "_blank"
-        );
-
+    const connectButton = document.getElementById("connectWallet");
+    if(connectButton){
+        connectButton.onclick = async function(){
+            if(typeof window.ethereum === "undefined"){
+                if(confirm("MetaMask is not installed.\n\nPress OK to install MetaMask.\nPress Cancel to enter a wallet manually.")){
+                    window.open("https://metamask.io/download/", "_blank");
+                }
+                return;
+            }
+            try {
+                const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+                const wallet = accounts[0];
+                document.getElementById("walletStatus").innerHTML = "Connected : " + wallet;
+                
+                const response = await fetch("{% url 'save_wallet' %}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": "{{ csrf_token }}"
+                    },
+                    body: JSON.stringify({ wallet: wallet })
+                });
+                
+                if(response.ok){
+                    location.reload();
+                } else {
+                    alert("Unable to save wallet.");
+                }
+            } catch(err) {
+                alert(err.message);
+            }
+        };
     }
-
-    return;
-}
-
-try{
-
-const accounts=await window.ethereum.request({
-
-method:"eth_requestAccounts"
-
-});
-
-const wallet=accounts[0];
-
-document.getElementById("walletStatus").innerHTML=
-
-"Connected : "+wallet;
-
-const response=await fetch("{% url 'save_wallet' %}",{
-
-method:"POST",
-
-headers:{
-
-"Content-Type":"application/json",
-
-"X-CSRFToken":"{{ csrf_token }}"
-
-},
-
-body:JSON.stringify({
-
-wallet:wallet
-
-})
-
-});
-
-if(response.ok){
-
-location.reload();
-
-}else{
-
-alert("Unable to save wallet.");
-
-}
-
-}
-
-catch(err){
-
-alert(err.message);
-
-}
-
-};
-
-}
-
 </script>
-
-</body>
-
-</html>
+{% endblock %}
+{% endblock %}

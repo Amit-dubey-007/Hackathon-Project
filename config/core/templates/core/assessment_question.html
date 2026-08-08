@@ -1,85 +1,81 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Assessment</title>
-</head>
+{% extends 'core/base.html' %}
 
-<body>
+{% block title %}Question {{ question_number }} | {{ assessment.skill.name }}{% endblock %}
 
-<h1>
-    {{ assessment.skill.name }} Assessment
-</h1>
+{% block content %}
+<div class="row justify-content-center my-4">
+    <div class="col-lg-10">
+        
+        <!-- Header -->
+        <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+            <div>
+                <span class="text-muted fw-bold text-uppercase tracking-wider small d-block mb-1">{{ assessment.skill.name }} Assessment</span>
+                <h2 class="fw-bold mb-0 text-dark">Question {{ question_number }} of {% if total_questions %}{{ total_questions }}{% else %}5{% endif %}</h2>
+            </div>
+            
+            <!-- Progress -->
+            <div class="d-flex align-items-center gap-3 bg-white px-4 py-3 rounded-pill shadow-sm border border-subtle">
+                <i class="bi bi-stopwatch text-primary fs-5"></i>
+                <div class="progress" style="width: 120px; height: 8px;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: calc({{ question_number }} / 5 * 100%)"></div>
+                </div>
+            </div>
+        </div>
 
-<h3>
-    Question {{ question_number }}
-    / {{ total_questions }}
-</h3>
-
-<hr>
-
-<h2>
-    {{ task.title }}
-</h2>
-
-<p>
-    <strong>Topic:</strong>
-    {{ task.topic }}
-</p>
-
-<p>
-    <strong>Difficulty:</strong>
-    {{ task.difficulty }}
-</p>
-
-<hr>
-
-<h3>Question</h3>
-
-<p>
-    {{ task.question }}
-</p>
-
-<hr>
-
-{% if error %}
-
-    <p style="color:red;">
-        {{ error }}
-    </p>
-
-{% endif %}
-
-<form method="POST">
-
-    {% csrf_token %}
-
-    <textarea
-        name="answer"
-        rows="15"
-        cols="80"
-        placeholder="Write your answer here..."
-        required
-    ></textarea>
-
-    <br><br>
-
-    <button type="submit">
-
-        {% if question_number == 5 %}
-            Submit Assessment
-        {% else %}
-            Next Question
+        {% if error %}
+        <div class="alert alert-danger bg-danger bg-opacity-10 border-0 rounded-xl d-flex gap-3 align-items-center p-4 mb-4 shadow-sm">
+            <i class="bi bi-exclamation-triangle-fill text-danger fs-4"></i>
+            <div class="fw-bold text-danger">{{ error }}</div>
+        </div>
         {% endif %}
 
-    </button>
+        <!-- Question Card -->
+        <div class="card border-0 shadow-sm rounded-2xl overflow-hidden mb-4">
+            <div class="card-header bg-white border-bottom border-subtle p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <h4 class="fw-bold mb-0 text-dark">{{ task.title }}</h4>
+                <div class="d-flex gap-2">
+                    <span class="badge bg-light text-dark border border-subtle px-3 py-2 rounded-pill fw-medium d-flex align-items-center gap-2">
+                        <i class="bi bi-tag text-muted"></i> {{ task.topic }}
+                    </span>
+                    <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill fw-bold d-flex align-items-center gap-2">
+                        <i class="bi bi-bar-chart-steps"></i> {{ task.difficulty }}
+                    </span>
+                </div>
+            </div>
+            <div class="card-body p-4 p-md-5">
+                <div class="bg-light p-4 rounded-xl border border-subtle mb-4">
+                    <p class="fs-5 text-dark mb-0 lh-lg" style="white-space: pre-line;">{{ task.question }}</p>
+                </div>
+                
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+                            <i class="bi bi-pencil-square text-primary fs-5"></i> Your Answer
+                        </label>
+                        <textarea 
+                            name="answer" 
+                            class="form-control rounded-xl p-4 border-subtle shadow-sm bg-white focus-ring focus-ring-primary" 
+                            rows="12" 
+                            placeholder="Type your comprehensive answer here... Code snippets and detailed explanations are encouraged." 
+                            required
+                            style="resize: vertical; font-family: 'Inter', monospace; font-size: 15px; line-height: 1.6;"
+                        ></textarea>
+                    </div>
 
-</form>
-
-<br>
-
-<p>
-    Question {{ question_number }} of 5
-</p>
-
-</body>
-</html>
+                    <div class="d-flex justify-content-end mt-5">
+                        <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-bold d-flex align-items-center gap-2 shadow hover-lift transition-transform">
+                            {% if question_number == 5 %}
+                                Submit Assessment <i class="bi bi-check2-circle fs-4"></i>
+                            {% else %}
+                                Next Question <i class="bi bi-arrow-right fs-4"></i>
+                            {% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}

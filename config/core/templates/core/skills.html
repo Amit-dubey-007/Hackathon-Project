@@ -1,41 +1,55 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Skills</title>
-</head>
+{% extends 'core/base.html' %}
 
-<body>
+{% block title %}Skills Catalog | AI Skills Platform{% endblock %}
 
-<h1>Choose a Skill</h1>
-
-{% for skill in skills %}
-
-    <div>
-
-        <h2>{{ skill.name }}</h2>
-
-        <p>
-            {{ skill.description }}
+{% block content %}
+<div class="row mb-5 mt-4">
+    <div class="col-12 text-center">
+        <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill fw-bold mb-3">SKILL ASSESSMENTS</span>
+        <h1 class="display-6 fw-bold text-dark mb-3">Choose a Skill</h1>
+        <p class="text-muted lead mx-auto" style="max-width: 600px;">
+            Explore our curated list of skills, take AI-powered assessments, and earn blockchain-verified certificates.
         </p>
-
-        <p>
-            Passing score:
-            {{ skill.passing_score }}
-        </p>
-
-        <a href="{% url 'skill_detail' skill.id %}">
-            View Skill
-        </a>
-
     </div>
+</div>
 
-    <hr>
-
-{% empty %}
-
-    <p>No skills available.</p>
-
-{% endfor %}
-
-</body>
-</html>
+<div class="row g-4 mb-5">
+    {% for skill in skills %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm rounded-2xl hover-lift">
+            <div class="card-body p-4 d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-start mb-4">
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-xl d-flex align-items-center justify-content-center" style="width: 54px; height: 54px;">
+                        <i class="bi bi-code-square fs-3"></i>
+                    </div>
+                    <span class="badge badge-primary fw-semibold rounded-pill d-flex align-items-center gap-1 px-3 py-2">
+                        <i class="bi bi-bullseye"></i> Pass: {{ skill.passing_score }}
+                    </span>
+                </div>
+                
+                <h4 class="card-title fw-bold text-dark mb-3">{{ skill.name }}</h4>
+                <p class="card-text text-muted mb-4 flex-grow-1" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                    {{ skill.description }}
+                </p>
+                
+                <a href="{% url 'skill_detail' skill.id %}" class="btn btn-primary w-100 rounded-pill fw-medium py-2 mt-auto d-flex justify-content-center align-items-center gap-2">
+                    View Skill <i class="bi bi-arrow-right-short fs-4"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="card border-0 shadow-sm rounded-2xl">
+            <div class="card-body p-5 text-center text-muted py-5">
+                <div class="d-inline-flex bg-light rounded-circle p-4 mb-3">
+                    <i class="bi bi-search fs-1 text-secondary opacity-50"></i>
+                </div>
+                <h5 class="fw-bold text-dark">No skills available</h5>
+                <p class="mb-0">Check back later for new skill assessments.</p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

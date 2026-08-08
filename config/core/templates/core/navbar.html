@@ -1,0 +1,55 @@
+<nav class="navbar navbar-expand-lg glass-navbar sticky-top py-3">
+    <div class="container">
+        <!-- Brand / Logo -->
+        <a class="navbar-brand d-flex align-items-center fw-bold text-dark gap-2" href="{% url 'dashboard' %}">
+            <div class="bg-primary text-white rounded d-flex align-items-center justify-content-center shadow-sm" style="width: 36px; height: 36px;">
+                <i class="bi bi-layers-half fs-5"></i>
+            </div>
+            <span class="fs-5 tracking-tight">AI Skills Platform</span>
+        </a>
+
+        <!-- Mobile Toggle -->
+        <button class="navbar-toggler border-0 shadow-none px-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-list fs-1 text-dark"></i>
+        </button>
+
+        <!-- Navbar Links -->
+        <div class="collapse navbar-collapse" id="mainNavbar">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 fw-medium ms-lg-4">
+                <li class="nav-item">
+                    <a class="nav-link px-3 text-dark hover-text-primary" href="{% url 'dashboard' %}">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link px-3 text-dark hover-text-primary" href="{% url 'skill_list' %}">Skills Catalog</a>
+                </li>
+            </ul>
+            
+            <!-- User Menu -->
+            <div class="d-flex align-items-center mt-3 mt-lg-0">
+                {% if request.user.is_authenticated %}
+                <div class="dropdown">
+                    <button class="btn btn-light dropdown-toggle rounded-pill px-3 py-2 border-subtle d-flex align-items-center gap-2 shadow-sm bg-white hover-lift" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 28px; height: 28px; font-size: 13px;">
+                            {{ request.user.username|make_list|first|upper }}
+                        </div>
+                        <span class="fw-medium text-dark">{{ request.user.username }}</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-subtle rounded-xl mt-2 py-2">
+                        <li>
+                            <a class="dropdown-item py-2 px-3 fw-medium text-muted d-flex align-items-center gap-2" href="{% url 'accounts:profile' %}">
+                                <i class="bi bi-person fs-5"></i> My Profile
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider border-subtle my-2"></li>
+                        <li>
+                            <a class="dropdown-item py-2 px-3 fw-medium text-danger d-flex align-items-center gap-2" href="{% url 'accounts:logout' %}">
+                                <i class="bi bi-box-arrow-right fs-5"></i> Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>
