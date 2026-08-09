@@ -234,7 +234,9 @@ def integrity_agreement(request, skill_id):
         "core/integrity_agreement.html",
         {"skill": skill}
     )
-
+import logging
+import traceback
+logger = logging.getLogger(__name__)
 @login_required
 def start_assessment(request, skill_id):
 
@@ -244,9 +246,13 @@ def start_assessment(request, skill_id):
     )
 
     # Create assessment
+    start_time = timezone.now()
+    end_time = start_time + timezone.timedelta(minutes=skill.duration)
     assessment = Assessment.objects.create(
         user=request.user,
-        skill=skill
+        skill=skill,
+        start_time=start_time,
+        end_time=end_time
     )
 
     try:
@@ -305,6 +311,12 @@ def start_assessment(request, skill_id):
             e
         )
 
+        logger.exception("START ASSESSMENT FAILED")
+
+        print(traceback.format_exc())
+
+        raise
+
         assessment.delete()
 
         return HttpResponse(
@@ -331,20 +343,24 @@ def assessment_question(
         user=request.user
     )
 
+    if assessment.completed_at:
+        return redirect(
+            "assessment_result",
+            assessment_id=assessment.id
+        )
+
     # Get generated task IDs
     task_ids = request.session.get(
         f"assessment_{assessment.id}_tasks"
     )
 
     if not task_ids:
-
         return HttpResponse(
             "Assessment questions could not be found."
         )
 
     # Make sure question number is valid
     if question_number < 1 or question_number > 5:
-
         return redirect(
             "assessment_result",
             assessment_id=assessment.id
@@ -361,11 +377,24 @@ def assessment_question(
         skill=assessment.skill
     )
     
+    # Calculate remaining time (timezone aware)
+    now = timezone.now()
+    remaining_seconds = 0
+    if assessment.end_time:
+        remaining_seconds = int((assessment.end_time - now).total_seconds())
+
+    # If remaining time <= 0, immediately trigger auto-submission
+    if remaining_seconds <= 0:
+        trigger_auto_submit(request, assessment, task_ids, task, request.POST.get("answer", "").strip())
+        return redirect(
+            "assessment_result",
+            assessment_id=assessment.id
+        )
+
     estimated_time = request.session.get(f"task_{task.id}_time", "15 mins")
 
     # Handle answer
     if request.method == "POST":
-
         answer = request.POST.get(
             "answer",
             ""
@@ -373,7 +402,6 @@ def assessment_question(
         print(f"[Views Debug] POST request received for task_id={task.id}. Answer length={len(answer)}")
 
         if not answer:
-
             return render(
                 request,
                 "core/assessment_question.html",
@@ -383,7 +411,8 @@ def assessment_question(
                     "question_number": question_number,
                     "total_questions": 5,
                     "estimated_time": estimated_time,
-                    "error": "Please enter your answer."
+                    "error": "Please enter your answer.",
+                    "remaining_seconds": max(0, remaining_seconds)
                 }
             )
 
@@ -406,7 +435,6 @@ def assessment_question(
 
         # Go to next question
         if question_number < 5:
-
             return redirect(
                 "assessment_question",
                 assessment_id=assessment.id,
@@ -433,9 +461,52 @@ def assessment_question(
             "question_number": question_number,
             "total_questions": 5,
             "estimated_time": estimated_time,
-            "existing_answer": existing_submission.answer if existing_submission else ""
+            "existing_answer": existing_submission.answer if existing_submission else "",
+            "remaining_seconds": max(0, remaining_seconds)
         }
     )
+
+@login_required
+def auto_submit_assessment(request, assessment_id):
+    from django.http import JsonResponse
+    import json
+
+    assessment = get_object_or_404(
+        Assessment,
+        id=assessment_id,
+        user=request.user
+    )
+
+    if assessment.completed_at:
+        return JsonResponse({"success": True, "redirect_url": reverse("assessment_result", args=[assessment.id])})
+
+    task_ids = request.session.get(f"assessment_{assessment.id}_tasks")
+    if not task_ids:
+        # Fallback to DB tasks if session is empty
+        task_ids = list(Task.objects.filter(skill=assessment.skill).values_list("id", flat=True)[:5])
+
+    # Get current task and answer from POST if present
+    current_task = None
+    current_answer = ""
+    if request.method == "POST":
+        if request.content_type == "application/json":
+            try:
+                data = json.loads(request.body)
+                current_answer = data.get("answer", "").strip()
+                current_task_id = data.get("task_id")
+                if current_task_id:
+                    current_task = Task.objects.filter(id=current_task_id).first()
+            except Exception as e:
+                print("Error parsing JSON body in auto_submit:", e)
+        else:
+            current_answer = request.POST.get("answer", "").strip()
+            current_task_id = request.POST.get("task_id")
+            if current_task_id:
+                current_task = Task.objects.filter(id=current_task_id).first()
+
+    trigger_auto_submit(request, assessment, task_ids, current_task, current_answer)
+    
+    return JsonResponse({"success": True, "redirect_url": reverse("assessment_result", args=[assessment.id])})
 
 @login_required
 def assessment_violation(request, assessment_id):
@@ -515,52 +586,23 @@ def assessment_heartbeat(request, assessment_id):
         return JsonResponse({"success": True})
     return JsonResponse({"error": "Invalid request"}, status=400)
 
-@login_required
-def evaluate_assessment(
-    request,
-    assessment_id
-):
-
-    assessment = get_object_or_404(
-        Assessment,
-        id=assessment_id,
-        user=request.user
-    )
-
-    # Don't evaluate twice
+def run_evaluation_pipeline(request, assessment, submissions, submission_type="Manual Submission"):
     if assessment.completed_at:
+        return
 
-        return redirect(
-            "assessment_result",
-            assessment_id=assessment.id
-        )
+    from .ai import evaluate_assessment_batch
 
-    submissions = Submission.objects.filter(
-        assessment=assessment
-    ).select_related(
-        "task"
-    ).order_by(
-        "submitted_at"
-    )
-
-    # Must have exactly 5 answers
-    if submissions.count() < 5:
-
-        return HttpResponse(
-            "Assessment is incomplete. "
-            "Please answer all 5 questions."
-        )
+    assessment.submission_type = submission_type
+    
+    total_seconds = int((timezone.now() - assessment.start_time).total_seconds()) if assessment.start_time else 0
+    max_seconds = assessment.skill.duration * 60
+    if submission_type == "Auto Submitted (Time Expired)":
+        assessment.time_taken = min(total_seconds, max_seconds)
+    else:
+        assessment.time_taken = total_seconds
 
     # Batch AI evaluation
-    from .ai import evaluate_assessment_batch
-    from django.contrib import messages
-
-    try:
-        batch_result = evaluate_assessment_batch(assessment, submissions)
-    except Exception as e:
-        print("AI batch evaluation error:", e)
-        messages.error(request, "AI evaluation failed. Please try again later.")
-        return redirect("dashboard")
+    batch_result = evaluate_assessment_batch(assessment, submissions)
 
     # Overall summary
     overall_score = int(batch_result.get("overall_score", 0))
@@ -613,19 +655,110 @@ def evaluate_assessment(
     assessment.score = overall_score
     assessment.passed = passed
     assessment.completed_at = timezone.now()
-
     assessment.save()
 
     # Create certificate if passed
     if passed:
-
         Certificate.objects.get_or_create(
             assessment=assessment,
             defaults={
-                "user": request.user,
+                "user": assessment.user,
                 "skill": assessment.skill,
             }
         )
+
+def trigger_auto_submit(request, assessment, task_ids, current_task=None, current_answer=""):
+    if assessment.completed_at:
+        return
+
+    # 1. Save current question's answer if provided
+    if current_task:
+        existing_sub = Submission.objects.filter(assessment=assessment, task=current_task).first()
+        if not existing_sub:
+            Submission.objects.create(
+                assessment=assessment,
+                user=assessment.user,
+                task=current_task,
+                answer=current_answer
+            )
+        else:
+            existing_sub.answer = current_answer
+            existing_sub.save()
+
+    # 2. Fill all remaining tasks with blank submissions
+    for t_id in task_ids:
+        t = Task.objects.filter(id=t_id).first()
+        if t:
+            existing = Submission.objects.filter(assessment=assessment, task=t).first()
+            if not existing:
+                Submission.objects.create(
+                    assessment=assessment,
+                    user=assessment.user,
+                    task=t,
+                    answer=""
+                )
+
+    # 3. Retrieve all submissions
+    submissions = Submission.objects.filter(
+        assessment=assessment
+    ).select_related("task").order_by("submitted_at")
+
+    # 4. Run evaluation pipeline
+    try:
+        run_evaluation_pipeline(request, assessment, submissions, submission_type="Auto Submitted (Time Expired)")
+    except Exception as e:
+        print("Auto evaluation pipeline error:", e)
+
+    # Clean up session
+    request.session.pop(
+        f"assessment_{assessment.id}_tasks",
+        None
+    )
+    request.session.modified = True
+
+@login_required
+def evaluate_assessment(
+    request,
+    assessment_id
+):
+
+    assessment = get_object_or_404(
+        Assessment,
+        id=assessment_id,
+        user=request.user
+    )
+
+    # Don't evaluate twice
+    if assessment.completed_at:
+        return redirect(
+            "assessment_result",
+            assessment_id=assessment.id
+        )
+
+    submissions = Submission.objects.filter(
+        assessment=assessment
+    ).select_related(
+        "task"
+    ).order_by(
+        "submitted_at"
+    )
+
+    # Must have exactly 5 answers
+    if submissions.count() < 5:
+        return HttpResponse(
+            "Assessment is incomplete. "
+            "Please answer all 5 questions."
+        )
+
+    from django.contrib import messages
+
+    try:
+        run_evaluation_pipeline(request, assessment, submissions, submission_type="Manual Submission")
+    except Exception as e:
+        print("AI batch evaluation error:", e)
+        messages.error(request, "AI evaluation failed. Please try again later.")
+        return redirect("dashboard")
+
     # Remove temporary session data
     request.session.pop(
         f"assessment_{assessment.id}_tasks",

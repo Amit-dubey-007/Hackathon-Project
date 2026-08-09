@@ -17,6 +17,7 @@ class Skill(models.Model):
         ],
         default="Medium"
     )
+    duration = models.PositiveIntegerField(default=45)
 
     def __str__(self):
         return self.name
@@ -120,8 +121,70 @@ class Assessment(models.Model):
         blank=True
     )
 
+    start_time = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
+    end_time = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
+    time_taken = models.IntegerField(
+        null=True,
+        blank=True
+    )
+
+    submission_type = models.CharField(
+        max_length=50,
+        default="Manual Submission"
+    )
+
     def __str__(self):
         return f"{self.user} - {self.skill}"
+
+    @property
+    def time_used_formatted(self):
+        if self.time_taken is None:
+            return "0s"
+        mins = self.time_taken // 60
+        secs = self.time_taken % 60
+        if mins > 0:
+            return f"{mins}m {secs}s"
+        return f"{secs}s"
+
+    @property
+    def time_saved_formatted(self):
+        if self.time_taken is None:
+            return "0s"
+        allowed_seconds = self.skill.duration * 60
+        saved_seconds = max(0, allowed_seconds - self.time_taken)
+        mins = saved_seconds // 60
+        secs = saved_seconds % 60
+        if mins > 0:
+            return f"{mins}m {secs}s"
+        return f"{secs}s"
+
+    @property
+    def time_remaining_formatted(self):
+        if self.time_taken is None:
+            return "0s"
+        allowed_seconds = self.skill.duration * 60
+        remaining_seconds = max(0, allowed_seconds - self.time_taken)
+        mins = remaining_seconds // 60
+        secs = remaining_seconds % 60
+        if mins > 0:
+            return f"{mins}m {secs}s"
+        return f"{secs}s"
+
+    @property
+    def time_efficiency(self):
+        if self.time_taken is None or self.skill.duration == 0:
+            return 0
+        allowed_seconds = self.skill.duration * 60
+        efficiency = ((allowed_seconds - self.time_taken) / allowed_seconds) * 100
+        return max(0, min(100, int(efficiency)))
 
 
 class Submission(models.Model):

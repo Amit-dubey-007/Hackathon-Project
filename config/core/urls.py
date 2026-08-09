@@ -68,6 +68,12 @@ urlpatterns = [
     ),
 
     path(
+        "assessment/<int:assessment_id>/auto-submit/",
+        views.auto_submit_assessment,
+        name="auto_submit_assessment"
+    ),
+
+    path(
         "assessment/<int:assessment_id>/result/",
         views.assessment_result,
         name="assessment_result"

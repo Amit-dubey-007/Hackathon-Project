@@ -150,8 +150,13 @@ for successfully completing the practical assessment in
 </tr>
 
 <tr>
-<td class="label">Issue Date</td>
-<td>{{ certificate.issued_at|date:"F d, Y" }}</td>
+<td class="label">Completion Date</td>
+<td>{{ certificate.assessment.completed_at|date:"F d, Y"|default:certificate.issued_at|date:"F d, Y" }}</td>
+</tr>
+
+<tr>
+<td class="label">Passing Requirement</td>
+<td>{{ certificate.skill.passing_score }}/100</td>
 </tr>
 
 <tr>
@@ -173,6 +178,31 @@ Pending Blockchain Mint
 <tr>
 <td class="label">Wallet Address</td>
 <td>{{ certificate.wallet_address|default:"Not Connected" }}</td>
+</tr>
+
+<tr>
+<td class="label">Time Allowed</td>
+<td>{{ certificate.assessment.skill.duration }}m</td>
+</tr>
+
+<tr>
+<td class="label">Time Taken</td>
+<td>{{ certificate.assessment.time_used_formatted }}</td>
+</tr>
+
+<tr>
+<td class="label">Time Saved</td>
+<td>{{ certificate.assessment.time_saved_formatted }}</td>
+</tr>
+
+<tr>
+<td class="label">Time Efficiency</td>
+<td>{{ certificate.assessment.time_efficiency }}%</td>
+</tr>
+
+<tr>
+<td class="label">Submission Type</td>
+<td>{{ certificate.assessment.submission_type }}</td>
 </tr>
 
 <tr>

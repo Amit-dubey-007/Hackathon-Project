@@ -191,5 +191,5 @@ def reset_password(request):
     return render(request, "accounts/reset_password.html") 
 
 def profile(request):
-    return render(request,"accounts/profile.html",{'user':request.user})
+    return render(request,"accounts/profile.html",{'user':request.user,'profile':request.user.profile})
 

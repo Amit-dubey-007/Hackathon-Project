@@ -73,11 +73,19 @@
                 <h2 class="fw-bold mb-0">Question {{ question_number }} of {% if total_questions %}{{ total_questions }}{% else %}5{% endif %}</h2>
             </div>
             
-            <!-- Progress -->
-            <div class="d-flex align-items-center gap-3 bg-body-tertiary px-4 py-3 rounded-pill shadow-sm border border-subtle">
-                <i class="bi bi-stopwatch text-primary fs-5"></i>
-                <div class="progress" style="width: 120px; height: 8px;">
-                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: calc({{ question_number }} / 5 * 100%)"></div>
+            <!-- Timer & Progress -->
+            <div class="d-flex align-items-center gap-3">
+                <!-- Countdown Timer -->
+                <div class="d-flex align-items-center gap-2 bg-danger bg-opacity-10 text-danger px-4 py-3 rounded-pill shadow-sm border border-danger border-opacity-25 fw-bold font-monospace fs-5">
+                    <i class="bi bi-alarm-fill animated-pulse"></i>
+                    <span id="countdownTimer">--:--</span>
+                </div>
+                <!-- Progress -->
+                <div class="d-flex align-items-center gap-3 bg-body-tertiary px-4 py-3 rounded-pill shadow-sm border border-subtle">
+                    <i class="bi bi-stopwatch text-primary fs-5"></i>
+                    <div class="progress" style="width: 120px; height: 8px;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: calc({{ question_number }} / 5 * 100%)"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -196,10 +204,73 @@
         const saveStatus = document.getElementById('saveStatus');
         const form = document.getElementById('assessmentForm');
         const submitBtn = document.getElementById('submitBtn');
+
+        // Countdown Timer Logic
+        let remainingSeconds = parseInt("{{ remaining_seconds|default:0 }}") || 0;
+        const countdownTimerEl = document.getElementById('countdownTimer');
+        const autoSubmitUrl = "{% url 'auto_submit_assessment' assessment.id %}";
+        
+        function formatTime(secs) {
+            if (secs <= 0) return "00:00";
+            const m = Math.floor(secs / 60);
+            const s = secs % 60;
+            return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
+        
+        countdownTimerEl.textContent = formatTime(remainingSeconds);
+
+        let autoSubmitting = false;
+        async function triggerAutoSubmitAjax() {
+            if (autoSubmitting) return;
+            autoSubmitting = true;
+            console.log("[Timer] Time expired. Triggering auto submission...");
+            
+            if (submitBtn) submitBtn.disabled = true;
+            if (isCode && monacoInstance) {
+                monacoInstance.updateOptions({ readOnly: true });
+                editorEl.value = monacoInstance.getValue();
+            } else {
+                editorEl.disabled = true;
+            }
+            
+            try {
+                const response = await fetch(autoSubmitUrl, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        answer: (isCode && monacoInstance) ? monacoInstance.getValue() : editorEl.value,
+                        task_id: "{{ task.id }}"
+                    })
+                });
+                const data = await response.json();
+                if (data.redirect_url) {
+                    window.location.href = data.redirect_url;
+                } else {
+                    window.location.href = "{% url 'assessment_result' assessment.id %}";
+                }
+            } catch (err) {
+                console.error("Auto submit failed:", err);
+                window.location.href = "{% url 'assessment_result' assessment.id %}";
+            }
+        }
+
+        const timerInterval = setInterval(() => {
+            remainingSeconds--;
+            if (remainingSeconds <= 0) {
+                remainingSeconds = 0;
+                clearInterval(timerInterval);
+                triggerAutoSubmitAjax();
+            }
+            countdownTimerEl.textContent = formatTime(remainingSeconds);
+        }, 1000);
         
         // Form submit listener guard
         if (form.dataset.listenerAttached) {
             console.log("[Anti-Cheat Debug] Form submit listener already attached.");
+            clearInterval(timerInterval);
             return;
         }
         form.dataset.listenerAttached = "true";

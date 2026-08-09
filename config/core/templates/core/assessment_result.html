@@ -48,6 +48,41 @@
             </div>
         </div>
 
+        <!-- Timing Summary -->
+        <h3 class="fw-bold mb-4 d-flex align-items-center gap-2">
+            <i class="bi bi-clock-history text-primary"></i> Timing Report
+        </h3>
+        <div class="card border-0 shadow-sm rounded-2xl overflow-hidden mb-5">
+            <div class="card-body p-4 p-md-5">
+                <div class="row g-4">
+                    <div class="col-sm-6 col-md-3">
+                        <div class="border border-subtle p-3 rounded-xl bg-body-tertiary">
+                            <label class="text-muted small fw-bold text-uppercase tracking-wider d-block mb-1">Time Allowed</label>
+                            <span class="fs-5 fw-bold text-body">{{ assessment.skill.duration }}m</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <div class="border border-subtle p-3 rounded-xl bg-body-tertiary">
+                            <label class="text-muted small fw-bold text-uppercase tracking-wider d-block mb-1">Time Used</label>
+                            <span class="fs-5 fw-bold text-body">{{ assessment.time_used_formatted }}</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <div class="border border-subtle p-3 rounded-xl bg-body-tertiary">
+                            <label class="text-muted small fw-bold text-uppercase tracking-wider d-block mb-1">Time Remaining</label>
+                            <span class="fs-5 fw-bold text-body">{% if assessment.submission_type == 'Auto Submitted (Time Expired)' %}0s{% else %}{{ assessment.time_remaining_formatted }}{% endif %}</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <div class="border border-subtle p-3 rounded-xl bg-body-tertiary">
+                            <label class="text-muted small fw-bold text-uppercase tracking-wider d-block mb-1">Submission Type</label>
+                            <span class="badge {% if assessment.submission_type == "Auto Submitted (Time Expired)" %}bg-danger{% else %}bg-success{% endif %} bg-opacity-10 {% if assessment.submission_type == "Auto Submitted (Time Expired)" %}text-danger{% else %}text-success{% endif %} fw-bold fs-6 rounded-pill px-3 py-1 mt-1 d-inline-block">{{ assessment.submission_type }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Integrity Audit Log -->
         <h3 class="fw-bold mb-4 d-flex align-items-center gap-2 mt-5">
             <i class="bi bi-shield-check text-primary"></i> Integrity Report

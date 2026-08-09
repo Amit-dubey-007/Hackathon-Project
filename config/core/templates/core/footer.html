@@ -1,15 +1,61 @@
-<footer class="bg-white border-top border-subtle py-4 mt-auto">
-    <div class="container text-center text-md-start">
+<footer class="bg-body-tertiary border-top border-subtle py-5 mt-auto">
+    <div class="container">
+        <div class="row gy-4 mb-4">
+            <!-- Brand & Description -->
+            <div class="col-lg-5 col-md-12 pe-lg-5">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="bg-primary text-white rounded d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: linear-gradient(135deg, #ff7eb3 0%, #ff758c 100%, #8b5cf6 100%);">
+                        <i class="bi bi-shield-shaded fs-5"></i>
+                    </div>
+                    <h5 class="fw-bold mb-0 tracking-wider">AEGIS PROCTOR</h5>
+                </div>
+                <p class="text-muted small fw-medium lh-lg">
+                    Enterprise skill credentialing engine featuring real-time project challenges, timed assessments, automated AI rubric evaluation, and hardware proctoring.
+                </p>
+            </div>
+
+            <!-- Contact Us -->
+            <div class="col-lg-4 col-md-6">
+                <h6 class="fw-bold text-uppercase tracking-wider mb-4">Contact Us</h6>
+                <div class="d-flex flex-column gap-3">
+                    <div class="d-flex gap-3">
+                        <i class="bi bi-envelope text-primary"></i>
+                        <span class="text-muted small fw-medium"><strong>Email:</strong> support@aegis-proctor.io</span>
+                    </div>
+                    <div class="d-flex gap-3">
+                        <i class="bi bi-telephone text-success"></i>
+                        <span class="text-muted small fw-medium"><strong>Phone:</strong> +1 (800) 555-AEGIS</span>
+                    </div>
+                    <div class="d-flex gap-3">
+                        <i class="bi bi-geo-alt text-warning"></i>
+                        <span class="text-muted small fw-medium"><strong>Address:</strong> 777 AI Cyber Way, Suite 400, Silicon Valley, CA 94025</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Navigation -->
+            <div class="col-lg-3 col-md-6">
+                <h6 class="fw-bold text-uppercase text-warning tracking-wider mb-4">Quick Navigation</h6>
+                <div class="d-flex flex-column gap-3">
+                    <a href="#" class="text-muted text-decoration-none small fw-medium hover-text-primary transition-colors">Skills Catalog</a>
+                    <a href="#" class="text-muted text-decoration-none small fw-medium hover-text-primary transition-colors">How This Works</a>
+                    <a href="#" class="text-muted text-decoration-none small fw-medium hover-text-primary transition-colors">Help & Troubleshooting</a>
+                </div>
+            </div>
+        </div>
+
+        <hr class="border-subtle my-4">
+
         <div class="row align-items-center">
-            <div class="col-md-6 mb-3 mb-md-0">
-                <span class="text-muted fw-medium small d-flex align-items-center justify-content-center justify-content-md-start gap-2">
-                    <div class="bg-primary rounded-circle" style="width: 8px; height: 8px; opacity: 0.8;"></div>
-                    &copy; {% now "Y" %} AI Skills Platform. All rights reserved.
+            <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                <span class="text-muted small fw-medium">
+                    &copy; {% now "Y" %} Aegis Proctoring Technologies Inc. All Rights Reserved.
                 </span>
             </div>
-            <div class="col-md-6 text-md-end">
-                <a href="#" class="text-muted text-decoration-none small me-4 fw-medium hover-text-primary transition-colors">Privacy Policy</a>
-                <a href="#" class="text-muted text-decoration-none small fw-medium hover-text-primary transition-colors">Terms of Service</a>
+            <div class="col-md-6 text-center text-md-end">
+                <span class="text-primary text-opacity-75 small fw-bold font-monospace">
+                    Strict Hardware Anti-Cheating Protocol Enabled
+                </span>
             </div>
         </div>
     </div>

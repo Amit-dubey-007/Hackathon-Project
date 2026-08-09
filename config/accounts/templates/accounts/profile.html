@@ -27,18 +27,65 @@
                 
                 <div class="mb-4">
                     <label class="form-label text-muted small fw-bold text-uppercase tracking-wider">Username</label>
-                    <div class="d-flex align-items-center gap-3 p-3 bg-light rounded-xl border border-subtle">
+                    <div class="d-flex align-items-center gap-3 p-3 bg-body-tertiary rounded-xl border border-subtle">
                         <div class="bg-primary bg-opacity-10 text-primary p-2 rounded-lg">
                             <i class="bi bi-person-badge fs-5"></i>
                         </div>
-                        <span class="fs-5 fw-bold text-dark">{{ user.username }}</span>
+                        <span class="fs-5 fw-bold text-body">{{ user.username }}</span>
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="mb-4">
+                    <label class="form-label text-muted small fw-bold text-uppercase">Email Address</label>
+                    <div class="d-flex align-items-center gap-3 p-3 bg-body-tertiary rounded-xl border border-subtle">
+                        <div class="bg-info bg-opacity-10 text-info p-2 rounded-lg">
+                            <i class="bi bi-envelope-fill fs-5"></i>
+                        </div>
+
+                        <span class="fs-6 fw-semibold text-body">
+                            {{ user.email|default:"Not Provided" }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Wallet -->
+                <div class="mb-4">
+                    <label class="form-label text-muted small fw-bold text-uppercase">Wallet Address</label>
+
+                    <div class="d-flex align-items-center justify-content-between gap-3 p-3 bg-body-tertiary rounded-xl border border-subtle">
+
+                        <div class="d-flex align-items-center gap-3">
+
+                            <div class="bg-warning bg-opacity-10 text-warning p-2 rounded-lg">
+                                <i class="bi bi-wallet2 fs-5"></i>
+                            </div>
+
+                            {% if profile.wallet_address %}
+                                <code id="walletAddress" class="mb-0 text-body fw-semibold">
+                                    {{ profile.wallet_address|slice:":6" }}...{{ profile.wallet_address|slice:"-4:" }}
+                                </code>
+                            {% else %}
+                                <span class="text-muted">Not Connected</span>
+                            {% endif %}
+
+                        </div>
+
+                        {% if profile.wallet_address %}
+                        <button
+                            class="btn btn-sm btn-outline-secondary rounded-pill"
+                            onclick="navigator.clipboard.writeText('{{ profile.wallet_address }}')">
+                            <i class="bi bi-copy me-1"></i> Copy
+                        </button>
+                        {% endif %}
+
                     </div>
                 </div>
 
                 <div class="alert bg-success bg-opacity-10 border-0 rounded-xl d-flex gap-3 align-items-start p-4 mt-5">
                     <i class="bi bi-shield-check text-success fs-3"></i>
                     <div>
-                        <h6 class="fw-bold text-dark mb-1">Secure Account</h6>
+                        <h6 class="fw-bold text-body mb-1">Secure Account</h6>
                         <p class="text-muted small mb-0 fw-medium">Your account is active and secure. Explore the dashboard to take assessments and earn certificates.</p>
                     </div>
                 </div>

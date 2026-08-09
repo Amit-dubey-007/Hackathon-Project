@@ -6,7 +6,7 @@ from .models import Skill, Task, Submission, Evaluation, Certificate,Assessment
 
 @admin.register(Skill)
 class SkillAdmin(admin.ModelAdmin):
-    list_display = ("name", "passing_score")
+    list_display = ("name", "passing_score", "duration")
     search_fields = ("name",)
 
 
