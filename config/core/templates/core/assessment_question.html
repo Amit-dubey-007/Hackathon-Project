@@ -73,8 +73,14 @@
                 <h2 class="fw-bold mb-0">Question {{ question_number }} of {% if total_questions %}{{ total_questions }}{% else %}5{% endif %}</h2>
             </div>
             
-            <!-- Timer & Progress -->
-            <div class="d-flex align-items-center gap-3">
+            <!-- Timer, Proctoring & Progress -->
+            <div class="d-flex align-items-center gap-3 flex-wrap">
+                <!-- Proctoring Status -->
+                <div class="d-flex align-items-center gap-2 bg-body-tertiary px-4 py-3 rounded-pill shadow-sm border border-subtle">
+                    <span class="d-inline-block bg-warning rounded-circle" id="proctoringIndicator" style="width: 10px; height: 10px; transition: background-color 0.3s;"></span>
+                    <span class="small fw-bold text-muted" id="proctoringStatusText">Initializing AI...</span>
+                    <span class="badge bg-danger rounded-pill ms-1" id="proctoringWarningsBadge" style="display: none;">0/3 Warnings</span>
+                </div>
                 <!-- Countdown Timer -->
                 <div class="d-flex align-items-center gap-2 bg-danger bg-opacity-10 text-danger px-4 py-3 rounded-pill shadow-sm border border-danger border-opacity-25 fw-bold font-monospace fs-5">
                     <i class="bi bi-alarm-fill animated-pulse"></i>
@@ -178,6 +184,9 @@
 </div>
 
 {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/face_detection.js" crossorigin="anonymous"></script>
 <script>
 (function() {
     // 1. Guard against duplicate execution
@@ -468,11 +477,39 @@
             }).catch(err => console.log('[Anti-Cheat Debug] Heartbeat failed', err));
         }, 5000);
 
-        // 2. Webcam Initialization
+        // 2. Webcam & AI Proctoring Initialization
         let mediaStream = null;
+        let cocoModel = null;
+        let faceDetector = null;
+        let aiProctoringArmed = false;
+        let warningCount = 0;
+
+        // Status Elements
+        const proctoringIndicator = document.getElementById('proctoringIndicator');
+        const proctoringStatusText = document.getElementById('proctoringStatusText');
+        const proctoringWarningsBadge = document.getElementById('proctoringWarningsBadge');
+
+        // Create webcam video preview element
+        const proctoringVideo = document.createElement('video');
+        proctoringVideo.autoplay = true;
+        proctoringVideo.muted = true;
+        proctoringVideo.playsInline = true;
+        proctoringVideo.style.position = 'fixed';
+        proctoringVideo.style.bottom = '20px';
+        proctoringVideo.style.right = '20px';
+        proctoringVideo.style.width = '140px';
+        proctoringVideo.style.height = '105px';
+        proctoringVideo.style.zIndex = '99999';
+        proctoringVideo.style.borderRadius = '8px';
+        proctoringVideo.style.border = '2px solid var(--bs-border-color)';
+        proctoringVideo.style.transform = 'scaleX(-1)';
+        proctoringVideo.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+        document.body.appendChild(proctoringVideo);
+
         try {
             console.log("[Anti-Cheat Debug] Requesting user media...");
-            mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            mediaStream = await navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 240 }, audio: true });
+            proctoringVideo.srcObject = mediaStream;
             webcamReady = true;
             console.log("[Anti-Cheat Debug] User media initialized successfully.");
         } catch (err) {
@@ -481,17 +518,67 @@
             return;
         }
 
+        // Initialize AI models locally
+        async function loadAIModels() {
+            try {
+                console.log("[AI Proctoring] Initializing local models...");
+                cocoModel = await cocoSsd.load();
+                console.log("[AI Proctoring] COCO-SSD loaded.");
+                
+                faceDetector = new FaceDetection({
+                    locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/${file}`
+                });
+                faceDetector.setOptions({
+                    modelSelection: 0,
+                    minDetectionConfidence: 0.5
+                });
+                
+                faceDetector.onResults((results) => {
+                    if (results && results.detections) {
+                        facesCount = results.detections.length;
+                        firstFaceDetection = results.detections.length > 0 ? results.detections[0] : null;
+                    } else {
+                        facesCount = 0;
+                        firstFaceDetection = null;
+                    }
+                });
+                
+                console.log("[AI Proctoring] MediaPipe Face Detection initialized.");
+                return true;
+            } catch (err) {
+                console.error("[AI Proctoring] Local model initialization failed:", err);
+                return false;
+            }
+        }
+
+        let facesCount = 1;
+        let firstFaceDetection = null;
+        let phoneDetected = false;
+
         // 3. Wait for all dependencies + 3s delay
         console.log("[Anti-Cheat Debug] Waiting for all dependencies. editorReady:", editorReady, "webcamReady:", webcamReady);
-        const checkInit = setInterval(() => {
+        const checkInit = setInterval(async () => {
             if (editorReady && webcamReady) {
                 clearInterval(checkInit);
-                console.log("[Anti-Cheat Debug] All dependencies ready. Arming anti-cheat in 3 seconds...");
-                setTimeout(armAntiCheat, 3000);
+                console.log("[Anti-Cheat Debug] All standard dependencies ready. Loading local AI proctoring models...");
+                const modelsLoaded = await loadAIModels();
+                
+                if (modelsLoaded) {
+                    proctoringIndicator.className = 'd-inline-block bg-success rounded-circle';
+                    proctoringStatusText.textContent = 'AI Proctoring Active';
+                    console.log("[Anti-Cheat Debug] AI Models loaded. Arming anti-cheat in 3 seconds...");
+                    setTimeout(() => armAntiCheat(true), 3000);
+                } else {
+                    console.error("[AI Proctoring] Failed to load proctoring models. Continuing with standard anti-cheat.");
+                    proctoringIndicator.className = 'd-inline-block bg-danger rounded-circle';
+                    proctoringStatusText.textContent = 'AI Proctoring Error';
+                    setTimeout(() => armAntiCheat(false), 3000);
+                }
             }
         }, 500);
 
         function triggerViolation(reason) {
+            console.log("[AI Proctoring Log] Browser anti-cheat triggered: " + reason);
             console.warn("[Anti-Cheat Debug] triggerViolation called. Reason:", reason);
             if (isCode && monacoInstance) {
                 editorEl.value = monacoInstance.getValue();
@@ -526,13 +613,259 @@
             });
         }
 
-        function armAntiCheat() {
+        // Show Proctoring Warning dialog
+        function showWarningPopup(reason, count) {
+            const existing = document.getElementById('aiWarningPopup');
+            if (existing) {
+                existing.remove();
+            }
+
+            const popup = document.createElement('div');
+            popup.id = 'aiWarningPopup';
+            popup.className = 'card border-danger shadow-lg p-4 text-center';
+            popup.style.position = 'fixed';
+            popup.style.top = '50%';
+            popup.style.left = '50%';
+            popup.style.transform = 'translate(-50%, -50%)';
+            popup.style.zIndex = '100000';
+            popup.style.maxWidth = '400px';
+            popup.style.backgroundColor = 'var(--bs-body-bg)';
+            popup.style.border = '2px solid var(--bs-danger)';
+            
+            popup.innerHTML = `
+                <div class="card-body">
+                    <i class="bi bi-exclamation-octagon-fill text-danger fs-1 mb-3 d-block"></i>
+                    <h4 class="fw-bold text-danger mb-2">Proctoring Warning</h4>
+                    <p class="fs-6 fw-medium text-body mb-3">
+                        Violation detected: <strong class="text-danger">${reason}</strong>
+                    </p>
+                    <div class="badge bg-danger fs-5 px-3 py-2 rounded-pill mb-3">
+                        Warning ${count} of 3
+                    </div>
+                    <p class="small text-muted mb-4">
+                        Note: 3 warnings will result in immediate termination of your assessment.
+                    </p>
+                    <button class="btn btn-danger rounded-pill px-4 py-2 fw-bold" onclick="document.getElementById('aiWarningPopup').remove()">
+                        I Understand
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(popup);
+        }
+
+        async function triggerAIWarning(reason) {
+            warningCount++;
+            console.warn(`[AI Proctoring Warning] ${reason}. Warning: ${warningCount}/3`);
+            
+            // Show warnings count badge
+            proctoringWarningsBadge.style.display = 'inline-block';
+            proctoringWarningsBadge.textContent = `${warningCount}/3 Warnings`;
+
+            // Log warning to backend audit log
+            try {
+                await fetch(warningUrl, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        event_type: 'proctoring_warning',
+                        message: `AI Proctoring: ${reason} (Warning ${warningCount}/3)`,
+                        duration: 0,
+                        deduction: 5
+                    })
+                });
+            } catch (err) {
+                console.error("Failed to log warning to backend:", err);
+            }
+
+            if (warningCount >= 3) {
+                triggerViolation(`AI Proctoring: Exceeded warning limit. Last violation: ${reason}`);
+                return;
+            }
+
+            showWarningPopup(reason, warningCount);
+        }
+
+        function armAntiCheat(aiEnabled = true) {
             if (antiCheatArmed) return;
             antiCheatArmed = true;
+            aiProctoringArmed = aiEnabled;
             console.log("[Anti-Cheat Debug] ========================================");
-            console.log("[Anti-Cheat Debug] ANTI-CHEAT SYSTEM ARMED AND ACTIVE NOW");
+            console.log("[Anti-Cheat Debug] ANTI-CHEAT & PROCTORING ACTIVE NOW. AI Enabled: " + aiEnabled);
             console.log("[Anti-Cheat Debug] ========================================");
             
+            if (aiEnabled) {
+                // Start Face Detection loop (every 1 second)
+                if (faceDetector) {
+                    setInterval(async () => {
+                        if (proctoringVideo.readyState >= 2) {
+                            try {
+                                await faceDetector.send({ image: proctoringVideo });
+                            } catch (e) {
+                                console.error("Face detection send error:", e);
+                            }
+                        }
+                    }, 1000);
+                }
+
+                // Start Phone Detection loop (every 1.5 seconds) using COCO-SSD
+                if (cocoModel) {
+                    setInterval(async () => {
+                        if (proctoringVideo.readyState >= 2) {
+                            try {
+                                const predictions = await cocoModel.detect(proctoringVideo);
+                                const prevPhoneDetected = phoneDetected;
+                                
+                                const phonePred = predictions.find(pred => 
+                                    ['cell phone', 'mobile phone', 'phone'].includes(pred.class.toLowerCase())
+                                );
+                                phoneDetected = !!phonePred && phonePred.score >= 0.4;
+                                
+                                if (phoneDetected && !prevPhoneDetected) {
+                                    console.log("[AI Proctoring Log] Phone detected");
+                                }
+                            } catch (e) {
+                                console.error("COCO-SSD detection error:", e);
+                            }
+                        }
+                    }, 1500);
+                }
+            }
+
+            // AI Threshold checking (every 1 second)
+            let phoneTimer = 0;
+            let lastPhoneState = false;
+
+            let missingFaceTimer = 0;
+            let lastFaceState = true;
+
+            let multipleFacesTimer = 0;
+            let lastMultipleFacesState = false;
+
+            let lookingAwayTimer = 0;
+            let lastLookingAwayState = false;
+
+            setInterval(() => {
+                if (!aiProctoringArmed) return;
+                // Log face presence status
+                if (facesCount === 0) {
+                    console.log("[AI Proctoring Log] Face missing");
+                } else {
+                    console.log("[AI Proctoring Log] Face detected");
+                }
+                
+                // Log current warning count
+                console.log("[AI Proctoring Log] Warning count: " + warningCount + "/3");
+
+                // 1. Phone warning logic
+                if (phoneDetected) {
+                    if (!lastPhoneState) {
+                        console.log("[AI Proctoring Log] Phone warning issued");
+                        triggerAIWarning("Mobile phone detected");
+                        phoneTimer = 0;
+                        lastPhoneState = true;
+                    } else {
+                        phoneTimer++;
+                        if (phoneTimer >= 5) {
+                            phoneTimer = 0;
+                            console.log("[AI Proctoring Log] Phone warning issued");
+                            triggerAIWarning("Mobile phone remains detected");
+                        }
+                    }
+                } else {
+                    phoneTimer = 0;
+                    lastPhoneState = false;
+                }
+
+                // 2. Face missing warning logic (6 seconds)
+                if (facesCount === 0) {
+                    if (lastFaceState) {
+                        console.log("[AI Proctoring Log] Face lost");
+                        lastFaceState = false;
+                        missingFaceTimer = 0;
+                    }
+                    missingFaceTimer++;
+                    if (missingFaceTimer >= 6) {
+                        missingFaceTimer = 0;
+                        console.log("[AI Proctoring Log] Face warning issued");
+                        triggerAIWarning("No face detected in webcam");
+                    }
+                } else {
+                    if (!lastFaceState) {
+                        console.log("[AI Proctoring Log] Face restored");
+                        lastFaceState = true;
+                    }
+                    missingFaceTimer = 0;
+                }
+
+                // 3. Head pose / Looking away logic (6 seconds, left/right only, not up/down)
+                let isLookingAway = false;
+                if (firstFaceDetection && firstFaceDetection.landmarks) {
+                    const landmarks = firstFaceDetection.landmarks;
+                    if (landmarks.length >= 4) {
+                        const nose = landmarks[0];
+                        const rightEye = landmarks[2];
+                        const leftEye = landmarks[3];
+                        
+                        if (nose && rightEye && leftEye) {
+                            const distL = Math.abs(nose.x - leftEye.x);
+                            const distR = Math.abs(nose.x - rightEye.x);
+                            const hRatio = distL / (distR || 0.0001);
+                            
+                            // conservative threshold for turning away from screen left or right
+                            if (hRatio < 0.4 || hRatio > 2.5) {
+                                isLookingAway = true;
+                            }
+                        }
+                    }
+                }
+
+                console.log("[AI Proctoring Log] Head direction: " + (isLookingAway ? "Looking Away (Left/Right)" : "Looking Straight"));
+
+                if (isLookingAway) {
+                    if (!lastLookingAwayState) {
+                        console.log("[AI Proctoring Log] Looking away");
+                        lastLookingAwayState = true;
+                        lookingAwayTimer = 0;
+                    }
+                    lookingAwayTimer++;
+                    if (lookingAwayTimer >= 6) {
+                        lookingAwayTimer = 0;
+                        console.log("[AI Proctoring Log] Looking away warning issued");
+                        triggerAIWarning("Looking away from the screen");
+                    }
+                } else {
+                    if (lastLookingAwayState) {
+                        console.log("[AI Proctoring Log] Looking back");
+                        lastLookingAwayState = false;
+                    }
+                    lookingAwayTimer = 0;
+                }
+
+                // 4. Multiple faces warning logic (immediate, then 5 seconds)
+                if (facesCount > 1) {
+                    console.log("[AI Proctoring Log] Multiple faces detected: " + facesCount);
+                    if (!lastMultipleFacesState) {
+                        console.log(`[AI Proctoring Log] Warning count: ${warningCount + 1}/3`);
+                        triggerAIWarning("Multiple faces detected in webcam");
+                        multipleFacesTimer = 0;
+                        lastMultipleFacesState = true;
+                    } else {
+                        multipleFacesTimer++;
+                        if (multipleFacesTimer >= 5) {
+                            multipleFacesTimer = 0;
+                            console.log(`[AI Proctoring Log] Warning count: ${warningCount + 1}/3`);
+                            triggerAIWarning("Multiple faces remain detected");
+                        }
+                    }
+                } else {
+                    lastMultipleFacesState = false;
+                    multipleFacesTimer = 0;
+                }
+            }, 1000);
+
             // Browser Events (Immediate Failure)
             document.addEventListener('visibilitychange', () => {
                 console.log("[Anti-Cheat Event] visibilitychange. State:", document.visibilityState);
