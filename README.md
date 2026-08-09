@@ -349,8 +349,7 @@ ConsensusAI/
 
 **YouTube Demo:**
 
-> Add your demo video link here.
-
+> https://youtu.be/v9U4mod_6P8
 ---
 
 # 🌐 Live Demo
@@ -388,6 +387,19 @@ ConsensusAI/
 This project was developed as part of a Hackathon.
 
 ---
+
+# ⚠️ Known Limitations
+
+This project was developed during a hackathon using free-tier AI services.
+
+Current limitations include:
+
+- AI proctoring accuracy (face and mobile phone detection) depends on the performance of free browser-based TensorFlow.js models.
+- Detection may vary based on camera quality, lighting conditions, and device performance.
+- Free-tier AI APIs have request and rate limits that can affect response times.
+- The proctoring module is intended as a proof of concept and can be enhanced further using commercial vision APIs or custom-trained models for production deployments.
+
+Despite these limitations, the platform demonstrates the complete workflow of secure AI-powered practical assessments and blockchain-verifiable certification.
 
 # 📬 Contact
 
