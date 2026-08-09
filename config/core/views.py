@@ -19,7 +19,7 @@ from .ai import (
     evaluate_assessment_batch,
 )
 
-from .utils import generate_qr
+from .utils import generate_qr_base64
 from django.urls import reverse
 
 def home(request):
@@ -717,12 +717,21 @@ def certificate_detail(request, certificate_id):
 
     profile = request.user.profile
 
+    verification_url = request.build_absolute_uri(
+        reverse(
+            "verify_certificate",
+            args=[certificate.id]
+        )
+    )
+    qr_code_base64 = generate_qr_base64(verification_url)
+
     return render(
         request,
         "core/certificate.html",
         {
             "certificate": certificate,
-            "profile": profile
+            "profile": profile,
+            "qr_code_base64": qr_code_base64
         }
     )
 
@@ -800,27 +809,6 @@ def mint_certificate_view(request, certificate_id):
     certificate.minted = True
 
     certificate.wallet_address = wallet
-
-    verification_url = request.build_absolute_uri(
-
-        reverse(
-            "verify_certificate",
-            args=[certificate.id]
-        )
-
-    )
-
-    certificate.qr_code.save(
-
-        f"certificate_{certificate.id}.png",
-
-        generate_qr(
-            verification_url
-        ),
-
-        save=False
-
-    )
 
     certificate.save()
 
@@ -945,9 +933,18 @@ def download_certificate(
         "core/certificate_pdf.html"
     )
 
+    verification_url = request.build_absolute_uri(
+        reverse(
+            "verify_certificate",
+            args=[certificate.id]
+        )
+    )
+    qr_code_base64 = generate_qr_base64(verification_url)
+
     html = template.render({
 
-        "certificate": certificate
+        "certificate": certificate,
+        "qr_code_base64": qr_code_base64
 
     })
 

@@ -105,10 +105,10 @@
                                 {% endif %}
                             </div>
                             
-                            {% if certificate.qr_code %}
+                            {% if qr_code_base64 %}
                             <div class="mt-auto pt-3 border-top border-subtle text-center">
                                 <p class="text-muted small fw-bold text-uppercase tracking-wider mb-3">Scan to Verify</p>
-                                <img src="{{ certificate.qr_code.url }}" class="img-fluid rounded-xl border border-subtle p-2 bg-white" style="max-width: 160px;" alt="QR Code">
+                                <img src="{{ qr_code_base64 }}" class="img-fluid rounded-xl border border-subtle p-2 bg-white" style="max-width: 160px;" alt="QR Code">
                             </div>
                             {% endif %}
                             

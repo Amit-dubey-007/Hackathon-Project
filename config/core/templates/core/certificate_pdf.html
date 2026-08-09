@@ -209,10 +209,10 @@ AI Assessment Authority
 
 <td style="border:0;text-align:center;">
 
-{% if certificate.qr_code %}
+{% if qr_code_base64 %}
 
 <img
-src="{{ certificate.qr_code.path }}"
+src="{{ qr_code_base64 }}"
 width="120"
 height="120">
 
