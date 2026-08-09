@@ -1,0 +1,711 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}PROOF.AI | Decentralized Skill Verification{% endblock %}
+
+{% block extra_css %}
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    darkBg: '#020204',
+                    glassBg: 'rgba(8, 9, 14, 0.82)',
+                    neonCyan: '#06B6D4',
+                    neonPurple: '#A855F7',
+                    neonIndigo: '#6366F1',
+                    neonPink: '#EC4899',
+                },
+                fontFamily: {
+                    sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    mono: ['"JetBrains Mono"', 'monospace'],
+                },
+                boxShadow: {
+                    'neon-cyan': '0 0 20px rgba(6, 182, 212, 0.15)',
+                    'neon-purple': '0 0 20px rgba(168, 85, 247, 0.15)',
+                    'neon-pink': '0 0 20px rgba(236, 72, 153, 0.15)',
+                }
+            }
+        }
+    }
+</script>
+
+<!-- Google Fonts & FontAwesome -->
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+    /* Reset main container limits for full-bleed Tailwind landing page */
+    main.container {
+        max-width: 100% !important;
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    body {
+        background-color: #020204 !important;
+        color: #ffffff !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
+        overflow-x: hidden;
+    }
+
+    /* Force light colors on navbar links specifically for home.html dark bg */
+    nav.glass-navbar .nav-link,
+    nav.glass-navbar .navbar-brand,
+    nav.glass-navbar .text-theme-main,
+    nav.glass-navbar .dropdown-toggle {
+        color: #ffffff !important;
+    }
+    
+    nav.glass-navbar .dropdown-menu {
+        background-color: #0f172a !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    nav.glass-navbar .dropdown-item {
+        color: #cbd5e1 !important;
+    }
+
+    nav.glass-navbar .dropdown-item:hover {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        color: #ffffff !important;
+    }
+
+    /* Resolve Tailwind CSS conflict with Bootstrap navbar collapse */
+    .collapse:not(.show) {
+        display: none !important;
+    }
+    @media (min-width: 992px) {
+        .navbar-expand-lg .navbar-collapse {
+            display: flex !important;
+            visibility: visible !important;
+        }
+    }
+
+    /* Glassmorphism */
+    .glass-panel {
+        background: rgba(8, 9, 14, 0.82);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    .glass-panel-hover:hover {
+        background: rgba(14, 16, 26, 0.9);
+        border-color: rgba(6, 182, 212, 0.3);
+        box-shadow: 0 0 30px rgba(6, 182, 212, 0.15);
+        transform: translateY(-4px);
+    }
+
+    /* Ambient Grid Background */
+    .grid-bg {
+        background-size: 40px 40px;
+        background-image: 
+            linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    }
+
+    /* Custom Scanline Animation */
+    .scanline::after {
+        content: " ";
+        display: block;
+        position: absolute;
+        top: 0; left: 0; bottom: 0; right: 0;
+        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+        z-index: 2;
+        background-size: 100% 2px, 3px 100%;
+        pointer-events: none;
+    }
+
+    /* Shimmer Effect for Headings */
+    .shimmer-text {
+        background: linear-gradient(to right, #ffffff 20%, #a855f7 40%, #06b6d4 60%, #ffffff 80%);
+        background-size: 200% auto;
+        color: transparent;
+        background-clip: text;
+        -webkit-background-clip: text;
+        animation: shine 6s linear infinite;
+    }
+
+    @keyframes shine {
+        to { background-position: 200% center; }
+    }
+
+    /* Floating blobs */
+    .blob {
+        filter: blur(100px);
+        opacity: 0.45;
+        mix-blend-mode: screen;
+        pointer-events: none;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+        background: #020204;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: rgba(6, 182, 212, 0.4);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<script>
+    document.documentElement.setAttribute('data-bs-theme', 'dark');
+    document.documentElement.classList.add('dark');
+</script>
+<div class="relative min-h-screen bg-darkBg text-white selection:bg-neonCyan/30 selection:text-neonCyan font-sans grid-bg">
+    
+    <!-- Ambient Floating Blobs -->
+    <div class="blob absolute top-20 left-[10%] w-[450px] h-[450px] rounded-full bg-gradient-to-tr from-neonCyan to-neonIndigo animate-[pulse_8s_infinite] z-0"></div>
+    <div class="blob absolute top-[40%] right-[10%] w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-neonPurple to-neonPink animate-[pulse_10s_infinite] z-0"></div>
+    <div class="blob absolute bottom-20 left-[20%] w-[400px] h-[400px] rounded-full bg-gradient-to-tr from-neonIndigo to-neonCyan animate-[pulse_9s_infinite] z-0"></div>
+
+    <!-- Connecting Particle Canvas -->
+    <canvas id="particlesCanvas" class="absolute inset-0 w-full h-full pointer-events-none z-[1]"></canvas>
+
+    <!-- HERO SECTION -->
+    <section class="relative pt-12 pb-24 px-6 max-w-7xl mx-auto z-10 flex flex-col lg:flex-row items-center gap-16">
+        <!-- Hero Details -->
+        <div class="flex-1 space-y-8 text-left reveal">
+            <!-- Soulbound Badge -->
+            <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-neonCyan/10 border border-neonCyan/25 backdrop-blur-md shadow-neon-cyan animate-pulse">
+                <i class="fa-solid fa-shield-halved text-neonCyan"></i>
+                <span class="text-xs font-bold uppercase tracking-widest text-neonCyan font-mono">ERC-5192 Soulbound Credentials</span>
+            </div>
+
+            <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight leading-[1.1] shimmer-text">
+                Don't Tell Employers What You Know.<br/>
+                <span class="text-white">Prove It.</span>
+            </h1>
+
+            <p class="text-lg text-white/70 max-w-2xl font-light leading-relaxed">
+                Consensus AI replaces old school resumes with immutable verification. Solve practical, sandbox-secured coding tasks in real-time, get certified by local AI proctors, and mint your Soulbound NFT certificate directly to your cryptographic wallet.
+            </p>
+
+            <div class="flex flex-wrap gap-4 pt-2">
+                <a href="{% url 'skill_list' %}" class="relative group px-8 py-4 rounded-full text-base font-bold text-darkBg overflow-hidden transition-transform active:scale-95 shadow-lg shadow-neonCyan/25">
+                    <span class="absolute inset-0 bg-gradient-to-r from-neonCyan via-neonIndigo to-neonPurple transition-all group-hover:scale-105"></span>
+                    <span class="relative flex items-center gap-2">
+                        Start Assessment <i class="fa-solid fa-arrow-right"></i>
+                    </span>
+                </a>
+                <a href="{% url 'wallet_guide' %}" class="px-8 py-4 rounded-full text-base font-bold text-white/90 bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all backdrop-blur-md">
+                    Explore Skills
+                </a>
+            </div>
+
+            <!-- Floating Metric Badges -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-6 max-w-lg">
+                <div class="glass-panel p-4 rounded-2xl flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-neonCyan/10 flex items-center justify-center text-neonCyan"><i class="fa-solid fa-brain"></i></div>
+                    <div>
+                        <div class="text-xs text-white/50 uppercase tracking-wider font-mono">Evaluation</div>
+                        <div class="font-bold text-white">Pure AI Rubric</div>
+                    </div>
+                </div>
+                <div class="glass-panel p-4 rounded-2xl flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-neonPurple/10 flex items-center justify-center text-neonPurple"><i class="fa-solid fa-cube"></i></div>
+                    <div>
+                        <div class="text-xs text-white/50 uppercase tracking-wider font-mono">Minting</div>
+                        <div class="font-bold text-white">Gasless SBT</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live AI Terminal -->
+        <div class="flex-1 w-full max-w-xl relative group z-10 reveal">
+            <div class="absolute -inset-1.5 bg-gradient-to-tr from-neonCyan via-neonIndigo to-neonPurple rounded-2xl blur opacity-30 group-hover:opacity-50 transition-opacity"></div>
+            <div class="relative glass-panel rounded-2xl overflow-hidden shadow-2xl scanline">
+                <!-- Window Header -->
+                <div class="flex items-center justify-between px-4 py-3 bg-black/40 border-b border-white/5">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-rose-500/80"></span>
+                        <span class="w-3 h-3 rounded-full bg-amber-500/80"></span>
+                        <span class="w-3 h-3 rounded-full bg-emerald-500/80"></span>
+                    </div>
+                    <span class="text-xs font-mono text-white/40 tracking-wider"><i class="fa-solid fa-terminal mr-1.5"></i> sandbox_environment.sh</span>
+                    <span class="text-xs font-mono text-neonCyan/80 px-2 py-0.5 rounded bg-neonCyan/10">01:00s</span>
+                </div>
+                <!-- Terminal Content -->
+                <div class="p-6 font-mono text-sm text-white/80 space-y-2.5 h-[290px] overflow-hidden select-none bg-black/60">
+                    <div id="terminal-body" class="space-y-2"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- STATISTICS SECTION -->
+    <section class="py-16 px-6 max-w-7xl mx-auto z-10 relative">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div class="glass-panel p-8 rounded-3xl text-center shadow-neon-cyan relative overflow-hidden group">
+                <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-neonCyan/5 rounded-full filter blur-xl group-hover:bg-neonCyan/15 transition-all"></div>
+                <div class="text-4xl md:text-5xl font-extrabold text-white mb-2" data-target="8240">0</div>
+                <div class="text-xs uppercase tracking-widest text-neonCyan font-mono">Verified Users</div>
+            </div>
+            <div class="glass-panel p-8 rounded-3xl text-center shadow-neon-purple relative overflow-hidden group">
+                <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-neonPurple/5 rounded-full filter blur-xl group-hover:bg-neonPurple/15 transition-all"></div>
+                <div class="text-4xl md:text-5xl font-extrabold text-white mb-2" data-target="99">0</div>
+                <div class="text-xs uppercase tracking-widest text-neonPurple font-mono">AI Accuracy %</div>
+            </div>
+            <div class="glass-panel p-8 rounded-3xl text-center shadow-neon-pink relative overflow-hidden group">
+                <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-neonPink/5 rounded-full filter blur-xl group-hover:bg-neonPink/15 transition-all"></div>
+                <div class="text-4xl md:text-5xl font-extrabold text-white mb-2" data-target="5120">0</div>
+                <div class="text-xs uppercase tracking-widest text-neonPink font-mono">Certificates Issued</div>
+            </div>
+            <div class="glass-panel p-8 rounded-3xl text-center shadow-neon-cyan relative overflow-hidden group">
+                <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-neonCyan/5 rounded-full filter blur-xl group-hover:bg-neonCyan/15 transition-all"></div>
+                <div class="text-4xl md:text-5xl font-extrabold text-white mb-2" data-target="420">0</div>
+                <div class="text-xs uppercase tracking-widest text-neonCyan font-mono">Hiring Partners</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- WHY PROOF.AI SECTION -->
+    <section class="py-24 px-6 max-w-7xl mx-auto z-10 relative space-y-16">
+        <div class="text-center space-y-4 max-w-3xl mx-auto reveal">
+            <h2 class="text-3xl md:text-5xl font-extrabold">Reforming Dynamic Credentials</h2>
+            <p class="text-white/60">A secure environment loaded with developer configurations and custom AI criteria assessment tools.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <!-- Card 1 -->
+            <div class="glass-panel glass-panel-hover p-8 rounded-3xl flex flex-col justify-between transition-all duration-300 reveal group">
+                <div class="space-y-6">
+                    <div class="w-12 h-12 rounded-2xl bg-neonCyan/15 flex items-center justify-center text-neonCyan text-xl group-hover:scale-110 transition-transform"><i class="fa-solid fa-microchip"></i></div>
+                    <h3 class="text-xl font-bold">AI Practical Evaluation</h3>
+                    <p class="text-sm text-white/60 leading-relaxed">Code execution tests are passed through local AI metrics verifying runtime performance and correct implementations.</p>
+                </div>
+            </div>
+            <!-- Card 2 -->
+            <div class="glass-panel glass-panel-hover p-8 rounded-3xl flex flex-col justify-between transition-all duration-300 reveal group">
+                <div class="space-y-6">
+                    <div class="w-12 h-12 rounded-2xl bg-neonPurple/15 flex items-center justify-center text-neonPurple text-xl group-hover:scale-110 transition-transform"><i class="fa-solid fa-server"></i></div>
+                    <h3 class="text-xl font-bold">Secure Sandbox</h3>
+                    <p class="text-sm text-white/60 leading-relaxed">Assessments run in isolated cloud docker execution environments so candidates can code without setup delays.</p>
+                </div>
+            </div>
+            <!-- Card 3 -->
+            <div class="glass-panel glass-panel-hover p-8 rounded-3xl flex flex-col justify-between transition-all duration-300 reveal group">
+                <div class="space-y-6">
+                    <div class="w-12 h-12 rounded-2xl bg-neonPink/15 flex items-center justify-center text-neonPink text-xl group-hover:scale-110 transition-transform"><i class="fa-solid fa-link"></i></div>
+                    <h3 class="text-xl font-bold">Blockchain Verification</h3>
+                    <p class="text-sm text-white/60 leading-relaxed">Every assessment score is recorded cryptographically on-chain ensuring 100% security against forge attempts.</p>
+                </div>
+            </div>
+            <!-- Card 4 -->
+            <div class="glass-panel glass-panel-hover p-8 rounded-3xl flex flex-col justify-between transition-all duration-300 reveal group">
+                <div class="space-y-6">
+                    <div class="w-12 h-12 rounded-2xl bg-neonCyan/15 flex items-center justify-center text-neonCyan text-xl group-hover:scale-110 transition-transform"><i class="fa-solid fa-award"></i></div>
+                    <h3 class="text-xl font-bold">Soulbound Certificates</h3>
+                    <p class="text-sm text-white/60 leading-relaxed">Mint credentials directly as Soulbound Tokens (SBT) ensuring they remain permanently anchored to your identity.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TRADITIONAL VS PROOF.AI -->
+    <section class="py-24 px-6 max-w-7xl mx-auto z-10 relative space-y-16">
+        <div class="text-center space-y-4 max-w-3xl mx-auto reveal">
+            <h2 class="text-3xl md:text-5xl font-extrabold">Resumes vs Reality</h2>
+            <p class="text-white/60">Compare the legacy verification infrastructure with dynamic smart contract credentials.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto reveal">
+            <!-- Legacy -->
+            <div class="glass-panel p-8 rounded-3xl border-rose-500/20 relative group">
+                <div class="absolute top-6 right-6 w-8 h-8 rounded-full bg-rose-500/10 flex items-center justify-center text-rose-500"><i class="fa-solid fa-circle-xmark"></i></div>
+                <h3 class="text-2xl font-bold text-white mb-6">Traditional Process</h3>
+                <ul class="space-y-6 text-white/70">
+                    <li class="flex items-start gap-4">
+                        <div class="w-6 h-6 rounded-full bg-rose-500/10 flex items-center justify-center text-rose-500 text-xs shrink-0 mt-0.5"><i class="fa-solid fa-xmark"></i></div>
+                        <div>
+                            <h4 class="font-bold text-white">Unverified Text-based Resumes</h4>
+                            <p class="text-xs text-white/50 mt-1">Easy to customize, manipulate, and overstate experience with zero verification checks.</p>
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-4">
+                        <div class="w-6 h-6 rounded-full bg-rose-500/10 flex items-center justify-center text-rose-500 text-xs shrink-0 mt-0.5"><i class="fa-solid fa-xmark"></i></div>
+                        <div>
+                            <h4 class="font-bold text-white">Theoretical Multiple-Choice Exams</h4>
+                            <p class="text-xs text-white/50 mt-1">Focuses purely on memorization instead of real practical capabilities and problem-solving.</p>
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-4">
+                        <div class="w-6 h-6 rounded-full bg-rose-500/10 flex items-center justify-center text-rose-500 text-xs shrink-0 mt-0.5"><i class="fa-solid fa-xmark"></i></div>
+                        <div>
+                            <h4 class="font-bold text-white">Centrally Controlled Certs</h4>
+                            <p class="text-xs text-white/50 mt-1">Can be revoked, easily altered, or entirely forged with few methods for employers to audit authenticity.</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- PROOF.AI -->
+            <div class="glass-panel p-8 rounded-3xl border-neonCyan/30 relative group shadow-neon-cyan">
+                <div class="absolute -inset-[1px] bg-gradient-to-tr from-neonCyan via-neonIndigo to-neonPurple rounded-3xl -z-10 blur-sm opacity-20"></div>
+                <div class="absolute top-6 right-6 w-8 h-8 rounded-full bg-neonCyan/10 flex items-center justify-center text-neonCyan"><i class="fa-solid fa-circle-check"></i></div>
+                <h3 class="text-2xl font-bold text-white mb-6">PROOF.AI Engine</h3>
+                <ul class="space-y-6 text-white/70">
+                    <li class="flex items-start gap-4">
+                        <div class="w-6 h-6 rounded-full bg-neonCyan/15 flex items-center justify-center text-neonCyan text-xs shrink-0 mt-0.5"><i class="fa-solid fa-check"></i></div>
+                        <div>
+                            <h4 class="font-bold text-white">Simulated Practical Assessments</h4>
+                            <p class="text-xs text-white/50 mt-1">Verify exact coding speed, architectural execution, and algorithmic correctness in structured environments.</p>
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-4">
+                        <div class="w-6 h-6 rounded-full bg-neonCyan/15 flex items-center justify-center text-neonCyan text-xs shrink-0 mt-0.5"><i class="fa-solid fa-check"></i></div>
+                        <div>
+                            <h4 class="font-bold text-white">Real-time Local AI Proctoring</h4>
+                            <p class="text-xs text-white/50 mt-1">Fully automated, non-biased security metrics evaluating environment focus and candidate actions.</p>
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-4">
+                        <div class="w-6 h-6 rounded-full bg-neonCyan/15 flex items-center justify-center text-neonCyan text-xs shrink-0 mt-0.5"><i class="fa-solid fa-check"></i></div>
+                        <div>
+                            <h4 class="font-bold text-white">On-Chain Soulbound Certification</h4>
+                            <p class="text-xs text-white/50 mt-1">100% decentralized credentials permanently bound as non-transferable cryptographic smart-contract assets.</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="py-24 px-6 max-w-7xl mx-auto z-10 relative space-y-16">
+        <div class="text-center space-y-4 max-w-3xl mx-auto reveal">
+            <h2 class="text-3xl md:text-5xl font-extrabold">Step-by-Step Onboarding</h2>
+            <p class="text-white/60">Ready to secure cryptographic proof of your engineering skills? Complete verification in 4 steps.</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div class="glass-panel p-8 rounded-3xl relative overflow-hidden group reveal">
+                <div class="text-6xl font-extrabold text-white/5 absolute right-4 top-4 font-mono select-none">01</div>
+                <div class="w-10 h-10 rounded-xl bg-neonCyan/10 flex items-center justify-center text-neonCyan mb-6"><i class="fa-solid fa-list-check"></i></div>
+                <h4 class="font-bold text-lg mb-2">Choose Skill</h4>
+                <p class="text-xs text-white/50 leading-relaxed">Browse the skills catalog and choose the technologies you wish to verify.</p>
+            </div>
+            <div class="glass-panel p-8 rounded-3xl relative overflow-hidden group reveal">
+                <div class="text-6xl font-extrabold text-white/5 absolute right-4 top-4 font-mono select-none">02</div>
+                <div class="w-10 h-10 rounded-xl bg-neonPurple/10 flex items-center justify-center text-neonPurple mb-6"><i class="fa-solid fa-code"></i></div>
+                <h4 class="font-bold text-lg mb-2">Solve Assessments</h4>
+                <p class="text-xs text-white/50 leading-relaxed">Enter our secure developer IDE sandbox and implement execution-based code solutions.</p>
+            </div>
+            <div class="glass-panel p-8 rounded-3xl relative overflow-hidden group reveal">
+                <div class="text-6xl font-extrabold text-white/5 absolute right-4 top-4 font-mono select-none">03</div>
+                <div class="w-10 h-10 rounded-xl bg-neonPink/10 flex items-center justify-center text-neonPink mb-6"><i class="fa-solid fa-robot"></i></div>
+                <h4 class="font-bold text-lg mb-2">AI Grading</h4>
+                <p class="text-xs text-white/50 leading-relaxed">Your project code runs through automated test-cases and an AI evaluation rubric.</p>
+            </div>
+            <div class="glass-panel p-8 rounded-3xl relative overflow-hidden group reveal">
+                <div class="text-6xl font-extrabold text-white/5 absolute right-4 top-4 font-mono select-none">04</div>
+                <div class="w-10 h-10 rounded-xl bg-neonCyan/10 flex items-center justify-center text-neonCyan mb-6"><i class="fa-solid fa-circle-nodes"></i></div>
+                <h4 class="font-bold text-lg mb-2">Receive SBT</h4>
+                <p class="text-xs text-white/50 leading-relaxed">Your passing credentials are minted instantly as a secure Soulbound Token (SBT).</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECURITY SECTION -->
+    <section class="py-24 px-6 max-w-7xl mx-auto z-10 relative">
+        <div class="glass-panel p-8 md:p-16 rounded-[40px] relative overflow-hidden flex flex-col lg:flex-row items-center gap-12 border-neonPurple/20 shadow-neon-purple reveal">
+            <div class="absolute -right-32 -bottom-32 w-96 h-96 bg-neonPurple/10 rounded-full filter blur-[80px]"></div>
+            <div class="flex-1 space-y-6">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-neonPurple/10 border border-neonPurple/25 text-neonPurple font-mono text-xs uppercase tracking-wider">
+                    <i class="fa-solid fa-lock"></i> Advanced Security
+                </div>
+                <h2 class="text-3xl md:text-5xl font-extrabold">Next-Gen Local AI Anti-Cheat Engine</h2>
+                <p class="text-white/70 font-light leading-relaxed">
+                    Consensus AI features strict, browser-based runtime proctoring configured directly client-side. We run zero cloud storage models, protecting candidates' privacy while securing the validation authenticity.
+                </p>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="text-neonCyan text-sm"><i class="fa-solid fa-shield-halved"></i></div>
+                        <span class="text-sm text-white/80">Browser Anti-Cheat</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="text-neonPurple text-sm"><i class="fa-solid fa-video"></i></div>
+                        <span class="text-sm text-white/80">Webcam AI Proctoring</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="text-neonPink text-sm"><i class="fa-solid fa-ban"></i></div>
+                        <span class="text-sm text-white/80">Clipboard Lock</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="text-neonCyan text-sm"><i class="fa-solid fa-expand"></i></div>
+                        <span class="text-sm text-white/80">Viewport Protection</span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex-1 flex justify-center w-full max-w-sm">
+                <div class="w-full aspect-square rounded-3xl bg-black/40 border border-white/5 flex items-center justify-center relative overflow-hidden group">
+                    <!-- Scanner Lines -->
+                    <div class="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_50%,rgba(6,182,212,0.1)_50%)] bg-[length:100%_8px] animate-[pulse_4s_infinite]"></div>
+                    <div class="absolute top-0 left-0 w-full h-[2px] bg-neonCyan/80 animate-[bounce_4s_infinite]"></div>
+                    <div class="text-center space-y-4">
+                        <div class="w-20 h-20 rounded-full border-2 border-neonCyan/40 flex items-center justify-center text-neonCyan text-4xl mx-auto shadow-lg shadow-neonCyan/20 animate-pulse">
+                            <i class="fa-solid fa-face-viewfinder"></i>
+                        </div>
+                        <div class="font-mono text-xs text-neonCyan uppercase tracking-widest font-bold">Scanning Candidate...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA BANNER -->
+    <section class="py-24 px-6 max-w-7xl mx-auto z-10 relative text-center reveal">
+        <div class="glass-panel p-12 md:p-24 rounded-[40px] relative overflow-hidden border-neonCyan/20 shadow-neon-cyan">
+            <div class="absolute -left-32 -top-32 w-96 h-96 bg-neonCyan/10 rounded-full filter blur-[80px]"></div>
+            <div class="max-w-3xl mx-auto space-y-8 relative z-10">
+                <h2 class="text-4xl md:text-6xl font-extrabold leading-tight">
+                    Stop Collecting Certificates.<br/>
+                    <span class="shimmer-text">Start Collecting Proof.</span>
+                </h2>
+                <p class="text-white/60 text-lg max-w-xl mx-auto">Join thousands of verified software engineers securing their on-chain soulbound skills credentials today.</p>
+                <div class="flex justify-center gap-4">
+                    <a href="{% url 'skill_list' %}" class="relative group px-8 py-4 rounded-full text-base font-bold text-darkBg overflow-hidden transition-transform active:scale-95 shadow-lg shadow-neonCyan/25">
+                        <span class="absolute inset-0 bg-gradient-to-r from-neonCyan via-neonIndigo to-neonPurple transition-all group-hover:scale-105"></span>
+                        <span class="relative">Start Now</span>
+                    </a>
+                    <a href="{% url 'dashboard' %}" class="px-8 py-4 rounded-full text-base font-bold text-white/90 bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all backdrop-blur-md">
+                        View Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <!-- Back to top -->
+    <button id="backToTop" class="fixed bottom-8 right-8 z-40 w-12 h-12 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 flex items-center justify-center text-white/80 hover:text-white transition-all transform translate-y-16 opacity-0 shadow-lg">
+        <i class="fa-solid fa-arrow-up"></i>
+    </button>
+</div>
+
+<!-- HELP MODAL -->
+<div id="helpModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-6 bg-black/70 backdrop-blur-md">
+    <div class="relative glass-panel rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl animate-[scaleIn_0.3s_ease]">
+        <div class="p-6 border-b border-white/5 flex justify-between items-center bg-black/40">
+            <h3 class="text-lg font-bold text-white"><i class="fa-solid fa-circle-question text-neonCyan mr-2"></i> Help & Troubleshooting</h3>
+            <button onclick="closeHelpModal()" class="text-white/40 hover:text-white transition-all text-lg"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="p-6 space-y-6 text-sm text-white/70 max-h-[400px] overflow-y-auto">
+            <div class="space-y-2">
+                <h4 class="font-bold text-white">How does local AI proctoring work?</h4>
+                <p class="text-xs leading-relaxed">The anti-cheat runs 100% locally in your browser. It uses MediaPipe and TensorFlow.js to scan webcam feeds without uploading files to clouds. Ensure you grant camera permissions before starting.</p>
+            </div>
+            <div class="space-y-2">
+                <h4 class="font-bold text-white">What is a Soulbound Token (SBT)?</h4>
+                <p class="text-xs leading-relaxed">Soulbound tokens are non-transferable NFTs issued to your wallet to establish verified on-chain cryptographic proofs of your assessments.</p>
+            </div>
+            <div class="space-y-2">
+                <h4 class="font-bold text-white">Having camera errors?</h4>
+                <p class="text-xs leading-relaxed">Check if other applications are using the camera. Refresh the browser and select "Allow Camera Permissions" when prompted.</p>
+            </div>
+        </div>
+        <div class="p-6 bg-black/20 border-t border-white/5 flex justify-end">
+            <button onclick="closeHelpModal()" class="px-5 py-2.5 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 font-bold text-xs text-white transition-all">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- Extra JS Logic -->
+<script>
+    // Help Modal functions
+    function openHelpModal() {
+        const modal = document.getElementById('helpModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+    function closeHelpModal() {
+        const modal = document.getElementById('helpModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Particle background logic
+        const canvas = document.getElementById('particlesCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 0.4;
+                this.vy = (Math.random() - 0.5) * 0.4;
+                this.radius = Math.random() * 2 + 1;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(6, 182, 212, 0.2)';
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 40; i++) {
+            particles.push(new Particle());
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((p, idx) => {
+                p.update();
+                p.draw();
+                // Draw connecting lines
+                for (let j = idx + 1; j < particles.length; j++) {
+                    const p2 = particles[j];
+                    const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+                    if (dist < 120) {
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.strokeStyle = `rgba(6, 182, 212, ${0.15 * (1 - dist / 120)})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.stroke();
+                    }
+                }
+            });
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        // Reveal animations on scroll
+        const revealElements = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.classList.remove('opacity-0', 'translate-y-8');
+                    e.target.classList.add('opacity-100', 'translate-y-0');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        revealElements.forEach(el => {
+            el.classList.add('opacity-0', 'translate-y-8', 'transition-all', 'duration-1000', 'ease-out');
+            observer.observe(el);
+        });
+
+        // Numeric counters animation
+        const stats = document.querySelectorAll('[data-target]');
+        const statsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const target = parseInt(entry.target.getAttribute('data-target'));
+                    let count = 0;
+                    const speed = target / 100;
+                    const updateCount = () => {
+                        count += speed;
+                        if (count < target) {
+                            entry.target.textContent = Math.floor(count);
+                            setTimeout(updateCount, 15);
+                        } else {
+                            entry.target.textContent = target + (target === 99 ? '%' : '+');
+                        }
+                    };
+                    updateCount();
+                    statsObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+        stats.forEach(stat => statsObserver.observe(stat));
+
+        // Terminal animation logic
+        const commands = [
+            { text: "Initializing sandbox environment...", color: "text-white/60" },
+            { text: "Launching isolated docker sandbox... [OK]", color: "text-neonCyan" },
+            { text: "Injecting assessment questions...", color: "text-white/60" },
+            { text: "Executing test verification tests...", color: "text-white/60" },
+            { text: "Test: 12 passed, 0 failed in 1.4s", color: "text-emerald-400" },
+            { text: "Running candidate semantic checks...", color: "text-white/60" },
+            { text: "Security anti-cheat proctoring checks... [CLEAN]", color: "text-neonPurple" },
+            { text: "Certificate criteria score: 94/100", color: "text-neonCyan" },
+            { text: "Generating Soulbound NFT metadata...", color: "text-white/60" },
+            { text: "Minting SBT directly to candidate wallet... [SUCCESS]", color: "text-emerald-400" },
+            { text: "Verification complete. Asset locked.", color: "text-neonPurple" }
+        ];
+
+        const terminalBody = document.getElementById('terminal-body');
+        let cmdIndex = 0;
+
+        function runTerminal() {
+            if (cmdIndex >= commands.length) {
+                setTimeout(() => {
+                    terminalBody.innerHTML = "";
+                    cmdIndex = 0;
+                    runTerminal();
+                }, 4000);
+                return;
+            }
+
+            const cmd = commands[cmdIndex];
+            const div = document.createElement('div');
+            div.className = cmd.color + " flex items-start gap-2";
+            div.innerHTML = `<span class="text-neonCyan">></span> <span class="typing-text"></span>`;
+            terminalBody.appendChild(div);
+
+            const textEl = div.querySelector('.typing-text');
+            let charIdx = 0;
+            const type = () => {
+                if (charIdx < cmd.text.length) {
+                    textEl.textContent += cmd.text.charAt(charIdx);
+                    charIdx++;
+                    setTimeout(type, 15);
+                } else {
+                    cmdIndex++;
+                    setTimeout(runTerminal, 800);
+                }
+            };
+            type();
+        }
+        runTerminal();
+
+        // Navbar blur on scroll (disabled custom navbar logic)
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 400) {
+                backToTop.classList.remove('translate-y-16', 'opacity-0');
+                backToTop.classList.add('translate-y-0', 'opacity-100');
+            } else {
+                backToTop.classList.add('translate-y-16', 'opacity-0');
+                backToTop.classList.remove('translate-y-0', 'opacity-100');
+            }
+        });
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    });
+</script>
+{% endblock %}

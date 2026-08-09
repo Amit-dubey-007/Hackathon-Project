@@ -23,8 +23,7 @@ from .utils import generate_qr_base64
 from django.urls import reverse
 
 def home(request):
-    return redirect("dashboard")
-
+    return render(request,"core/home.html")
 
 @login_required
 def dashboard(request):

@@ -19,11 +19,11 @@
                     {% endif %}
                 </div>
                 
-                <h1 class="display-3 fw-black {% if assessment.passed %}text-success{% elif assessment.violation_reason %}text-dark{% else %}text-danger{% endif %} mb-2" style="font-weight: 800;">
+                <h1 class="display-3 fw-black {% if assessment.passed %}text-success{% elif assessment.violation_reason %}text-danger{% else %}text-danger{% endif %} mb-2" style="font-weight: 800;">
                     {{ assessment.score }}<span class="fs-3 text-muted fw-bold">/100</span>
                 </h1>
                 
-                <h2 class="fw-bold text-dark mb-3">
+                <h2 class="fw-bold text-body mb-3">
                     {% if assessment.passed %}
                         🎉 Assessment Passed!
                     {% elif assessment.violation_reason %}
@@ -35,15 +35,15 @@
                 
                 <p class="lead text-muted mb-0 mx-auto" style="max-width: 600px;">
                     {% if assessment.passed %}
-                        Congratulations! You demonstrated sufficient practical skill in <strong class="text-dark">{{ assessment.skill.name }}</strong>.
+                        Congratulations! You demonstrated sufficient practical skill in <strong class="text-body-emphasis">{{ assessment.skill.name }}</strong>.
                     {% elif assessment.violation_reason %}
                         Your assessment was automatically terminated because our anti-cheat system detected a violation of the Zero Tolerance Policy.
                     {% else %}
-                        Keep practicing! You did not reach the required passing score for <strong class="text-dark">{{ assessment.skill.name }}</strong>.
+                        Keep practicing! You did not reach the required passing score for <strong class="text-body-emphasis">{{ assessment.skill.name }}</strong>.
                     {% endif %}
                 </p>
                 <div class="mt-4">
-                    <span class="badge bg-white border border-subtle text-dark px-4 py-2 rounded-pill fw-bold shadow-sm">Required Score: {{ assessment.skill.passing_score }}/100</span>
+                    <span class="badge bg-body border border-subtle text-body px-4 py-2 rounded-pill fw-bold shadow-sm">Required Score: {{ assessment.skill.passing_score }}/100</span>
                 </div>
             </div>
         </div>
