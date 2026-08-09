@@ -1,0 +1,137 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Assessment Integrity Agreement | {{ skill.name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center my-4">
+    <div class="col-lg-10">
+        
+        <div class="card border-0 shadow-sm rounded-2xl overflow-hidden mb-4 border-danger border-2">
+            <div class="card-header bg-danger text-white p-4 text-center">
+                <i class="bi bi-shield-lock-fill display-4 mb-3"></i>
+                <h2 class="fw-bold mb-0 text-white">Assessment Integrity Agreement</h2>
+                <p class="mb-0 mt-2 text-white">Zero Tolerance Anti-Cheat Policy Active</p>
+            </div>
+            
+            <div class="card-body p-4 p-md-5">
+                <div class="alert alert-warning border-0 rounded-xl d-flex gap-3 align-items-center p-4 mb-4 shadow-sm" id="desktopWarning" style="display: none !important;">
+                    <i class="bi bi-display text-warning fs-4"></i>
+                    <div class="fw-bold">This assessment requires a desktop environment. Mobile devices are not supported.</div>
+                </div>
+
+                <div class="bg-body-tertiary p-4 rounded-xl border border-subtle mb-4" style="max-height: 400px; overflow-y: auto;">
+                    <h4 class="text-danger fw-bold mb-3">ZERO TOLERANCE POLICY</h4>
+                    <p class="fw-medium">This assessment is strictly monitored. Certain violations will immediately terminate the assessment resulting in instant failure, while minor anomalies will generate warnings and deduct from your integrity score.</p>
+                    
+                    <h5 class="fw-bold mt-4 mb-3 text-danger">Immediate Failure Events:</h5>
+                    <ul class="lh-lg fw-medium">
+                        <li>Switching browser tabs or hiding the window</li>
+                        <li>Minimizing the browser or opening another application</li>
+                        <li>Leaving the assessment page</li>
+                        <li>Exiting required fullscreen mode</li>
+                        <li>Copying (Ctrl+C), Pasting (Ctrl+V), Cutting (Ctrl+X)</li>
+                        <li>Using browser context menu (Right-click)</li>
+                        <li>Drag & Drop into editor</li>
+                        <li>Opening another tab or window during the assessment</li>
+                        <li>Revoking camera or microphone permissions</li>
+                    </ul>
+
+                    <h5 class="fw-bold mt-4 mb-3 text-warning">Warning Events (Score Deductions):</h5>
+                    <ul class="lh-lg">
+                        <li>Face temporarily not detected (longer than 5 seconds)</li>
+                        <li>Temporary multiple face detection</li>
+                        <li>Temporary camera obstruction</li>
+                        <li>Excessive continuous noise or speaking</li>
+                    </ul>
+                    <p class="text-muted small mt-2">Note: Continuous absence of your face for more than 10 seconds will result in an immediate failure.</p>
+                </div>
+                
+                <div class="alert alert-info border-0 rounded-xl d-flex gap-3 align-items-center p-4 mb-4 shadow-sm" id="permissionBox">
+                    <i class="bi bi-camera-video-fill text-info fs-4"></i>
+                    <div>
+                        <div class="fw-bold">Camera & Microphone Access Required</div>
+                        <div class="small">We need permission to initialize AI Proctoring. Click "Request Permissions" below.</div>
+                        <button id="requestPermsBtn" class="btn btn-outline-info btn-sm mt-2 rounded-pill fw-bold px-3">Request Permissions</button>
+                    </div>
+                </div>
+
+                <div class="form-check mb-4 mt-4 p-4 bg-body-tertiary rounded border border-subtle">
+                    <input class="form-check-input fs-4 me-3" type="checkbox" value="" id="agreeCheck">
+                    <label class="form-check-label fs-5 fw-bold pt-1" for="agreeCheck">
+                        I have read all assessment rules and accept the Zero Tolerance Policy.
+                    </label>
+                </div>
+
+                <div class="d-flex justify-content-end gap-3 mt-4">
+                    <a href="{% url 'skill_detail' skill.id %}" class="btn btn-secondary btn-lg rounded-pill px-5 py-3 fw-medium">
+                        Cancel
+                    </a>
+                    <a href="{% url 'loading_questions' skill.id %}" id="beginBtn" class="btn btn-danger btn-lg rounded-pill px-5 py-3 fw-bold shadow disabled d-flex align-items-center gap-2">
+                        Begin Protected Assessment <i class="bi bi-shield-check fs-4"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const agreeCheck = document.getElementById('agreeCheck');
+    const beginBtn = document.getElementById('beginBtn');
+    const desktopWarning = document.getElementById('desktopWarning');
+    const requestPermsBtn = document.getElementById('requestPermsBtn');
+    const permissionBox = document.getElementById('permissionBox');
+    
+    let permissionsGranted = false;
+    agreeCheck.disabled = true;
+
+    // Desktop check
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+    
+    if (isMobile) {
+        desktopWarning.style.setProperty('display', 'flex', 'important');
+        requestPermsBtn.disabled = true;
+    } else {
+        requestPermsBtn.addEventListener('click', async function() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                permissionsGranted = true;
+                // Stop tracks immediately since we only needed to verify permission here
+                stream.getTracks().forEach(track => track.stop());
+                
+                permissionBox.classList.replace('alert-info', 'alert-success');
+                permissionBox.innerHTML = '<i class="bi bi-check-circle-fill text-success fs-4"></i><div class="fw-bold text-dark">Permissions Granted</div>';
+                agreeCheck.disabled = false;
+            } catch (err) {
+                alert('Camera and microphone access is required to take this assessment. Please allow access in your browser settings.');
+            }
+        });
+
+        agreeCheck.addEventListener('change', function() {
+            if (this.checked && permissionsGranted) {
+                beginBtn.classList.remove('disabled');
+            } else {
+                beginBtn.classList.add('disabled');
+            }
+        });
+        
+        beginBtn.addEventListener('click', function(e) {
+            if (!agreeCheck.checked) {
+                e.preventDefault();
+            } else {
+                // Request fullscreen when beginning
+                const elem = document.documentElement;
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen().catch(err => console.log(err));
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
+{% endblock %}

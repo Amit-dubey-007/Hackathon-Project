@@ -3,6 +3,17 @@
 {% block title %}Dashboard | AI Skills Platform{% endblock %}
 
 {% block content %}
+<style>
+    .assessment-card{
+        transition:.25s;
+        cursor:pointer;
+    }
+
+    .assessment-card:hover{
+        transform:translateY(-4px);
+        box-shadow:0 .75rem 1.5rem rgba(0,0,0,.12)!important;
+    }   
+</style>
 <div class="row mb-5 mt-3">
     <div class="col-12">
         <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
@@ -30,31 +41,45 @@
                     <div class="list-group list-group-flush rounded-2xl">
                         {% for assessment in assessments %}
                         {% if assessment.completed_at %}
-                        <div class="list-group-item list-group-item-action p-4 border-subtle">
-                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                                <div>
-                                    <h5 class="mb-1 fw-bold">{{ assessment.skill.name }}</h5>
-                                    <div class="d-flex align-items-center gap-3 mt-2">
-                            
-                                        <span class="badge {% if assessment.passed %}badge-success{% else %}badge-danger{% endif %} fw-semibold">
-                                            {% if assessment.passed %}
-                                                <i class="bi bi-check-circle-fill me-1"></i> Passed
-                                            {% else %}
-                                                <i class="bi bi-x-circle-fill me-1"></i> Failed
-                                            {% endif %}
-                                        </span>
-                                        <span class="text-muted small fw-medium">
-                                            <i class="bi bi-star-fill text-warning me-1"></i> Score: {{ assessment.score }}/100
-                                        </span>
-    
-                                        
+
+                        <a href="{% url 'assessment_result' assessment.id %}"
+                            class="text-decoration-none text-dark">
+
+                            <div class="card border-0 shadow-sm rounded-4 mb-3 assessment-card">
+                                <div class="card-body p-4">
+                                    <div class="d-flex justify-content-between align-items-center">
+
+                                        <div>
+                                            <h4 class="fw-bold mb-3">
+                                                {{ assessment.skill.name }}
+                                            </h4>
+
+                                            <div class="d-flex align-items-center gap-3">
+
+                                                <span class="badge {% if assessment.passed %}badge-success{% else %}badge-danger{% endif %} fw-semibold">
+                                                    {% if assessment.passed %}
+                                                        <i class="bi bi-check-circle-fill me-1"></i> Passed
+                                                    {% else %}
+                                                        <i class="bi bi-x-circle-fill me-1"></i> Failed
+                                                    {% endif %}
+                                                </span>
+
+                                                <span class="text-muted small fw-medium">
+                                                    <i class="bi bi-star-fill text-warning me-1"></i>
+                                                    Score: {{ assessment.score }}/100
+                                                </span>
+
+                                            </div>
+                                        </div>
+
+                                        <i class="bi bi-chevron-right fs-4 text-muted"></i>
+
                                     </div>
                                 </div>
-                                {% if not assessment.completed_at %}
-                                    <a href="{% url 'start_assessment' assessment.skill.id %}" class="btn btn-sm btn-outline-primary fw-medium rounded-pill px-4">Continue</a>
-                                {% endif %}
                             </div>
-                        </div>
+
+                        </a>
+
                         {% endif %}
                         {% endfor %}
                     </div>

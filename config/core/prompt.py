@@ -75,8 +75,22 @@ Return ONLY valid JSON in this format:
             "topic": "API Development",
             "difficulty": "Medium",
             "estimated_time": "15 mins",
-            "question": "Create a Django REST API that..."
+            "question": "Create a Django REST API that...",
+            "type": "code",
+            "language": "Python"
+        },
+        {
+            "title": "System Architecture Design",
+            "topic": "System Design",
+            "difficulty": "Medium",
+            "estimated_time": "15 mins",
+            "question": "Explain how you would design a scalable...",
+            "type": "text"
         }
     ]
 }
+
+Note:
+- Use "type": "code" and include the "language" (e.g., Python, JavaScript, SQL, HTML, etc.) if the task requires writing code.
+- Use "type": "text" and DO NOT include "language" if the task is theoretical, design, architecture, or conceptual.
 """

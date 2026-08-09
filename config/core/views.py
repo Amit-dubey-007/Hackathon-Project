@@ -224,6 +224,18 @@ def skill_detail(request, skill_id):
     )
 
 @login_required
+def integrity_agreement(request, skill_id):
+    skill = get_object_or_404(
+        Skill,
+        id=skill_id
+    )
+    return render(
+        request,
+        "core/integrity_agreement.html",
+        {"skill": skill}
+    )
+
+@login_required
 def start_assessment(request, skill_id):
 
     skill = get_object_or_404(
@@ -270,6 +282,8 @@ def start_assessment(request, skill_id):
                 difficulty=item.get("difficulty", "Medium"),
                 topic=item.get("topic", "")[:300],
                 max_score=100,
+                task_type=item.get("type", "text")[:10],
+                language=item.get("language", "")[:50],
             )
 
             task_ids.append(task.id)
@@ -356,6 +370,7 @@ def assessment_question(
             "answer",
             ""
         ).strip()
+        print(f"[Views Debug] POST request received for task_id={task.id}. Answer length={len(answer)}")
 
         if not answer:
 
@@ -421,6 +436,84 @@ def assessment_question(
             "existing_answer": existing_submission.answer if existing_submission else ""
         }
     )
+
+@login_required
+def assessment_violation(request, assessment_id):
+    from django.http import JsonResponse
+    import json
+    if request.method == "POST":
+        assessment = get_object_or_404(Assessment, id=assessment_id, user=request.user)
+        if not assessment.completed_at:
+            try:
+                data = json.loads(request.body)
+                reason = data.get("reason", "cheating")
+            except:
+                reason = "cheating"
+
+            assessment.score = 0
+            assessment.passed = False
+            assessment.completed_at = timezone.now()
+            assessment.violation_reason = reason
+            assessment.integrity_score = 0
+            
+            audit_entry = {
+                "timestamp": timezone.now().isoformat(),
+                "type": "violation",
+                "severity": "fatal",
+                "message": reason,
+                "duration": 0
+            }
+            if not isinstance(assessment.audit_trail, list):
+                assessment.audit_trail = []
+            assessment.audit_trail.append(audit_entry)
+            
+            assessment.save()
+        return JsonResponse({"success": True, "redirect_url": reverse('assessment_result', args=[assessment.id])})
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
+@login_required
+def log_warning(request, assessment_id):
+    import json
+    from django.http import JsonResponse
+    if request.method == "POST":
+        assessment = get_object_or_404(Assessment, id=assessment_id, user=request.user)
+        if not assessment.completed_at:
+            try:
+                data = json.loads(request.body)
+                event_type = data.get("event_type", "warning")
+                message = data.get("message", "Warning")
+                duration = data.get("duration", 0)
+                deduction = data.get("deduction", 2)
+                
+                audit_entry = {
+                    "timestamp": timezone.now().isoformat(),
+                    "type": event_type,
+                    "severity": "warning",
+                    "message": message,
+                    "duration": duration
+                }
+                
+                if not isinstance(assessment.audit_trail, list):
+                    assessment.audit_trail = []
+                    
+                assessment.audit_trail.append(audit_entry)
+                assessment.integrity_score = max(0, assessment.integrity_score - deduction)
+                assessment.save(update_fields=['audit_trail', 'integrity_score'])
+                return JsonResponse({"success": True})
+            except Exception as e:
+                return JsonResponse({"error": str(e)}, status=400)
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
+@login_required
+def assessment_heartbeat(request, assessment_id):
+    from django.http import JsonResponse
+    if request.method == "POST":
+        assessment = get_object_or_404(Assessment, id=assessment_id, user=request.user)
+        if not assessment.completed_at:
+            assessment.last_heartbeat = timezone.now()
+            assessment.save(update_fields=['last_heartbeat'])
+        return JsonResponse({"success": True})
+    return JsonResponse({"error": "Invalid request"}, status=400)
 
 @login_required
 def evaluate_assessment(

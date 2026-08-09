@@ -55,6 +55,18 @@ class Task(models.Model):
         blank=True
     )
 
+    task_type = models.CharField(
+        max_length=10,
+        choices=[("text", "text"), ("code", "code")],
+        default="text"
+    )
+
+    language = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True
+    )
+
     def __str__(self):
         return self.title
 
@@ -87,6 +99,25 @@ class Assessment(models.Model):
 
     passed = models.BooleanField(
         default=False
+    )
+
+    violation_reason = models.TextField(
+        blank=True,
+        null=True
+    )
+
+    integrity_score = models.IntegerField(
+        default=100
+    )
+
+    audit_trail = models.JSONField(
+        default=list,
+        blank=True
+    )
+
+    last_heartbeat = models.DateTimeField(
+        null=True,
+        blank=True
     )
 
     def __str__(self):

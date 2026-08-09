@@ -1,7 +1,7 @@
 
 # Register your models here.
 from django.contrib import admin
-from .models import Skill, Task, Submission, Evaluation, Certificate
+from .models import Skill, Task, Submission, Evaluation, Certificate,Assessment
 
 
 @admin.register(Skill)
@@ -39,3 +39,5 @@ class CertificateAdmin(admin.ModelAdmin):
         "transaction_hash",
     )
     list_filter = ("minted", "skill")
+
+admin.site.register(Assessment)

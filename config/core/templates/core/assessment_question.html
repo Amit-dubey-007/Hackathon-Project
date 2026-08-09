@@ -1,38 +1,98 @@
 {% extends 'core/base.html' %}
+{% load static %}
 
 {% block title %}Question {{ question_number }} | {{ assessment.skill.name }}{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/loader.css' %}">
+<style>
+    /* Fullscreen Enforcement Overlay */
+    #fullscreen-enforcer {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; width: 100vw; height: 100vh;
+        background: rgba(0, 0, 0, 0.95);
+        z-index: 99999;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        color: white;
+    }
+    .monaco-container {
+        height: 400px;
+        width: 100%;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        border: 1px solid #dee2e6;
+    }
+    
+    /* Loader overlay */
+    #submit-loader-overlay {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; width: 100vw; height: 100vh;
+        background: rgba(255, 255, 255, 0.95);
+        z-index: 10000;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="row justify-content-center my-4">
+<!-- Fullscreen Enforcer -->
+<div id="fullscreen-enforcer">
+    <i class="bi bi-arrows-fullscreen display-1 text-danger mb-4"></i>
+    <h2 class="fw-bold">Fullscreen Required</h2>
+    <p class="fs-5 text-center px-4">This assessment must be taken in fullscreen mode.<br>Click the button below to return to the assessment.</p>
+    <button id="return-fullscreen-btn" class="btn btn-danger btn-lg mt-3 rounded-pill fw-bold px-5 py-3">Return to Fullscreen</button>
+</div>
+
+<!-- Loader Overlay -->
+<div id="submit-loader-overlay">
+    <div class="ai-loader-container">
+        <div class="neural-net">
+            <div class="neural-node"></div><div class="neural-node"></div><div class="neural-node"></div><div class="neural-node"></div><div class="neural-node"></div>
+            <div class="neural-line line-1"></div><div class="neural-line line-2"></div><div class="neural-line line-3"></div><div class="neural-line line-4"></div>
+        </div>
+        <div class="status-messages w-100 mt-4">
+            <div class="status-message active text-center fw-bold fs-5 text-primary">{% if question_number == 5 %}Submitting Assessment & Running AI Evaluation...{% else %}Saving Answer...{% endif %}</div>
+        </div>
+        <div class="progress-container mt-4 mb-3">
+            <div class="progress-indeterminate"></div>
+        </div>
+    </div>
+</div>
+
     <div class="col-lg-10">
         
         <!-- Header -->
         <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
             <div>
                 <span class="text-muted fw-bold text-uppercase tracking-wider small d-block mb-1">{{ assessment.skill.name }} Assessment</span>
-                <h2 class="fw-bold mb-0 text-dark">Question {{ question_number }} of {% if total_questions %}{{ total_questions }}{% else %}5{% endif %}</h2>
+                <h2 class="fw-bold mb-0">Question {{ question_number }} of {% if total_questions %}{{ total_questions }}{% else %}5{% endif %}</h2>
             </div>
             
             <!-- Progress -->
-            <div class="d-flex align-items-center gap-3 bg-white px-4 py-3 rounded-pill shadow-sm border border-subtle">
+            <div class="d-flex align-items-center gap-3 bg-body-tertiary px-4 py-3 rounded-pill shadow-sm border border-subtle">
                 <i class="bi bi-stopwatch text-primary fs-5"></i>
                 <div class="progress" style="width: 120px; height: 8px;">
                     <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: calc({{ question_number }} / 5 * 100%)"></div>
                 </div>
             </div>
         </div>
-
+ 
         {% if error %}
         <div class="alert alert-danger bg-danger bg-opacity-10 border-0 rounded-xl d-flex gap-3 align-items-center p-4 mb-4 shadow-sm">
             <i class="bi bi-exclamation-triangle-fill text-danger fs-4"></i>
             <div class="fw-bold text-danger">{{ error }}</div>
         </div>
         {% endif %}
-
+ 
         <!-- Question Card -->
         <div class="card border-0 shadow-sm rounded-2xl overflow-hidden mb-4">
-            <div class="card-header bg-white border-bottom border-subtle p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
-                <h4 class="fw-bold mb-0 text-dark">{{ task.title }}</h4>
+            <div class="card-header border-bottom border-subtle p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <h4 class="fw-bold mb-0">{{ task.title }}</h4>
                 <div class="d-flex flex-wrap gap-2">
                     <span class="badge bg-light text-dark border border-subtle px-3 py-2 rounded-pill fw-medium d-flex align-items-center gap-2">
                         <i class="bi bi-tag text-muted"></i> {{ task.topic }}
@@ -48,40 +108,48 @@
                 </div>
             </div>
             <div class="card-body p-4 p-md-5">
-                <div class="bg-light p-4 rounded-xl border border-subtle mb-4">
-                    <p class="fs-5 text-dark mb-0 lh-lg" style="white-space: pre-line;">{{ task.question }}</p>
+                <div class="bg-body-tertiary p-4 rounded-xl border border-subtle mb-4">
+                    <p class="fs-5 mb-0 lh-lg" style="white-space: pre-line;">{{ task.question }}</p>
                 </div>
                 
                 <form method="POST" id="assessmentForm">
                     {% csrf_token %}
                     <div class="mb-4">
                         <div class="d-flex justify-content-between align-items-end mb-3">
-                            <label class="form-label fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+                            <label class="form-label fw-bold mb-0 d-flex align-items-center gap-2">
                                 <i class="bi bi-code-square text-primary fs-5"></i> Practical Implementation
                             </label>
                             <span id="saveStatus" class="text-muted small fw-medium d-none">
                                 <i class="bi bi-check2-circle text-success"></i> Auto-saved locally
                             </span>
                         </div>
+                        {% if task.task_type == 'code' %}
+                        <div id="monaco-editor" class="monaco-container shadow-sm"></div>
                         <textarea 
                             id="answerEditor"
                             name="answer" 
-                            class="form-control rounded-xl p-4 border-subtle shadow-sm bg-white focus-ring focus-ring-primary font-monospace" 
+                            class="d-none" 
+                        >{{ existing_answer|default:"" }}</textarea>
+                        {% else %}
+                        <textarea 
+                            id="answerEditor"
+                            name="answer" 
+                            class="form-control rounded-xl p-4 border-subtle shadow-sm bg-body-tertiary focus-ring focus-ring-primary font-monospace" 
                             rows="15" 
-                            placeholder="Write your comprehensive code and explanation here...&#10;&#10;// You can write several thousand words or large code snippets.&#10;// Do not worry about length limits." 
-                            required
+                            placeholder="Write your comprehensive answer here..." 
                             style="resize: vertical; font-size: 14px; line-height: 1.6;"
                         >{{ existing_answer|default:"" }}</textarea>
+                        {% endif %}
                         <div class="d-flex justify-content-between mt-2">
                             <small class="text-muted">Take your time. Provide robust and complete solutions.</small>
-                            <small class="text-muted" id="wordCount">0 words</small>
+                            <small class="text-muted" id="wordCount">0 words/characters</small>
                         </div>
                     </div>
 
                     <div class="d-flex justify-content-between mt-5">
                         <div>
                             {% if question_number > 1 %}
-                            <a href="{% url 'assessment_question' assessment.id question_number|add:'-1' %}" class="btn btn-outline-secondary btn-lg rounded-pill px-4 py-3 fw-bold d-flex align-items-center gap-2 hover-lift transition-transform">
+                            <a id="prevBtn" href="{% url 'assessment_question' assessment.id question_number|add:'-1' %}" class="btn btn-outline-secondary btn-lg rounded-pill px-4 py-3 fw-bold d-flex align-items-center gap-2 hover-lift transition-transform">
                                 <i class="bi bi-arrow-left fs-4"></i> Previous
                             </a>
                             {% endif %}
@@ -103,56 +171,348 @@
 
 {% block extra_js %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const editor = document.getElementById('answerEditor');
-    const wordCount = document.getElementById('wordCount');
-    const saveStatus = document.getElementById('saveStatus');
-    const form = document.getElementById('assessmentForm');
-    const submitBtn = document.getElementById('submitBtn');
-    
-    // Unique key for this specific task
-    const storageKey = 'assessment_task_{{ task.id }}_draft';
+(function() {
+    // 1. Guard against duplicate execution
+    if (window.assessmentInitialized) {
+        console.log("[Anti-Cheat Debug] Already initialized. Skipping duplicate execution.");
+        return;
+    }
+    window.assessmentInitialized = true;
 
-    // Load draft if exists
-    const savedDraft = sessionStorage.getItem(storageKey);
-    if (savedDraft) {
-        editor.value = savedDraft;
-        updateWordCount();
+    // 2. Load Monaco loader dynamically to prevent duplicate script tags
+    if (typeof require === 'undefined') {
+        const script = document.createElement('script');
+        script.src = "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js";
+        script.onload = () => initializeAssessment();
+        document.head.appendChild(script);
+    } else {
+        initializeAssessment();
     }
 
-    // Auto-save on input with debounce
-    let timeoutId;
-    editor.addEventListener('input', function() {
-        updateWordCount();
+    async function initializeAssessment() {
+        console.log("[Anti-Cheat Debug] initializeAssessment started.");
+        const editorEl = document.getElementById('answerEditor');
+        const wordCount = document.getElementById('wordCount');
+        const saveStatus = document.getElementById('saveStatus');
+        const form = document.getElementById('assessmentForm');
+        const submitBtn = document.getElementById('submitBtn');
         
-        saveStatus.classList.add('d-none');
+        // Form submit listener guard
+        if (form.dataset.listenerAttached) {
+            console.log("[Anti-Cheat Debug] Form submit listener already attached.");
+            return;
+        }
+        form.dataset.listenerAttached = "true";
+
+        // Integrity Endpoints
+        const violationUrl = "{% url 'assessment_violation' assessment.id %}";
+        const warningUrl = "{% url 'log_warning' assessment.id %}";
+        const heartbeatUrl = "{% url 'assessment_heartbeat' assessment.id %}";
+
+        const isCode = "{{ task.task_type }}" === "code";
+        let monacoInstance = null;
+        let editorReady = false;
+        let webcamReady = false;
+        let antiCheatArmed = false;
         
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => {
-            sessionStorage.setItem(storageKey, editor.value);
-            saveStatus.classList.remove('d-none');
-            // Hide "Saved" message after 2 seconds
-            setTimeout(() => {
+        const storageKey = 'assessment_task_{{ task.id }}_draft';
+        const savedDraft = sessionStorage.getItem(storageKey);
+        console.log("[Anti-Cheat Debug] SessionStorage draft loaded. Length:", savedDraft ? savedDraft.length : 0);
+
+        // Desktop check
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768) {
+            console.warn("[Anti-Cheat Debug] Mobile device detected.");
+            triggerViolation('Mobile device detected');
+        }
+
+        // Save draft helper
+        function saveDraftImmediately() {
+            const val = isCode && monacoInstance ? monacoInstance.getValue() : editorEl.value;
+            sessionStorage.setItem(storageKey, val);
+            console.log("[Anti-Cheat Debug] saveDraftImmediately() saved draft of length:", val.length);
+        }
+
+        // 1. Monaco Setup
+        if (isCode) {
+            if (window.editorInstance) {
+                console.log("[Anti-Cheat Debug] Monaco instance already exists. Skipping creation.");
+                return;
+            }
+            console.log("[Anti-Cheat Debug] Initializing Monaco Editor...");
+            require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs' }});
+            require(['vs/editor/editor.main'], function() {
+                let lang = "{{ task.language }}".toLowerCase();
+                const langMap = {
+                    'python': 'python', 'c': 'c', 'c++': 'cpp', 'cpp': 'cpp', 'c#': 'csharp', 'csharp': 'csharp',
+                    'java': 'java', 'javascript': 'javascript', 'js': 'javascript', 'typescript': 'typescript', 'ts': 'typescript',
+                    'html': 'html', 'css': 'css', 'sql': 'sql', 'json': 'json', 'yaml': 'yaml', 'xml': 'xml',
+                    'shell': 'shell', 'bash': 'shell', 'powershell': 'powershell', 'go': 'go', 'golang': 'go',
+                    'rust': 'rust', 'php': 'php', 'kotlin': 'kotlin', 'swift': 'swift', 'ruby': 'ruby', 'react': 'javascript'
+                };
+                lang = langMap[lang] || 'plaintext';
+                console.log("[Anti-Cheat Debug] Monaco language mode:", lang);
+
+                try {
+                    const initialValue = savedDraft || editorEl.value;
+                    console.log("[Anti-Cheat Debug] Initializing Monaco value. Length:", initialValue.length);
+                    
+                    monacoInstance = monaco.editor.create(document.getElementById('monaco-editor'), {
+                        value: initialValue,
+                        language: lang,
+                        theme: 'vs-dark',
+                        automaticLayout: true,
+                        wordWrap: 'on',
+                        minimap: { enabled: false },
+                        fontFamily: "'JetBrains Mono', 'Fira Code', Consolas, 'Courier New', monospace",
+                        fontLigatures: true,
+                        tabSize: 4,
+                        bracketPairColorization: { enabled: true },
+                        formatOnPaste: true,
+                        formatOnType: true,
+                        suggestOnTriggerCharacters: true
+                    });
+                    
+                    window.editorInstance = monacoInstance;
+                    
+                    // Keep the hidden textarea updated on every change to prevent validation issues
+                    editorEl.value = monacoInstance.getValue();
+                    console.log("[Anti-Cheat Debug] Monaco instance created. Textarea value synchronized. Length:", editorEl.value.length);
+                    editorReady = true;
+                    
+                    let timeoutId;
+                    monacoInstance.onDidChangeModelContent(() => {
+                        const value = monacoInstance.getValue();
+                        editorEl.value = value;
+                        updateWordCount();
+                        saveStatus.classList.add('d-none');
+                        clearTimeout(timeoutId);
+                        timeoutId = setTimeout(() => {
+                            sessionStorage.setItem(storageKey, value);
+                            console.log("[Anti-Cheat Debug] Debounced save draft to sessionStorage. Length:", value.length);
+                            saveStatus.classList.remove('d-none');
+                            setTimeout(() => saveStatus.classList.add('d-none'), 2000);
+                        }, 5000); // 5 second debounce
+                    });
+                    
+                } catch (e) {
+                    console.error("[Anti-Cheat Debug] Monaco failed to load, falling back to textarea.", e);
+                    document.getElementById('monaco-editor').style.display = 'none';
+                    editorEl.classList.remove('d-none');
+                    editorReady = true;
+                }
+                updateWordCount();
+            });
+        } else {
+            console.log("[Anti-Cheat Debug] Standard textarea initialized.");
+            editorReady = true;
+            if (savedDraft) {
+                editorEl.value = savedDraft;
+                console.log("[Anti-Cheat Debug] Textarea value restored from savedDraft. Length:", editorEl.value.length);
+            }
+            updateWordCount();
+
+            let timeoutId;
+            editorEl.addEventListener('input', function() {
+                updateWordCount();
                 saveStatus.classList.add('d-none');
-            }, 2000);
-        }, 1000);
-    });
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    sessionStorage.setItem(storageKey, editorEl.value);
+                    console.log("[Anti-Cheat Debug] Debounced textarea save draft. Length:", editorEl.value.length);
+                    saveStatus.classList.remove('d-none');
+                    setTimeout(() => saveStatus.classList.add('d-none'), 2000);
+                }, 5000); // 5 second debounce
+            });
+        }
 
-    function updateWordCount() {
-        const text = editor.value.trim();
-        const words = text ? text.split(/\s+/).length : 0;
-        wordCount.textContent = words + (words === 1 ? ' word' : ' words');
+        function updateWordCount() {
+            const text = isCode && monacoInstance ? monacoInstance.getValue() : editorEl.value;
+            const val = text.trim();
+            const count = isCode ? val.length : (val ? val.split(/\s+/).length : 0);
+            wordCount.textContent = isCode ? count + ' characters' : count + (count === 1 ? ' word' : ' words');
+        }
+
+        // Save draft when clicking previous
+        const prevBtn = document.getElementById('prevBtn');
+        if (prevBtn) {
+            prevBtn.addEventListener('click', function() {
+                console.log("[Anti-Cheat Debug] Previous button clicked. Saving draft...");
+                saveDraftImmediately();
+            });
+        }
+
+        form.addEventListener('submit', function(e) {
+            console.log("[Anti-Cheat Debug] form submit listener fired.");
+            console.log("Submitting...");
+            if (isCode && monacoInstance) {
+                const monacoVal = monacoInstance.getValue();
+                console.log("Editor:", monacoVal);
+                editorEl.value = monacoVal;
+            } else {
+                console.log("Editor: Not using Monaco editor");
+            }
+            
+            console.log("Textarea:", editorEl.value);
+            const textVal = editorEl.value.trim();
+            console.log("[Anti-Cheat Debug] Textarea value length before submission check:", textVal.length);
+            
+            if (!textVal) {
+                e.preventDefault();
+                console.warn("[Anti-Cheat Debug] Form submit blocked: Value is empty.");
+                alert("Please fill answer of this question first.");
+                console.log("Save failed", "Value is empty");
+                return;
+            }
+            
+            console.log("Save request started");
+            // Show submission loader immediately
+            document.getElementById('submit-loader-overlay').style.display = 'flex';
+            sessionStorage.removeItem(storageKey);
+            console.log("[Anti-Cheat Debug] Cleared draft. Submitting form...");
+            
+            // Defer disabling the button so the submit event finishes processing in the browser
+            setTimeout(() => {
+                submitBtn.disabled = true;
+                console.log("[Anti-Cheat Debug] Submit button disabled asynchronously.");
+                console.log("Save success");
+            }, 0);
+        });
+
+        // Save draft on window unload/beforeunload
+        window.addEventListener('beforeunload', function() {
+            console.log("[Anti-Cheat Debug] beforeunload fired.");
+            saveDraftImmediately();
+        });
+        window.addEventListener('pagehide', function() {
+            console.log("[Anti-Cheat Debug] pagehide fired.");
+            saveDraftImmediately();
+        });
+
+        // Heartbeat every 5 seconds
+        setInterval(() => {
+            console.log("[Anti-Cheat Debug] Heartbeat pinging...");
+            fetch(heartbeatUrl, {
+                method: 'POST',
+                headers: { 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value }
+            }).catch(err => console.log('[Anti-Cheat Debug] Heartbeat failed', err));
+        }, 5000);
+
+        // 2. Webcam Initialization
+        let mediaStream = null;
+        try {
+            console.log("[Anti-Cheat Debug] Requesting user media...");
+            mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            webcamReady = true;
+            console.log("[Anti-Cheat Debug] User media initialized successfully.");
+        } catch (err) {
+            console.error("[Anti-Cheat Debug] User media initialization failed:", err);
+            triggerViolation("Camera or microphone permission revoked");
+            return;
+        }
+
+        // 3. Wait for all dependencies + 3s delay
+        console.log("[Anti-Cheat Debug] Waiting for all dependencies. editorReady:", editorReady, "webcamReady:", webcamReady);
+        const checkInit = setInterval(() => {
+            if (editorReady && webcamReady) {
+                clearInterval(checkInit);
+                console.log("[Anti-Cheat Debug] All dependencies ready. Arming anti-cheat in 3 seconds...");
+                setTimeout(armAntiCheat, 3000);
+            }
+        }, 500);
+
+        function triggerViolation(reason) {
+            console.warn("[Anti-Cheat Debug] triggerViolation called. Reason:", reason);
+            if (isCode && monacoInstance) {
+                editorEl.value = monacoInstance.getValue();
+            }
+            sessionStorage.removeItem(storageKey);
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(t => {
+                    t.stop();
+                    console.log("[Anti-Cheat Debug] Stopped track:", t.kind);
+                });
+            }
+
+            console.log("[Anti-Cheat Debug] Posting violation to:", violationUrl);
+            fetch(violationUrl, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ reason: reason })
+            }).then(res => {
+                console.log("[Anti-Cheat Debug] Violation POST complete. Status:", res.status);
+                return res.json();
+            }).then(data => {
+                if (data.redirect_url) {
+                    console.log("[Anti-Cheat Debug] Redirecting to:", data.redirect_url);
+                    window.location.href = data.redirect_url;
+                }
+            }).catch(err => {
+                console.error("[Anti-Cheat Debug] Violation POST failed. Redirecting to dashboard.", err);
+                window.location.href = "{% url 'dashboard' %}";
+            });
+        }
+
+        function armAntiCheat() {
+            if (antiCheatArmed) return;
+            antiCheatArmed = true;
+            console.log("[Anti-Cheat Debug] ========================================");
+            console.log("[Anti-Cheat Debug] ANTI-CHEAT SYSTEM ARMED AND ACTIVE NOW");
+            console.log("[Anti-Cheat Debug] ========================================");
+            
+            // Browser Events (Immediate Failure)
+            document.addEventListener('visibilitychange', () => {
+                console.log("[Anti-Cheat Event] visibilitychange. State:", document.visibilityState);
+                if (document.visibilityState === 'hidden') {
+                    triggerViolation('Tab switched or hidden');
+                }
+            });
+
+            document.addEventListener('fullscreenchange', () => {
+                const isFullscreen = !!document.fullscreenElement;
+                console.log("[Anti-Cheat Event] fullscreenchange. isFullscreen:", isFullscreen);
+                if (!isFullscreen) {
+                    triggerViolation('Exited fullscreen');
+                }
+            });
+
+            const preventAction = (e) => {
+                console.log("[Anti-Cheat Event] Preventing action:", e.type);
+                e.preventDefault();
+                triggerViolation('Attempted to ' + e.type);
+            };
+            
+            console.log("[Anti-Cheat Debug] Attaching copy/cut/paste/drag/drop listeners.");
+            document.addEventListener('copy', preventAction);
+            document.addEventListener('cut', preventAction);
+            document.addEventListener('paste', preventAction);
+            document.addEventListener('dragover', preventAction);
+            document.addEventListener('drop', preventAction);
+            
+            console.log("[Anti-Cheat Debug] Attaching keyboard combo blockers.");
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey || e.metaKey) {
+                    const blockedKeys = ['c', 'v', 'x'];
+                    if (blockedKeys.includes(e.key.toLowerCase())) {
+                        console.log("[Anti-Cheat Event] Blocked shortcut pressed: Ctrl +", e.key);
+                        e.preventDefault();
+                        triggerViolation('Blocked shortcut: ' + e.key);
+                    }
+                }
+            });
+
+            // AI Proctoring Simulator
+            setInterval(() => {
+                if (mediaStream && !mediaStream.active) {
+                    console.warn("[Anti-Cheat Event] Media stream became inactive.");
+                    triggerViolation("Webcam stream disconnected");
+                }
+            }, 1000);
+        }
     }
-
-    // Prevent duplicate submissions and clear storage
-    form.addEventListener('submit', function() {
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
-        
-        // Clear local storage for this task
-        sessionStorage.removeItem(storageKey);
-    });
-});
+})();
 </script>
 {% endblock %}
 {% endblock %}

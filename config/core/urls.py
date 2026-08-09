@@ -1,3 +1,4 @@
+# Triggering URLconf reload
 from django.urls import path
 from . import views
 
@@ -25,9 +26,33 @@ urlpatterns = [
     ),
 
     path(
+        "skills/<int:skill_id>/agreement/",
+        views.integrity_agreement,
+        name="integrity_agreement"
+    ),
+
+    path(
         "skills/<int:skill_id>/start/",
         views.start_assessment,
         name="start_assessment"
+    ),
+
+    path(
+        "assessment/<int:assessment_id>/violation/",
+        views.assessment_violation,
+        name="assessment_violation"
+    ),
+
+    path(
+        "assessment/<int:assessment_id>/warning/",
+        views.log_warning,
+        name="log_warning"
+    ),
+
+    path(
+        "assessment/<int:assessment_id>/heartbeat/",
+        views.assessment_heartbeat,
+        name="assessment_heartbeat"
     ),
 
     path(
