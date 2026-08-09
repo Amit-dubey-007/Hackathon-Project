@@ -23,6 +23,12 @@ Instead of relying on claims, academic credentials, or keyword-filled resumes, C
 
 ---
 
+<h2 align="center">📜 Sample Certificate</h2>
+
+<p align="center">
+  <img src="config/core/static/certificate_bg.png" width="850">
+</p>
+
 # ✨ Features
 
 ## 🔐 Secure Authentication
