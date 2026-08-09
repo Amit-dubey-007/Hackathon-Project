@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Certificate of Achievement | {{ certificate.skill.name }}</title>
+    
+    <!-- Google Fonts for Web View -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Great+Vibes&display=swap" rel="stylesheet">
+    
+    <style>
+        /* PDF Page Setup */
+        @page {
+            size: A4 landscape;
+            margin: 0;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0c0e17;
+            font-family: 'Plus Jakarta Sans', Helvetica, Arial, sans-serif;
+            color: #1e293b;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .no-print-bar {
+            background-color: #111827;
+            border-bottom: 1px solid #374151;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 9999px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .btn-primary {
+            background-color: #2563eb;
+            color: #ffffff;
+        }
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: #d1d5db;
+            border-color: #4b5563;
+        }
+        .btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .btn-back {
+            color: #9ca3af;
+            font-size: 13px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Certificate Container */
+        .cert-wrapper {
+            padding: 40px 0;
+            display: flex;
+            justify-content: center;
+            background-color: #0c0e17;
+        }
+
+        .cert-container {
+            width: 1000px;
+            height: 700px;
+            background-color: #ffffff;
+            box-sizing: border-box;
+            border: 24px solid #ffffff;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Double border styling matching the artwork */
+        .cert-border {
+            border: 2px double #1e3a8a;
+            height: 100%;
+            width: 100%;
+            box-sizing: border-box;
+            position: relative;
+            background-color: #ffffff;
+        }
+
+        /* Corner Ornaments */
+        .corner-ornament {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-color: #1e3a8a;
+            border-style: solid;
+            pointer-events: none;
+        }
+        .corner-tl { top: 10px; left: 10px; border-width: 2px 0 0 2px; }
+        .corner-tr { top: 10px; right: 10px; border-width: 2px 2px 0 0; }
+        .corner-bl { bottom: 10px; left: 10px; border-width: 0 0 2px 2px; }
+        .corner-br { bottom: 10px; right: 10px; border-width: 0 2px 2px 0; }
+
+        /* Main Table Layout */
+        .cert-table {
+            width: 100%;
+            height: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        .col-left {
+            width: 65%;
+            padding: 40px 30px 40px 50px;
+            vertical-align: top;
+            box-sizing: border-box;
+        }
+
+        .col-right {
+            width: 35%;
+            padding: 40px 40px 40px 30px;
+            vertical-align: top;
+            border-left: 1px solid #e2e8f0;
+            box-sizing: border-box;
+            background-color: #fafbfc;
+        }
+
+        /* Branding */
+        .brand-section {
+            margin-bottom: 25px;
+        }
+        .brand-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #f97316;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+        .brand-text {
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #475569;
+        }
+
+        .cert-header {
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .cert-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: #1e3a8a;
+            margin: 0 0 5px 0;
+            text-align: center;
+        }
+
+        .cert-skill {
+            font-size: 36px;
+            font-weight: 800;
+            color: #f97316;
+            margin: 0 0 20px 0;
+            text-align: center;
+        }
+
+        .cert-divider {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .cert-line {
+            display: inline-block;
+            width: 80px;
+            height: 1px;
+            background-color: #cbd5e1;
+            vertical-align: middle;
+        }
+        .cert-star {
+            display: inline-block;
+            color: #059669;
+            margin: 0 10px;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        .cert-certifies {
+            font-size: 13px;
+            color: #64748b;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .cert-name {
+            font-family: 'Great Vibes', cursive, Georgia, serif;
+            font-size: 54px;
+            color: #0f172a;
+            text-align: center;
+            margin: 0 0 20px 0;
+            line-height: 1.1;
+        }
+
+        .cert-desc {
+            font-size: 12px;
+            color: #475569;
+            text-align: center;
+            line-height: 1.6;
+            margin-bottom: 40px;
+            padding: 0 20px;
+        }
+
+        /* Bottom Signatures & Seal Row */
+        .bottom-row-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .bottom-cell {
+            width: 33.33%;
+            vertical-align: bottom;
+            text-align: center;
+        }
+
+        .signature-area {
+            border-top: 1px solid #94a3b8;
+            padding-top: 8px;
+            width: 80%;
+            margin: 0 auto;
+        }
+        .signature-image {
+            font-family: 'Great Vibes', cursive;
+            font-size: 24px;
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+        .signature-title {
+            font-size: 9px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .seal-container {
+            text-align: center;
+        }
+        .seal-badge {
+            width: 75px;
+            height: 75px;
+            background-color: #1e3a8a;
+            border-radius: 50%;
+            display: inline-block;
+            position: relative;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        /* Blue-green ribbon tail shapes */
+        .seal-ribbon-left {
+            position: absolute;
+            bottom: -15px;
+            left: 20px;
+            width: 15px;
+            height: 35px;
+            background-color: #2563eb;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%);
+        }
+        .seal-ribbon-right {
+            position: absolute;
+            bottom: -15px;
+            right: 20px;
+            width: 15px;
+            height: 35px;
+            background-color: #059669;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%);
+        }
+
+        .issued-box {
+            text-align: center;
+        }
+        .issued-label {
+            font-size: 9px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+        .issued-date {
+            font-size: 11px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        /* Right Column Metrics Panel */
+        .verified-badge-container {
+            text-align: right;
+            margin-bottom: 25px;
+        }
+        .verified-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid #10b981;
+            background-color: rgba(16, 185, 129, 0.06);
+            color: #10b981;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .verified-dot {
+            width: 6px;
+            height: 6px;
+            background-color: #10b981;
+            border-radius: 50%;
+        }
+
+        .score-box {
+            margin-bottom: 25px;
+        }
+        .score-value {
+            font-size: 48px;
+            font-weight: 800;
+            color: #0f172a;
+        }
+        .score-denominator {
+            font-size: 18px;
+            color: #64748b;
+            font-weight: 500;
+        }
+        .score-progress-bar {
+            width: 100%;
+            height: 4px;
+            background-color: #e2e8f0;
+            border-radius: 9999px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        .score-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #10b981);
+        }
+        .score-requirement {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 6px;
+        }
+
+        /* Metrics List Table */
+        .metrics-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+        }
+        .metrics-td {
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .metric-item {
+            width: 50%;
+            vertical-align: top;
+        }
+        .metric-icon-cell {
+            width: 28px;
+            vertical-align: top;
+        }
+        .metric-icon {
+            font-size: 16px;
+            color: #2563eb;
+            margin-top: 2px;
+        }
+        .metric-label {
+            font-size: 9px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
+        .metric-value {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .metric-value-mono {
+            font-family: 'JetBrains Mono', Courier, monospace;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        /* QR Section */
+        .qr-section-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .qr-img-cell {
+            width: 75px;
+            vertical-align: middle;
+        }
+        .qr-img {
+            width: 70px;
+            height: 70px;
+            border: 1px solid #e2e8f0;
+            padding: 2px;
+            background-color: #ffffff;
+        }
+        .qr-text-cell {
+            padding-left: 15px;
+            vertical-align: middle;
+            font-size: 10px;
+            color: #64748b;
+            line-height: 1.5;
+        }
+        .verify-link {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* Share Modal Styling */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background-color: #1f2937;
+            border: 1px solid #374151;
+            padding: 24px;
+            border-radius: 16px;
+            max-width: 450px;
+            width: 100%;
+            color: #ffffff;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            color: #9ca3af;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .share-input-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .share-input {
+            flex-grow: 1;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid #4b5563;
+            background-color: #111827;
+            color: #ffffff;
+            font-size: 13px;
+        }
+        
+        /* Print Overrides */
+        @media print {
+            .no-print-bar, .cert-wrapper {
+                background-color: #ffffff !important;
+                padding: 0 !important;
+            }
+            .no-print-bar {
+                display: none !important;
+            }
+            .cert-container {
+                box-shadow: none !important;
+                border: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+            }
+            body {
+                background-color: #ffffff !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Action Panel (Only visible for Owner) -->
+    {% if is_owner %}
+    <div class="no-print-bar">
+        <a href="{% url 'certificate_detail' certificate.id %}" class="btn-back">
+            <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+        </a>
+        <div class="btn-group">
+            <a href="{% url 'download_certificate' certificate.id %}" class="btn btn-primary">
+                <i class="fa-solid fa-file-pdf"></i> Download PDF
+            </a>
+            <button onclick="window.print()" class="btn btn-secondary">
+                <i class="fa-solid fa-print"></i> Print
+            </button>
+            <button onclick="openShareModal()" class="btn btn-secondary">
+                <i class="fa-solid fa-share-nodes"></i> Share
+            </button>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Certificate Layout Wrap -->
+    <div class="cert-wrapper">
+        <div class="cert-container">
+            <div class="cert-border">
+                <!-- Border Corners -->
+                <div class="corner-ornament corner-tl"></div>
+                <div class="corner-ornament corner-tr"></div>
+                <div class="corner-ornament corner-bl"></div>
+                <div class="corner-ornament corner-br"></div>
+                
+                <!-- Main Grid layout -->
+                <table class="cert-table">
+                    <tr>
+                        <!-- Left pane: Main certificate fields -->
+                        <td class="col-left">
+                            <div class="brand-section">
+                                <span class="brand-dot"></span>
+                                <span class="brand-text">CONSENSUS AI</span>
+                            </div>
+                            
+                            <div class="cert-header">Certificate of Achievement</div>
+                            <div class="cert-title">Verified proficiency in</div>
+                            <div class="cert-skill">{{ certificate.skill.name }}</div>
+                            
+                            <div class="cert-divider">
+                                <span class="cert-line"></span>
+                                <span class="cert-star">&#9733;</span>
+                                <span class="cert-line"></span>
+                            </div>
+                            
+                            <div class="cert-certifies">This certifies that</div>
+                            <div class="cert-name">{{ certificate.user.get_full_name|default:certificate.user.username }}</div>
+                            
+                            <div class="cert-desc">
+                                has completed a practical, AI-evaluated skill assessment and demonstrated applied ability in {{ certificate.skill.name }}. This credential is recorded on-chain as a non-transferable proof of skill, independently verifiable by anyone.
+                            </div>
+                            
+                            <!-- Bottom Seals & Signatures -->
+                            <table class="bottom-row-table">
+                                <tr>
+                                    <td class="bottom-cell" style="text-align: left;">
+                                        <div class="signature-area" style="margin-left: 0;">
+                                            <div class="signature-image">J. Karat</div>
+                                            <div class="signature-title">AI Assessment Authority</div>
+                                        </div>
+                                    </td>
+                                    <td class="bottom-cell">
+                                        <div class="seal-container">
+                                            <div class="seal-badge">
+                                                <div class="seal-ribbon-left"></div>
+                                                <div class="seal-ribbon-right"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="bottom-cell" style="text-align: right;">
+                                        <div class="issued-box">
+                                            <div class="issued-label">Issued on</div>
+                                            <div class="issued-date">{{ certificate.assessment.completed_at|date:"M d, Y"|default:certificate.issued_at|date:"M d, Y" }}</div>
+                                            <div class="issued-date" style="font-size: 9px; font-weight: 500; color: #64748b; margin-top: 2px;">
+                                                {{ certificate.assessment.completed_at|date:"P"|default:certificate.issued_at|date:"P" }} UTC
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        
+                        <!-- Right pane: Metrics & Blockchain proof -->
+                        <td class="col-right">
+                            <div class="verified-badge-container">
+                                <span class="verified-badge">
+                                    <span class="verified-dot"></span> Blockchain Verified
+                                </span>
+                            </div>
+                            
+                            <div class="score-box">
+                                <span class="score-value">{{ certificate.assessment.score }}</span>
+                                <span class="score-denominator">/ 100</span>
+                                <div class="score-progress-bar">
+                                    <div class="score-progress-fill" style="width: {{ certificate.assessment.score }}%;"></div>
+                                </div>
+                                <div class="score-requirement">Passing requirement: {{ certificate.skill.passing_score }}/100</div>
+                            </div>
+                            
+                            <!-- Metrics rows -->
+                            <table class="metrics-table">
+                                <tr>
+                                    <td class="metrics-td metric-item">
+                                        <table style="width: 100%;">
+                                            <tr>
+                                                <td class="metric-icon-cell"><i class="fa-solid fa-id-card metric-icon"></i></td>
+                                                <td>
+                                                    <div class="metric-label">Certificate ID</div>
+                                                    <div class="metric-value">CERT-{{ certificate.id }}</div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td class="metrics-td metric-item">
+                                        <table style="width: 100%;">
+                                            <tr>
+                                                <td class="metric-icon-cell"><i class="fa-solid fa-key metric-icon" style="color: #a855f7;"></i></td>
+                                                <td>
+                                                    <div class="metric-label">Token ID</div>
+                                                    <div class="metric-value">#{{ certificate.token_id|default:"-" }}</div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="metrics-td metric-item">
+                                        <table style="width: 100%;">
+                                            <tr>
+                                                <td class="metric-icon-cell"><i class="fa-solid fa-clock metric-icon" style="color: #3b82f6;"></i></td>
+                                                <td>
+                                                    <div class="metric-label">Time Taken</div>
+                                                    <div class="metric-value">{{ certificate.assessment.time_used_formatted }}</div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td class="metrics-td metric-item">
+                                        <table style="width: 100%;">
+                                            <tr>
+                                                <td class="metric-icon-cell"><i class="fa-solid fa-hourglass-half metric-icon" style="color: #06b6d4;"></i></td>
+                                                <td>
+                                                    <div class="metric-label">Time Allowed</div>
+                                                    <div class="metric-value">{{ certificate.assessment.skill.duration }}m</div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="metrics-td" colspan="2">
+                                        <table style="width: 100%;">
+                                            <tr>
+                                                <td class="metric-icon-cell"><i class="fa-solid fa-wallet metric-icon" style="color: #6366f1;"></i></td>
+                                                <td>
+                                                    <div class="metric-label">Wallet Address</div>
+                                                    <div class="metric-value metric-value-mono" style="word-break: break-all;">
+                                                        {{ certificate.wallet_address|default:"Not Connected" }}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="metrics-td" colspan="2" style="border-bottom: 0;">
+                                        <table style="width: 100%;">
+                                            <tr>
+                                                <td class="metric-icon-cell"><i class="fa-solid fa-link metric-icon" style="color: #ec4899;"></i></td>
+                                                <td>
+                                                    <div class="metric-label">Transaction Hash</div>
+                                                    <div class="metric-value metric-value-mono" style="word-break: break-all; font-size: 9px; line-height: 1.3;">
+                                                        {{ certificate.transaction_hash|default:"Not Available" }}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- QR Section -->
+                            <table class="qr-section-table">
+                                <tr>
+                                    <td class="qr-img-cell">
+                                        {% if qr_code_base64 %}
+                                            <img src="{{ qr_code_base64 }}" class="qr-img" alt="QR verification">
+                                        {% endif %}
+                                    </td>
+                                    <td class="qr-text-cell">
+                                        Scan to verify on-chain, or check the transaction details online:<br>
+                                        <a href="{{ verification_url }}" class="verify-link" target="_blank">verify.consensus-ai.io</a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div id="shareModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Share Certificate</div>
+                <button onclick="closeShareModal()" class="close-btn">&times;</button>
+            </div>
+            <p style="font-size: 13px; color: #9ca3af; margin: 0 0 16px 0;">Copy the public verification link to share your achievement with employers.</p>
+            <div class="share-input-group">
+                <input type="text" id="shareUrl" class="share-input" value="{{ verification_url }}" readonly>
+                <button onclick="copyShareUrl()" class="btn btn-primary" style="border-radius: 8px;">Copy</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openShareModal() {
+            document.getElementById('shareModal').style.display = 'flex';
+        }
+        function closeShareModal() {
+            document.getElementById('shareModal').style.display = 'none';
+        }
+        function copyShareUrl() {
+            const copyText = document.getElementById("shareUrl");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(copyText.value);
+            alert("Copied share link: " + copyText.value);
+        }
+        window.onclick = function(event) {
+            const modal = document.getElementById('shareModal');
+            if (event.target == modal) {
+                closeShareModal();
+            }
+        }
+    </script>
+</body>
+</html>

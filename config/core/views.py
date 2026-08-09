@@ -993,12 +993,23 @@ def verify_certificate(request, certificate_id):
         id=certificate_id,
         minted=True,
     )
+    
+    verification_url = request.build_absolute_uri(
+        reverse(
+            "verify_certificate",
+            args=[certificate.id]
+        )
+    )
+    qr_code_base64 = generate_qr_base64(verification_url)
 
     return render(
         request,
-        "core/verify_certificate.html",
+        "core/certificate_white.html",
         {
             "certificate": certificate,
+            "qr_code_base64": qr_code_base64,
+            "verification_url": verification_url,
+            "is_owner": False,
         },
     )
 
@@ -1061,17 +1072,13 @@ def download_certificate(
 ):
 
     certificate = get_object_or_404(
-
         Certificate,
-
         id=certificate_id,
-
         user=request.user
-
     )
 
     template = get_template(
-        "core/certificate_pdf.html"
+        "core/certificate_white.html"
     )
 
     verification_url = request.build_absolute_uri(
@@ -1083,10 +1090,10 @@ def download_certificate(
     qr_code_base64 = generate_qr_base64(verification_url)
 
     html = template.render({
-
         "certificate": certificate,
-        "qr_code_base64": qr_code_base64
-
+        "qr_code_base64": qr_code_base64,
+        "verification_url": verification_url,
+        "is_owner": False,
     })
 
     pdf = BytesIO()
@@ -1148,3 +1155,29 @@ def wallet_guide(request):
 
 def how_it_works(request):
     return render(request, "core/how_it_works.html")
+
+@login_required
+def show_white_certificate(request, certificate_id):
+    certificate = get_object_or_404(
+        Certificate,
+        id=certificate_id,
+        user=request.user
+    )
+    verification_url = request.build_absolute_uri(
+        reverse(
+            "verify_certificate",
+            args=[certificate.id]
+        )
+    )
+    qr_code_base64 = generate_qr_base64(verification_url)
+    
+    return render(
+        request,
+        "core/certificate_white.html",
+        {
+            "certificate": certificate,
+            "qr_code_base64": qr_code_base64,
+            "verification_url": verification_url,
+            "is_owner": True,
+        }
+    )

@@ -123,4 +123,5 @@ urlpatterns = [
     path("contact/", views.contact, name="contact"),
     path("wallet-guide/", views.wallet_guide, name="wallet_guide"),
     path("how-it-works/", views.how_it_works, name="how_it_works"),
+    path("certificate/<int:certificate_id>/view/", views.show_white_certificate, name="show_white_certificate"),
 ]
