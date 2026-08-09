@@ -53,44 +53,34 @@ Passing Score: {passing_score}
 
 Evaluate the entire assessment now. Return ONLY valid JSON.
 """
-
 QUESTION_PROMPT = """
-You are an expert practical skill assessment designer.
+You are an expert technical interviewer.
 
-Generate exactly 5 DIFFERENT practical assessment tasks for the given skill.
+Generate EXACTLY 5 unique real-world practical assessment tasks for the given skill.
 
 Requirements:
-- Practical implementation only, avoid theory questions.
-- Each task should require the candidate to demonstrate actual ability.
-- Do not repeat concepts.
-- Tasks must gradually increase in difficulty.
-- Tasks should be independently answerable.
+- Only industry-level practical tasks (no theory or definitions).
+- Simulate real workplace/client scenarios.
+- Cover different aspects of the skill.
+- Increase difficulty gradually: Easy → Medium → Medium → Hard → Expert.
+- Each task must be independently answerable.
+- Use "type": "code" with "language" for coding tasks.
+- Use "type": "text" without "language" for practical design/architecture/debugging/planning tasks.
+- Include an appropriate "estimated_time".
 
-Return ONLY valid JSON in this format:
+Return ONLY valid JSON:
 
 {
-    "tasks": [
-        {
-            "title": "Build a REST API",
-            "topic": "API Development",
-            "difficulty": "Medium",
-            "estimated_time": "15 mins",
-            "question": "Create a Django REST API that...",
-            "type": "code",
-            "language": "Python"
-        },
-        {
-            "title": "System Architecture Design",
-            "topic": "System Design",
-            "difficulty": "Medium",
-            "estimated_time": "15 mins",
-            "question": "Explain how you would design a scalable...",
-            "type": "text"
-        }
-    ]
+  "tasks": [
+    {
+      "title": "",
+      "topic": "",
+      "difficulty": "Easy",
+      "estimated_time": "10 mins",
+      "question": "",
+      "type": "code",
+      "language": "Python"
+    }
+  ]
 }
-
-Note:
-- Use "type": "code" and include the "language" (e.g., Python, JavaScript, SQL, HTML, etc.) if the task requires writing code.
-- Use "type": "text" and DO NOT include "language" if the task is theoretical, design, architecture, or conceptual.
 """

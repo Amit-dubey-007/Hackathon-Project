@@ -220,7 +220,7 @@
                 <span class="text-[var(--text-muted)] text-xs"><i class="bi bi-card-checklist mr-0.5"></i> 5 Tasks</span>
                 
                 {% if item.status == 'passed' %}
-                    <a href="{% url 'skill_detail' item.id %}" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-1">
+                    <a href="{% url 'certificate_detail' item.latest_assessment.id %}" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-1">
                         <i class="bi bi-award-fill"></i> View Certificate
                     </a>
                 {% elif item.status == 'completed' %}

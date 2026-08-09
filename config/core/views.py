@@ -33,7 +33,7 @@ def dashboard(request):
 
     assessments = Assessment.objects.filter(
         user=request.user
-    ).order_by("-started_at")
+    ).order_by("-started_at")[:7]
 
     certificates = Certificate.objects.filter(
         user=request.user
@@ -193,6 +193,15 @@ def skill_list(request):
 
     categories = ['Frontend', 'Backend', 'AI', 'Blockchain', 'Cloud', 'Cybersecurity', 'Database', 'Programming Languages']
 
+    for item in page_obj:
+        assessment = (
+            Assessment.objects
+            .filter(user=request.user, skill=item["obj"], passed=True)
+            .order_by("-completed_at")
+            .first()
+        )
+        item["latest_assessment"] = assessment
+
     context = {
         'page_obj': page_obj,
         'search_query': search_query,
@@ -311,11 +320,11 @@ def start_assessment(request, skill_id):
             e
         )
 
-        logger.exception("START ASSESSMENT FAILED")
+        # logger.exception("START ASSESSMENT FAILED")
 
-        print(traceback.format_exc())
+        # print(traceback.format_exc())
 
-        raise
+        # raise
 
         assessment.delete()
 

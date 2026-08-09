@@ -3,13 +3,22 @@
 {% block title %}Certificate | {{ certificate.skill.name }}{% endblock %}
 
 {% block content %}
+
+<style>
+    [data-bs-theme="dark"] .cert:hover {
+        color: #fff !important;
+    }
+    [data-bs-theme="dark"] .cert {
+        color: #fff !important;
+    }
+</style>
 <div class="row justify-content-center my-4">
     <div class="col-lg-10">
         
         <!-- Header -->
         <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
             <div>
-                <h2 class="fw-bold mb-0 text-dark">Certificate Details</h2>
+                <h2 class="fw-bold mb-0 text-dark cert">Certificate Details</h2>
                 <p class="text-muted mb-0">Manage your skill credential and blockchain verification.</p>
             </div>
             <div class="d-flex gap-2">
@@ -51,23 +60,23 @@
                             <div class="row g-4">
                                 <div class="col-sm-6 col-md-4">
                                     <p class="text-muted small fw-bold text-uppercase tracking-wider mb-1">Certificate ID</p>
-                                    <p class="fw-medium text-dark mb-0 fs-5">CERT-{{ certificate.id }}</p>
+                                    <p class="fw-medium text-dark mb-0 fs-5 text-white">CERT-{{ certificate.id }}</p>
                                 </div>
                                 <div class="col-sm-6 col-md-4">
                                     <p class="text-muted small fw-bold text-uppercase tracking-wider mb-1">Completion Date</p>
-                                    <p class="fw-medium text-dark mb-0 fs-5">{{ certificate.assessment.completed_at|default:certificate.issued_at }}</p>
+                                    <p class="fw-medium text-dark mb-0 fs-5 text-white">{{ certificate.assessment.completed_at|default:certificate.issued_at }}</p>
                                 </div>
                                 <div class="col-sm-6 col-md-4">
                                     <p class="text-muted small fw-bold text-uppercase tracking-wider mb-1">Passing Requirement</p>
-                                    <p class="fw-medium text-dark mb-0 fs-5">{{ certificate.skill.passing_score }}/100</p>
+                                    <p class="fw-medium text-dark mb-0 fs-5 text-white">{{ certificate.skill.passing_score }}/100</p>
                                 </div>
                                 <div class="col-sm-6 col-md-4">
                                     <p class="text-muted small fw-bold text-uppercase tracking-wider mb-1">Final Score</p>
-                                    <p class="fw-bold text-primary mb-0 fs-5">{{ certificate.assessment.score }}/100</p>
+                                    <p class="fw-bold text-primary mb-0 fs-5 text-white">{{ certificate.assessment.score }}/100</p>
                                 </div>
                                 <div class="col-sm-6 col-md-4">
                                     <p class="text-muted small fw-bold text-uppercase tracking-wider mb-1">Wallet Address</p>
-                                    <p class="fw-medium text-dark mb-0 fs-5 text-truncate" title="{{ certificate.wallet_address|default:"Not Connected" }}">{{ certificate.wallet_address|default:"Not Connected" }}</p>
+                                    <p class="fw-medium text-dark mb-0 fs-5 text-truncate text-white" title="{{ certificate.wallet_address|default:"Not Connected" }}">{{ certificate.wallet_address|default:"Not Connected" }}</p>
                                 </div>
                                 <div class="col-sm-6 col-md-4">
                                     <p class="text-muted small fw-bold text-uppercase tracking-wider mb-1">Status</p>

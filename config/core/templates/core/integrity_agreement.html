@@ -56,9 +56,9 @@
                     </div>
                 </div>
 
-                <div class="form-check mb-4 mt-4 p-4 bg-body-tertiary rounded border border-subtle">
-                    <input class="form-check-input fs-4 me-3" type="checkbox" value="" id="agreeCheck">
-                    <label class="form-check-label fs-5 fw-bold pt-1" for="agreeCheck">
+                <div class="d-flex align-items-center gap-3 mb-4 mt-4 p-4 bg-body-tertiary rounded border border-subtle">
+                    <input class="form-check-input fs-4 m-0" type="checkbox" value="" id="agreeCheck" style="flex-shrink: 0;">
+                    <label class="form-check-label fs-5 fw-bold" for="agreeCheck">
                         I have read all assessment rules and accept the Zero Tolerance Policy.
                     </label>
                 </div>
@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     let permissionsGranted = false;
     agreeCheck.disabled = true;
-
+ 
     // Desktop check
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
     
@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 stream.getTracks().forEach(track => track.stop());
                 
                 permissionBox.classList.replace('alert-info', 'alert-success');
-                permissionBox.innerHTML = '<i class="bi bi-check-circle-fill text-success fs-4"></i><div class="fw-bold text-dark">Permissions Granted</div>';
+                permissionBox.innerHTML = '<i class="bi bi-check-circle-fill text-success fs-4"></i><div class="fw-bold text-success-emphasis">Permissions Granted</div>';
                 agreeCheck.disabled = false;
             } catch (err) {
                 alert('Camera and microphone access is required to take this assessment. Please allow access in your browser settings.');
