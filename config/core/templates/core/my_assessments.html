@@ -1,0 +1,294 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}My Assessments | Consensus AI{% endblock %}
+
+{% block content %}
+<style>
+    /* Custom styles for Glassmorphism Cards */
+    .glass-card {
+        background: rgba(17, 24, 39, 0.7);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .glass-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(6, 182, 212, 0.3);
+        box-shadow: 0 15px 30px -5px rgba(6, 182, 212, 0.15);
+    }
+    .glass-input {
+        background: rgba(31, 41, 55, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #fff;
+        transition: all 0.2s;
+    }
+    .glass-input:focus {
+        border-color: #06b6d4;
+        background: rgba(31, 41, 55, 0.7);
+        box-shadow: 0 0 12px rgba(6, 182, 212, 0.25);
+        outline: none;
+    }
+</style>
+
+<div class="container py-5 text-white">
+    <!-- Header -->
+    <div class="d-flex align-items-center justify-content-between mb-5 flex-wrap gap-4">
+        <div>
+            <h1 class="display-5 fw-bold bg-gradient-to-r from-cyan-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">My Assessments</h1>
+            <p class="text-secondary mb-0">View and track all your practical verification records and scores.</p>
+        </div>
+        <a href="{% url 'skill_list' %}" class="btn btn-outline-cyan rounded-pill px-4 fw-semibold text-cyan hover:bg-cyan hover:text-dark transition-all">
+            <i class="bi bi-compass me-2"></i> Explore Skills Catalog
+        </a>
+    </div>
+
+    <!-- Search, Filter & Sort Form -->
+    <div class="glass-card rounded-3xl p-4 mb-5">
+        <form method="GET" action="{% url 'my_assessments' %}" class="row g-3 align-items-center">
+            <!-- Search -->
+            <div class="col-lg-4 col-md-12">
+                <div class="position-relative">
+                    <span class="position-absolute top-50 start-0 translate-middle-y ps-3 text-secondary">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" name="q" value="{{ search_query }}" placeholder="Search by skill name..." class="form-control rounded-pill py-2.5 ps-5 pe-3 glass-input">
+                </div>
+            </div>
+
+            <!-- Filter Status -->
+            <div class="col-lg-3 col-md-4">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="text-secondary small fw-bold text-nowrap">Filter:</span>
+                    <select name="filter" class="form-select rounded-pill py-2.5 glass-input" onchange="this.form.submit()">
+                        
+                        <option value="failed" {% if filter_val == 'failed' %}selected{% endif %}>Failed Only</option>
+                        <option value="passed" {% if filter_val == 'passed' %}selected{% endif %}>Passed Only</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Sort By -->
+            <div class="col-lg-3 col-md-4">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="text-secondary small fw-bold text-nowrap">Sort:</span>
+                    <select name="sort" class="form-select rounded-pill py-2.5 glass-input" onchange="this.form.submit()">
+                        <option value="newest" {% if sort_val == 'newest' %}selected{% endif %}>Newest Completed</option>
+                        <option value="oldest" {% if sort_val == 'oldest' %}selected{% endif %}>Oldest Completed</option>
+                        <option value="highest" {% if sort_val == 'highest' %}selected{% endif %}>Highest Score</option>
+                        <option value="lowest" {% if sort_val == 'lowest' %}selected{% endif %}>Lowest Score</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Submit Buttons -->
+            <div class="col-lg-2 col-md-4 d-flex gap-2">
+                <button type="submit" class="btn btn-cyan w-100 rounded-pill py-2.5 fw-bold text-dark">
+                    Apply
+                </button>
+                {% if search_query or filter_val != 'all' or sort_val != 'newest' %}
+                    <a href="{% url 'my_assessments' %}" class="btn btn-outline-secondary rounded-pill p-2 px-3 d-flex align-items-center justify-content-center" title="Reset Filters">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <!-- Assessments Cards List -->
+    {% if page_obj %}
+        <div class="row g-4 mb-5">
+            {% for assessment in page_obj %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="glass-card rounded-3xl p-4 h-100 d-flex flex-column justify-content-between position-relative overflow-hidden">
+                        <!-- Neon gradient side-glow -->
+                        <div class="position-absolute top-0 start-0 h-100 w-1 {% if assessment.passed %}bg-success{% elif not assessment.completed_at %}bg-info{% else %}bg-danger{% endif %} bg-gradient"></div>
+
+                        <div>
+                            <!-- Header / Date & Status Badge -->
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <span class="text-secondary small">
+                                    <i class="bi bi-calendar-event me-1"></i>
+                                    {{ assessment.completed_at|date:"M d, Y"|default:assessment.started_at|date:"M d, Y" }}
+                                </span>
+                                
+                                {% if not assessment.completed_at %}
+                                    <span class="badge bg-cyan bg-opacity-10 text-cyan px-3 py-1.5 rounded-pill fw-bold border border-cyan border-opacity-25 text-uppercase tracking-wide small">
+                                        In Progress
+                                    </span>
+                                {% elif assessment.passed %}
+                                    <span class="badge bg-success bg-opacity-10 text-success px-3 py-1.5 rounded-pill fw-bold border border-success border-opacity-25 text-uppercase tracking-wide small">
+                                        Passed
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-1.5 rounded-pill fw-bold border border-danger border-opacity-25 text-uppercase tracking-wide small">
+                                        Failed
+                                    </span>
+                                {% endif %}
+                            </div>
+
+                            <!-- Skill title & difficulty badge -->
+                            <div class="mb-3">
+                                <h3 class="h4 fw-bold mb-2 text-white">{{ assessment.skill.name }}</h3>
+                                <span class="badge bg-white bg-opacity-5 text-secondary border border-white border-opacity-10 px-2 py-1 rounded-pill small">
+                                    {{ assessment.skill.difficulty }}
+                                </span>
+                            </div>
+
+                            <!-- Score and Progress bar -->
+                            <div class="score-container mb-4">
+                                <div class="d-flex justify-content-between align-items-end mb-2">
+                                    <span class="text-secondary small">Assessment Score</span>
+                                    <span class="h3 fw-bold mb-0 text-white">
+                                        {% if assessment.score is not None %}
+                                            {{ assessment.score }}<span class="fs-6 fw-normal text-secondary">/100</span>
+                                        {% else %}
+                                            --
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <div class="progress bg-white bg-opacity-5 rounded-pill" style="height: 6px;">
+                                    <div class="progress-bar {% if assessment.passed %}bg-success{% else %}bg-danger{% endif %} bg-gradient rounded-pill" role="progressbar" style="width: {{ assessment.score|default:0 }}%" aria-valuenow="{{ assessment.score|default:0 }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                <div class="d-flex justify-content-between text-secondary small mt-2">
+                                    <span>Passing Requirement: {{ assessment.skill.passing_score }}/100</span>
+                                    {% if assessment.integrity_score is not None %}
+                                        <span class="text-cyan">Integrity: {{ assessment.integrity_score }}%</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Detail Icons list -->
+                            <div class="row g-2 mb-4 pt-3 border-top border-white border-opacity-5">
+                                <div class="col-6">
+                                    <div class="d-flex align-items-center gap-2 text-secondary small">
+                                        <i class="bi bi-clock-history text-cyan"></i>
+                                        <div>
+                                            <div class="fw-bold text-white small" style="font-size: 11px;">Time Taken</div>
+                                            <div class="small">{{ assessment.time_used_formatted|default:"--" }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="d-flex align-items-center gap-2 text-secondary small">
+                                        <i class="bi bi-hourglass-split text-indigo"></i>
+                                        <div>
+                                            <div class="fw-bold text-white small" style="font-size: 11px;">Allowed</div>
+                                            <div class="small">{{ assessment.skill.duration }}m</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 mt-2">
+                                    <div class="d-flex align-items-center gap-2 text-secondary small">
+                                        <i class="bi bi-send-check text-purple"></i>
+                                        <div>
+                                            <span class="fw-bold text-white small" style="font-size: 11px;">Submission Type:</span>
+                                            <span class="small ms-1">{{ assessment.submission_type }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card Action -->
+                        <div class="mt-4">
+                            {% if assessment.completed_at %}
+                                <a href="{% url 'assessment_result' assessment.id %}" class="btn btn-cyan w-100 rounded-pill py-2 fw-bold text-dark d-flex align-items-center justify-content-center gap-2">
+                                    View Report <i class="bi bi-arrow-right-short"></i>
+                                </a>
+                            {% else %}
+                                <a href="{% url 'assessment_question' assessment.id 1 %}" class="btn btn-outline-cyan w-100 rounded-pill py-2 fw-bold d-flex align-items-center justify-content-center gap-2">
+                                    Resume Test <i class="bi bi-play-fill"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Server-side Pagination controls -->
+        {% if page_obj.has_other_pages %}
+            <nav aria-label="Assessments history pagination" class="d-flex justify-content-center mt-5">
+                <ul class="pagination gap-2 bg-transparent border-0 mb-0">
+                    <!-- Previous button -->
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link rounded-circle d-flex align-items-center justify-content-center glass-input" style="width: 42px; height: 42px;" href="?page={{ page_obj.previous_page_number }}&q={{ search_query }}&filter={{ filter_val }}&sort={{ sort_val }}">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled opacity-50">
+                            <span class="page-link rounded-circle d-flex align-items-center justify-content-center glass-input" style="width: 42px; height: 42px;">
+                                <i class="bi bi-chevron-left"></i>
+                            </span>
+                        </li>
+                    {% endif %}
+
+                    <!-- Page Numbers -->
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link rounded-circle d-flex align-items-center justify-content-center bg-cyan border-cyan text-dark fw-bold" style="width: 42px; height: 42px;">
+                                    {{ num }}
+                                </span>
+                            </li>
+                        {% else %}
+                            <li class="page-item">
+                                <a class="page-link rounded-circle d-flex align-items-center justify-content-center glass-input" style="width: 42px; height: 42px;" href="?page={{ num }}&q={{ search_query }}&filter={{ filter_val }}&sort={{ sort_val }}">
+                                    {{ num }}
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    <!-- Next button -->
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link rounded-circle d-flex align-items-center justify-content-center glass-input" style="width: 42px; height: 42px;" href="?page={{ page_obj.next_page_number }}&q={{ search_query }}&filter={{ filter_val }}&sort={{ sort_val }}">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled opacity-50">
+                            <span class="page-link rounded-circle d-flex align-items-center justify-content-center glass-input" style="width: 42px; height: 42px;">
+                                <i class="bi bi-chevron-right"></i>
+                            </span>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+
+    {% else %}
+        <!-- Empty State -->
+        <div class="glass-card rounded-3xl p-5 text-center my-5 d-flex flex-column align-items-center justify-content-center">
+            <div class="bg-cyan bg-opacity-10 text-cyan rounded-circle p-4 mb-4 d-flex align-items-center justify-content-center" style="width: 90px; height: 90px;">
+                <i class="bi bi-clipboard2-x" style="font-size: 2.5rem;"></i>
+            </div>
+            <h3 class="fw-bold mb-2">No assessments found</h3>
+            <p class="text-secondary max-w-md mb-4">
+                {% if search_query or filter_val != 'all' %}
+                    We couldn't find any results matching your search terms or filter status. Try clearing your search parameters.
+                {% else %}
+                    You haven't completed any skills assessments yet. Challenge yourself today and mint your verified proof of skill credentials!
+                {% endif %}
+            </p>
+            <div class="d-flex gap-3">
+                {% if search_query or filter_val != 'all' %}
+                    <a href="{% url 'my_assessments' %}" class="btn btn-outline-cyan rounded-pill px-4 py-2.5 fw-bold">
+                        Clear Search
+                    </a>
+                {% else %}
+                    <a href="{% url 'skill_list' %}" class="btn btn-cyan rounded-pill px-4 py-2.5 fw-bold text-dark d-flex align-items-center gap-2">
+                        Explore Skills <i class="bi bi-arrow-right-short"></i>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

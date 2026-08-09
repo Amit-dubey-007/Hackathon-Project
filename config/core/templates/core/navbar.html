@@ -1,10 +1,19 @@
 {% load static %}
+<style>
+    nav.glass-navbar .nav-link {
+        white-space: nowrap !important;
+        font-size: 14.5px !important;
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+    }
+    nav.glass-navbar .navbar-brand {
+        white-space: nowrap !important;
+    }
+</style>
 <nav class="navbar navbar-expand-lg glass-navbar sticky-top py-3">
     <div class="container">
-        <!-- Brand / Logo -->
-        <a class="navbar-brand d-flex align-items-center fw-bold text-theme-main gap-2" href="{% url 'home' %}">
-            <img src="{% static 'logo.png' %}" alt="Consensus AI" style="width: 36px; height: 36px; object-fit: contain;">
-            <span class="fs-5 tracking-tight">Consensus AI</span>
+        <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
+            <img src="{% static 'logo.png' %}" alt="Consensus AI" style="height: 38px; width: auto; display: block;">
         </a>
 
         <!-- Mobile Toggle -->
@@ -44,7 +53,7 @@
                 <button id="themeToggleBtn" class="btn-theme-toggle" aria-label="Toggle Theme">
                     <i id="themeToggleIcon" class="bi bi-moon-stars fs-5"></i>
                 </button>
-
+ 
                 {% if request.user.is_authenticated %}
                 <div class="dropdown">
                     <button class="btn btn-light dropdown-toggle rounded-pill px-3 py-2 border-subtle d-flex align-items-center gap-2 shadow-sm bg-white hover-lift" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -67,6 +76,9 @@
                         </li>
                     </ul>
                 </div>
+                {% else %}
+                <a href="{% url 'accounts:login' %}" class="btn btn-outline-cyan rounded-pill px-3 py-2 fw-medium me-1 text-theme-main">Login</a>
+                <a href="{% url 'accounts:register' %}" class="btn btn-cyan rounded-pill px-3 py-2 fw-semibold text-dark">Register</a>
                 {% endif %}
             </div>
         </div>

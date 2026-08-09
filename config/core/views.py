@@ -1181,3 +1181,42 @@ def show_white_certificate(request, certificate_id):
             "is_owner": True,
         }
     )
+
+@login_required
+def my_assessments(request):
+    from django.core.paginator import Paginator
+    
+    search_query = request.GET.get("q", "").strip()
+    filter_val = request.GET.get("filter", "all").strip()
+    sort_val = request.GET.get("sort", "newest").strip()
+    
+    assessments = Assessment.objects.filter(user=request.user, completed_at__isnull=False)
+    
+    if search_query:
+        assessments = assessments.filter(skill__name__icontains=search_query)
+        
+    if filter_val == "passed":
+        assessments = assessments.filter(passed=True)
+    elif filter_val == "failed":
+        assessments = assessments.filter(passed=False, completed_at__isnull=False)
+        
+    if sort_val == "oldest":
+        assessments = assessments.order_by("completed_at")
+    elif sort_val == "highest":
+        assessments = assessments.order_by("-score")
+    elif sort_val == "lowest":
+        assessments = assessments.order_by("score")
+    else:
+        # newest
+        assessments = assessments.order_by("-completed_at")
+        
+    paginator = Paginator(assessments, 10)
+    page_number = request.GET.get("page", 1)
+    page_obj = paginator.get_page(page_number)
+    
+    return render(request, "core/my_assessments.html", {
+        "page_obj": page_obj,
+        "search_query": search_query,
+        "filter_val": filter_val,
+        "sort_val": sort_val,
+    })

@@ -1,50 +1,141 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-slate-50">
+<html lang="en" class="h-full bg-[#020204]">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Hackathon site{% endblock %}</title>
+    <title>{% block title %}Consensus AI{% endblock %}</title>
     <!-- Tailwind CSS v4 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- Google Fonts: Plus Jakarta Sans -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #020204 !important;
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            color: #ffffff !important;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Ambient Floating Blobs */
+        .blob {
+            position: absolute;
+            filter: blur(100px);
+            opacity: 0.35;
+            mix-blend-mode: screen;
+            pointer-events: none;
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        /* Overrides for standard tailwind elements to glassmorphism */
+        .bg-white, .bg-gray-100 {
+            background: rgba(8, 9, 14, 0.82) !important;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            color: #ffffff !important;
+            box-shadow: 0 0 35px rgba(6, 182, 212, 0.12) !important;
+        }
+
+        h2, h1, label, p, span, legend {
+            color: #f8fafc !important;
+        }
+        
+        .text-gray-800, .text-gray-700, .text-gray-600, .text-gray-500, .text-slate-800 {
+            color: #94a3b8 !important;
+        }
+
+        /* Styling Inputs globally for consistency */
+        input[type="text"], input[type="password"], input[type="email"], input[type="number"], select, textarea {
+            background-color: rgba(2, 2, 4, 0.6) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: #ffffff !important;
+            border-radius: 9999px !important; /* Premium rounded style */
+            padding: 10px 20px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+            font-size: 14px !important;
+            transition: all 0.3s;
+        }
+        
+        /* Keep register form standard rounded if needed, but 9999px looks great */
+        .border.rounded, .border.rounded-lg {
+            border: none !important;
+            padding: 0 !important;
+        }
+
+        input:focus {
+            border-color: #06b6d4 !important;
+            outline: none !important;
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.3) !important;
+        }
+
+        /* Button override */
+        button, input[type="submit"], .btn-primary-gradient {
+            background: linear-gradient(135deg, #06b6d4 0%, #6366f1 50%, #a855f7 100%) !important;
+            border: none !important;
+            color: #020204 !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.5px !important;
+            transition: all 0.3s !important;
+            border-radius: 9999px !important;
+            cursor: pointer;
+        }
+
+        button:hover, input[type="submit"]:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.4) !important;
+            opacity: 0.95 !important;
+        }
+
+        a {
+            color: #06b6d4 !important;
+            text-decoration: none !important;
+            transition: color 0.2s;
+        }
+        a:hover {
+            color: #a855f7 !important;
+            text-decoration: underline !important;
         }
     </style>
 </head>
 <body>
-    <!-- Alert Messages (Dynamic Toast Style) -->
+    <!-- Background blobs -->
+    <div class="blob top-10 left-[10%] w-[300px] h-[300px] bg-gradient-to-tr from-cyan-500 to-indigo-500"></div>
+    <div class="blob bottom-10 right-[10%] w-[350px] h-[350px] bg-gradient-to-tr from-purple-500 to-pink-500"></div>
+
+    <!-- Alert Messages -->
     {% if messages %}
-    <div class="fixed top-20 right-4 z-50 flex flex-col gap-3 max-w-md w-full px-4 sm:px-0">
+    <div class="fixed top-6 right-4 z-50 flex flex-col gap-3 max-w-md w-full px-4 sm:px-0">
         {% for message in messages %}
-        <div class="flex items-center gap-3 rounded-2xl border border-emerald-100 bg-white p-4 shadow-xl shadow-slate-100 animate-slide-in transition-all" role="alert">
-            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+        <div class="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/60 p-4 shadow-xl backdrop-blur-md animate-slide-in" role="alert">
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-500">
+                <i class="fa-solid fa-bell"></i>
             </div>
             <div class="flex-1">
-                <p class="text-sm font-semibold text-slate-800">{{ message }}</p>
+                <p class="text-sm font-semibold text-white">{{ message }}</p>
             </div>
-            <button type="button" class="text-slate-400 hover:text-slate-600 transition-colors" onclick="this.parentElement.remove()">
-                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
+            <button type="button" class="text-white/40 hover:text-white transition-colors" onclick="this.parentElement.remove()">
+                <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
         {% endfor %}
     </div>
     {% endif %}
 
-    <main class="flex-grow">
+    <main class="flex-grow flex items-center justify-center relative z-10">
         {% block content %}
-        <!-- Content will be injected here -->
         {% endblock %}
     </main>
 </body>

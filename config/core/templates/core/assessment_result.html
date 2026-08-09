@@ -56,25 +56,25 @@
             <div class="card-body p-4 p-md-5">
                 <div class="row g-4">
                     <div class="col-sm-6 col-md-3">
-                        <div class="border border-subtle p-3 rounded-xl bg-body-tertiary">
+                        <div class="border border-subtle p-3 rounded-xl bg-body-tertiary text-center">
                             <label class="text-muted small fw-bold text-uppercase tracking-wider d-block mb-1">Time Allowed</label>
-                            <span class="fs-5 fw-bold text-body">{{ assessment.skill.duration }}m</span>
+                            <span class="fs-5 fw-bold text-theme-main">{{ assessment.skill.duration }}m</span>
                         </div>
                     </div>
                     <div class="col-sm-6 col-md-3">
-                        <div class="border border-subtle p-3 rounded-xl bg-body-tertiary">
+                        <div class="border border-subtle p-3 rounded-xl bg-body-tertiary text-center">
                             <label class="text-muted small fw-bold text-uppercase tracking-wider d-block mb-1">Time Used</label>
-                            <span class="fs-5 fw-bold text-body">{{ assessment.time_used_formatted }}</span>
+                            <span class="fs-5 fw-bold text-theme-main">{{ assessment.time_used_formatted }}</span>
                         </div>
                     </div>
                     <div class="col-sm-6 col-md-3">
-                        <div class="border border-subtle p-3 rounded-xl bg-body-tertiary">
+                        <div class="border border-subtle p-3 rounded-xl bg-body-tertiary text-center">
                             <label class="text-muted small fw-bold text-uppercase tracking-wider d-block mb-1">Time Remaining</label>
-                            <span class="fs-5 fw-bold text-body">{% if assessment.submission_type == 'Auto Submitted (Time Expired)' %}0s{% else %}{{ assessment.time_remaining_formatted }}{% endif %}</span>
+                            <span class="fs-5 fw-bold text-theme-main">{% if assessment.submission_type == 'Auto Submitted (Time Expired)' %}0s{% else %}{{ assessment.time_remaining_formatted }}{% endif %}</span>
                         </div>
                     </div>
                     <div class="col-sm-6 col-md-3">
-                        <div class="border border-subtle p-3 rounded-xl bg-body-tertiary">
+                        <div class="border border-subtle p-3 rounded-xl bg-body-tertiary text-center">
                             <label class="text-muted small fw-bold text-uppercase tracking-wider d-block mb-1">Submission Type</label>
                             <span class="badge {% if assessment.submission_type == "Auto Submitted (Time Expired)" %}bg-danger{% else %}bg-success{% endif %} bg-opacity-10 {% if assessment.submission_type == "Auto Submitted (Time Expired)" %}text-danger{% else %}text-success{% endif %} fw-bold fs-6 rounded-pill px-3 py-1 mt-1 d-inline-block">{{ assessment.submission_type }}</span>
                         </div>
@@ -105,7 +105,7 @@
                             <i class="bi bi-info-circle-fill text-info fs-4"></i>
                         {% endif %}
                         <div>
-                            <div class="fw-bold text-dark">{{ event.message }}</div>
+                            <div class="fw-bold text-theme-main">{{ event.message }}</div>
                             <small class="text-muted text-uppercase tracking-wider" style="font-size: 0.75rem;">{{ event.type }} &bull; {{ event.timestamp|slice:":10" }} {% if event.duration > 0 %}&bull; Duration: {{ event.duration }}s{% endif %}</small>
                         </div>
                     </li>
@@ -115,7 +115,7 @@
                     <li class="list-group-item d-flex align-items-start gap-3 py-3 px-0 border-0">
                         <i class="bi bi-check-circle-fill text-success fs-4"></i>
                         <div>
-                            <div class="fw-bold text-dark">Perfect Integrity</div>
+                            <div class="fw-bold text-theme-main">Perfect Integrity</div>
                             <small class="text-muted">No violations or warnings detected during the assessment.</small>
                         </div>
                     </li>
@@ -133,7 +133,7 @@
                         <i class="bi bi-award-fill fs-1"></i>
                     </div>
                     <div>
-                        <h3 class="fw-bold text-dark mb-2">Certificate Earned!</h3>
+                        <h3 class="fw-bold text-theme-main mb-2">Certificate Earned!</h3>
                         <div class="d-flex align-items-center gap-2 text-muted fw-medium">
                             <i class="bi bi-link-45deg fs-4"></i> Blockchain Status: 
                             {% if certificate.minted %}
@@ -162,7 +162,7 @@
                     <h6 class="text-primary fw-bold text-uppercase tracking-wider small mb-3 d-flex align-items-center gap-2">
                         <i class="bi bi-chat-right-quote fs-5"></i> Overall Feedback
                     </h6>
-                    <p class="mb-0 text-dark lh-lg fs-6">{{ overall_summary.feedback }}</p>
+                    <p class="mb-0 text-theme-main lh-lg fs-6">{{ overall_summary.feedback }}</p>
                 </div>
             </div>
             <div class="col-md-6">
@@ -170,7 +170,7 @@
                     <h6 class="text-success fw-bold text-uppercase tracking-wider small mb-3 d-flex align-items-center gap-2">
                         <i class="bi bi-plus-circle-fill fs-5"></i> Key Strengths
                     </h6>
-                    <p class="mb-0 text-dark lh-lg">{{ overall_summary.strengths }}</p>
+                    <p class="mb-0 text-theme-main lh-lg">{{ overall_summary.strengths }}</p>
                 </div>
             </div>
             <div class="col-md-6">
@@ -178,7 +178,7 @@
                     <h6 class="text-danger fw-bold text-uppercase tracking-wider small mb-3 d-flex align-items-center gap-2">
                         <i class="bi bi-dash-circle-fill fs-5"></i> Key Weaknesses
                     </h6>
-                    <p class="mb-0 text-dark lh-lg">{{ overall_summary.weaknesses }}</p>
+                    <p class="mb-0 text-theme-main lh-lg">{{ overall_summary.weaknesses }}</p>
                 </div>
             </div>
             <div class="col-12">
@@ -186,7 +186,7 @@
                     <h6 class="text-warning fw-bold text-uppercase tracking-wider small mb-3 d-flex align-items-center gap-2">
                         <i class="bi bi-lightbulb-fill fs-5"></i> Overall Suggestions
                     </h6>
-                    <p class="mb-0 text-dark lh-lg">{{ overall_summary.suggestions }}</p>
+                    <p class="mb-0 text-theme-main lh-lg">{{ overall_summary.suggestions }}</p>
                 </div>
             </div>
         </div>
@@ -201,7 +201,7 @@
             {% for result in results %}
             <div class="accordion-item border-0 border-bottom border-subtle">
                 <h2 class="accordion-header" id="heading{{ forloop.counter }}">
-                    <button class="accordion-button collapsed bg-white fw-bold text-dark p-4 gap-3 fs-5" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter }}" aria-expanded="false" aria-controls="collapse{{ forloop.counter }}">
+                    <button class="accordion-button collapsed bg-white fw-bold text-theme-main p-4 gap-3 fs-5" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter }}" aria-expanded="false" aria-controls="collapse{{ forloop.counter }}">
                         <div class="bg-light text-secondary rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 36px; height: 36px; flex-shrink: 0;">
                             {{ forloop.counter }}
                         </div>
@@ -209,7 +209,7 @@
                             {{ result.task.title }}
                         </div>
                         {% if result.evaluation %}
-                            <span class="badge bg-light border border-subtle text-dark px-3 py-2 rounded-pill me-3 d-none d-md-inline-block shadow-sm">Score: {{ result.evaluation.score }}/100</span>
+                            <span class="badge bg-light border border-subtle text-theme-main px-3 py-2 rounded-pill me-3 d-none d-md-inline-block shadow-sm">Score: {{ result.evaluation.score }}/100</span>
                         {% endif %}
                     </button>
                 </h2>
@@ -219,7 +219,7 @@
                             
                             <!-- Score Card Mobile -->
                             <div class="d-md-none mb-4 d-flex align-items-center gap-2">
-                                <span class="badge bg-white border border-subtle text-dark px-4 py-2 rounded-pill fw-bold shadow-sm fs-6">Score: {{ result.evaluation.score }}/100</span>
+                                <span class="badge bg-white border border-subtle text-theme-main px-4 py-2 rounded-pill fw-bold shadow-sm fs-6">Score: {{ result.evaluation.score }}/100</span>
                             </div>
 
                             <div class="row g-4">
@@ -228,7 +228,7 @@
                                         <h6 class="text-primary fw-bold text-uppercase tracking-wider small mb-3 d-flex align-items-center gap-2">
                                             <i class="bi bi-chat-right-quote fs-5"></i> General Feedback
                                         </h6>
-                                        <p class="mb-0 text-dark lh-lg fs-6">{{ result.evaluation.feedback }}</p>
+                                        <p class="mb-0 text-theme-main lh-lg fs-6">{{ result.evaluation.feedback }}</p>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -236,7 +236,7 @@
                                         <h6 class="text-success fw-bold text-uppercase tracking-wider small mb-3 d-flex align-items-center gap-2">
                                             <i class="bi bi-plus-circle-fill fs-5"></i> Strengths
                                         </h6>
-                                        <p class="mb-0 text-dark lh-lg">{{ result.evaluation.strengths }}</p>
+                                        <p class="mb-0 text-theme-main lh-lg">{{ result.evaluation.strengths }}</p>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -244,7 +244,7 @@
                                         <h6 class="text-danger fw-bold text-uppercase tracking-wider small mb-3 d-flex align-items-center gap-2">
                                             <i class="bi bi-dash-circle-fill fs-5"></i> Weaknesses
                                         </h6>
-                                        <p class="mb-0 text-dark lh-lg">{{ result.evaluation.weaknesses }}</p>
+                                        <p class="mb-0 text-theme-main lh-lg">{{ result.evaluation.weaknesses }}</p>
                                     </div>
                                 </div>
                                 <div class="col-12">
@@ -252,7 +252,7 @@
                                         <h6 class="text-warning fw-bold text-uppercase tracking-wider small mb-3 d-flex align-items-center gap-2">
                                             <i class="bi bi-lightbulb-fill fs-5"></i> Suggestions for Improvement
                                         </h6>
-                                        <p class="mb-0 text-dark lh-lg">{{ result.evaluation.suggestions }}</p>
+                                        <p class="mb-0 text-theme-main lh-lg">{{ result.evaluation.suggestions }}</p>
                                     </div>
                                 </div>
                             </div>

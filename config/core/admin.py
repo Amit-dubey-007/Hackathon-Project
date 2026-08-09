@@ -1,7 +1,7 @@
 
 # Register your models here.
 from django.contrib import admin
-from .models import Skill, Task, Submission, Evaluation, Certificate,Assessment
+from .models import Skill, Task, Submission, Evaluation, Certificate,Assessment,ContactMessage
 
 
 @admin.register(Skill)
@@ -41,3 +41,4 @@ class CertificateAdmin(admin.ModelAdmin):
     list_filter = ("minted", "skill")
 
 admin.site.register(Assessment)
+admin.site.register(ContactMessage)

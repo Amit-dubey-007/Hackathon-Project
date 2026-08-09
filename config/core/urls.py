@@ -1,4 +1,4 @@
-# Triggering URLconf reload
+# Force reload of URLconf for my_assessments route
 from django.urls import path
 from . import views
 
@@ -124,4 +124,5 @@ urlpatterns = [
     path("wallet-guide/", views.wallet_guide, name="wallet_guide"),
     path("how-it-works/", views.how_it_works, name="how_it_works"),
     path("certificate/<int:certificate_id>/view/", views.show_white_certificate, name="show_white_certificate"),
+    path("my-assessments/", views.my_assessments, name="my_assessments"),
 ]
