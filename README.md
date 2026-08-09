@@ -229,58 +229,81 @@ Users can track their progress with:
 
 # 🚀 Installation
 
-Clone the repository
+## 1. Clone the repository
 
 ```bash
 git clone <repository-url>
 ```
 
-Move into the project
+## 2. Navigate to the project directory
 
 ```bash
-cd ConsensusAI
+cd HACKATHON
 ```
 
-Create a virtual environment
+> Replace `HACKATHON` with your repository name if different.
+
+## 3. Create a virtual environment (Optional if not already created)
 
 ```bash
-python -m venv venv
+python -m venv .venv
 ```
 
-Activate virtual environment
+## 4. Activate the virtual environment
 
-Windows
+### Windows
 
 ```bash
-venv\Scripts\activate
+.venv\Scripts\activate
 ```
 
-Linux/macOS
+### Linux / macOS
 
 ```bash
-source venv/bin/activate
+source .venv/bin/activate
 ```
 
-Install dependencies
+## 5. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Run database migrations
+## 6. Configure environment variables
+
+Create a `.env` file in the project root and add the required variables.
+
+```env
+SECRET_KEY=YOUR_SECRET_KEY
+DEBUG=True
+GEMINI_API_KEY=YOUR_GEMINI_API_KEY
+
+# Add other required variables if applicable.
+```
+
+## 7. Navigate to the Django project
+
+```bash
+cd config
+```
+
+## 8. Apply database migrations
 
 ```bash
 python manage.py migrate
 ```
 
-Start the development server
+## 9. Start the development server
 
 ```bash
 python manage.py runserver
 ```
 
----
+## 10. Open the application
 
+```
+http://127.0.0.1:8000/
+```
 # 🔑 Environment Variables
 
 Create a `.env` file and configure the required environment variables.
@@ -302,38 +325,25 @@ GEMINI_API_KEY=YOUR_GEMINI_API_KEY
 ```text
 ConsensusAI/
 
-├── core/
-│   ├── templates/
-│   ├── static/
-│   ├── views.py
-│   ├── models.py
-│   ├── urls.py
-│   └── utils.py
+├── config/
+│   ├── accounts/              # Authentication & user management
+│   ├── config/                # Django project settings
+│   ├── core/                  # Main application
+│   │   ├── templates/
+│   │   ├── static/
+│   │   ├── views.py
+│   │   ├── models.py
+│   │   ├── urls.py
+│   │   └── utils.py
+│   ├── media/                 # Generated certificates & uploads
+│   └── manage.py
 │
-├── media/
-├── static/
-├── manage.py
+├── .env                       # Environment variables
+├── .gitignore
 ├── requirements.txt
 └── README.md
 ```
 
----
-
-# 📸 Screenshots
-
-Add screenshots of:
-
-- Home Page
-- Dashboard
-- Skills Catalog
-- Assessment Workspace
-- AI Proctoring
-- Assessment Report
-- Certificate Management
-- Blockchain Certificate
-- Public Verification Page
-
----
 
 # 🎥 Demo Video
 
@@ -385,11 +395,11 @@ This project was developed as part of a Hackathon.
 
 Website:  https://hackathon-project-dxpn.onrender.com
 
-Email: 
+Email: amit4528990@gmail.com
 
 GitHub: https://github.com/Amit-dubey-007/Hackathon-Project/
 
-LinkedIn:
+LinkedIn: https://www.linkedin.com/in/amit-dubey-613355371/
 
 ---
 
