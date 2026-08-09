@@ -1145,3 +1145,6 @@ def contact(request):
 
 def wallet_guide(request):
     return render(request, "core/wallet_guide.html")
+
+def how_it_works(request):
+    return render(request, "core/how_it_works.html")

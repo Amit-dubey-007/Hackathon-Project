@@ -30,7 +30,7 @@ def send_otp_email(email, otp):
         },
         json={
             "sender": {
-                "name": "AI Skills",
+                "name": "Consensus AI",
                 "email": settings.EMAIL_HOST_USER,
             },
             "to": [

@@ -122,4 +122,5 @@ urlpatterns = [
     path("about/", views.about, name="about"),
     path("contact/", views.contact, name="contact"),
     path("wallet-guide/", views.wallet_guide, name="wallet_guide"),
+    path("how-it-works/", views.how_it_works, name="how_it_works"),
 ]

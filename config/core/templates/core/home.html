@@ -1,7 +1,7 @@
 {% extends 'core/base.html' %}
 {% load static %}
 
-{% block title %}PROOF.AI | Decentralized Skill Verification{% endblock %}
+{% block title %}Consensus AI| Decentralized Skill Verification{% endblock %}
 
 {% block extra_css %}
 <!-- Tailwind CSS CDN -->
@@ -77,11 +77,14 @@
     }
 
     /* Resolve Tailwind CSS conflict with Bootstrap navbar collapse */
-    .collapse:not(.show) {
-        display: none !important;
+    @media (max-width: 991.98px) {
+        nav.glass-navbar .collapse:not(.show) {
+            display: none !important;
+            visibility: hidden !important;
+        }
     }
     @media (min-width: 992px) {
-        .navbar-expand-lg .navbar-collapse {
+        nav.glass-navbar .collapse {
             display: flex !important;
             visibility: visible !important;
         }
@@ -196,13 +199,13 @@
             </p>
 
             <div class="flex flex-wrap gap-4 pt-2">
-                <a href="{% url 'skill_list' %}" class="relative group px-8 py-4 rounded-full text-base font-bold text-darkBg overflow-hidden transition-transform active:scale-95 shadow-lg shadow-neonCyan/25">
+                <a href="{% url 'dashboard' %}" class="relative group px-8 py-4 rounded-full text-base font-bold text-darkBg overflow-hidden transition-transform active:scale-95 shadow-lg shadow-neonCyan/25">
                     <span class="absolute inset-0 bg-gradient-to-r from-neonCyan via-neonIndigo to-neonPurple transition-all group-hover:scale-105"></span>
                     <span class="relative flex items-center gap-2">
                         Start Assessment <i class="fa-solid fa-arrow-right"></i>
                     </span>
                 </a>
-                <a href="{% url 'wallet_guide' %}" class="px-8 py-4 rounded-full text-base font-bold text-white/90 bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all backdrop-blur-md">
+                <a href="{% url 'skill_list' %}" class="px-8 py-4 rounded-full text-base font-bold text-white/90 bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all backdrop-blur-md">
                     Explore Skills
                 </a>
             </div>
@@ -484,7 +487,7 @@
                         <span class="relative">Start Now</span>
                     </a>
                     <a href="{% url 'dashboard' %}" class="px-8 py-4 rounded-full text-base font-bold text-white/90 bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all backdrop-blur-md">
-                        View Dashboard
+                        How To Use?
                     </a>
                 </div>
             </div>

@@ -1,0 +1,545 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Consensus AI | How It Works{% endblock %}
+
+{% block extra_css %}
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    darkBg: '#020204',
+                    glassBg: 'rgba(8, 9, 14, 0.82)',
+                    neonCyan: '#06B6D4',
+                    neonPurple: '#A855F7',
+                    neonIndigo: '#6366F1',
+                    neonPink: '#EC4899',
+                },
+                fontFamily: {
+                    sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    mono: ['"JetBrains Mono"', 'monospace'],
+                },
+                boxShadow: {
+                    'neon-cyan': '0 0 20px rgba(6, 182, 212, 0.15)',
+                    'neon-purple': '0 0 20px rgba(168, 85, 247, 0.15)',
+                    'neon-pink': '0 0 20px rgba(236, 72, 153, 0.15)',
+                }
+            }
+        }
+    }
+</script>
+
+<!-- Google Fonts & FontAwesome -->
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+    /* Reset main container limits for full-bleed Tailwind landing page */
+    main.container {
+        max-width: 100% !important;
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    body {
+        background-color: #020204 !important;
+        color: #ffffff !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
+        overflow-x: hidden;
+    }
+
+    /* Force light colors on navbar links specifically for home.html / how_it_works.html dark bg */
+    nav.glass-navbar .nav-link,
+    nav.glass-navbar .navbar-brand,
+    nav.glass-navbar .text-theme-main,
+    nav.glass-navbar .dropdown-toggle {
+        color: #ffffff !important;
+    }
+    
+    nav.glass-navbar .dropdown-menu {
+        background-color: #0f172a !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    nav.glass-navbar .dropdown-item {
+        color: #cbd5e1 !important;
+    }
+
+    nav.glass-navbar .dropdown-item:hover {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        color: #ffffff !important;
+    }
+
+    /* Resolve Tailwind CSS conflict with Bootstrap navbar collapse */
+    @media (max-width: 991.98px) {
+        nav.glass-navbar .collapse:not(.show) {
+            display: none !important;
+            visibility: hidden !important;
+        }
+    }
+    @media (min-width: 992px) {
+        nav.glass-navbar .collapse {
+            display: flex !important;
+            visibility: visible !important;
+        }
+    }
+
+    /* Glassmorphism */
+    .glass-panel {
+        background: rgba(8, 9, 14, 0.82);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    .glass-panel-hover:hover {
+        background: rgba(14, 16, 26, 0.9);
+        border-color: rgba(6, 182, 212, 0.3);
+        box-shadow: 0 0 30px rgba(6, 182, 212, 0.15);
+        transform: translateY(-4px);
+    }
+
+    /* Ambient Grid Background */
+    .grid-bg {
+        background-size: 40px 40px;
+        background-image: 
+            linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    }
+
+    /* Shimmer Effect for Headings */
+    .shimmer-text {
+        background: linear-gradient(to right, #ffffff 20%, #a855f7 40%, #06b6d4 60%, #ffffff 80%);
+        background-size: 200% auto;
+        color: transparent;
+        background-clip: text;
+        -webkit-background-clip: text;
+        animation: shine 6s linear infinite;
+    }
+
+    @keyframes shine {
+        to { background-position: 200% center; }
+    }
+
+    /* Floating blobs */
+    .blob {
+        filter: blur(100px);
+        opacity: 0.45;
+        mix-blend-mode: screen;
+        pointer-events: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<script>
+    document.documentElement.setAttribute('data-bs-theme', 'dark');
+    document.documentElement.classList.add('dark');
+</script>
+<div class="relative min-h-screen bg-darkBg text-white selection:bg-neonCyan/30 selection:text-neonCyan font-sans grid-bg">
+    
+    <!-- Ambient Floating Blobs -->
+    <div class="blob absolute top-20 left-[10%] w-[450px] h-[450px] rounded-full bg-gradient-to-tr from-neonCyan to-neonIndigo animate-[pulse_8s_infinite] z-0"></div>
+    <div class="blob absolute top-[40%] right-[10%] w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-neonPurple to-neonPink animate-[pulse_10s_infinite] z-0"></div>
+    <div class="blob absolute bottom-20 left-[20%] w-[400px] h-[400px] rounded-full bg-gradient-to-tr from-neonIndigo to-neonCyan animate-[pulse_9s_infinite] z-0"></div>
+
+    <!-- HERO SECTION -->
+    <section class="relative pt-20 pb-24 px-6 max-w-7xl mx-auto z-10 text-center space-y-8 reveal">
+        <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-neonCyan/10 border border-neonCyan/25 backdrop-blur-md shadow-neon-cyan animate-pulse">
+            <i class="fa-solid fa-circle-info text-neonCyan"></i>
+            <span class="text-xs font-bold uppercase tracking-widest text-neonCyan font-mono">Platform Documentation</span>
+        </div>
+        
+        <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight leading-[1.1] shimmer-text">
+            How Consensus AI Works
+        </h1>
+        
+        <p class="text-lg text-white/70 max-w-3xl mx-auto font-light leading-relaxed">
+            Consensus AI replaces conventional theoretical questionnaires with automated sandboxed execution assessments. Validate your engineering capabilities and secure verifiable credentials permanently minted directly on-chain.
+        </p>
+
+        <!-- Illustration Timeline -->
+        <div class="relative max-w-5xl mx-auto pt-16">
+            <div class="absolute top-[48%] left-4 right-4 h-1 bg-gradient-to-r from-neonCyan via-neonPurple to-neonPink -z-10 hidden md:block opacity-35"></div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="glass-panel p-6 rounded-3xl space-y-4">
+                    <div class="w-12 h-12 rounded-2xl bg-neonCyan/20 flex items-center justify-center text-neonCyan mx-auto text-lg"><i class="fa-solid fa-sliders"></i></div>
+                    <div class="font-bold">1. Select Skill</div>
+                </div>
+                <div class="glass-panel p-6 rounded-3xl space-y-4">
+                    <div class="w-12 h-12 rounded-2xl bg-neonPurple/20 flex items-center justify-center text-neonPurple mx-auto text-lg"><i class="fa-solid fa-code"></i></div>
+                    <div class="font-bold">2. Practical Sandbox</div>
+                </div>
+                <div class="glass-panel p-6 rounded-3xl space-y-4">
+                    <div class="w-12 h-12 rounded-2xl bg-neonPink/20 flex items-center justify-center text-neonPink mx-auto text-lg"><i class="fa-solid fa-robot"></i></div>
+                    <div class="font-bold">3. AI Evaluation</div>
+                </div>
+                <div class="glass-panel p-6 rounded-3xl space-y-4">
+                    <div class="w-12 h-12 rounded-2xl bg-neonCyan/20 flex items-center justify-center text-neonCyan mx-auto text-lg"><i class="fa-solid fa-cube"></i></div>
+                    <div class="font-bold">4. Mint SBT NFT</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- STEP-BY-STEP TIMELINE -->
+    <section class="py-20 px-6 max-w-6xl mx-auto z-10 relative space-y-32">
+        
+        <!-- STEP 1 -->
+        <div class="flex flex-col lg:flex-row items-center gap-16 reveal">
+            <div class="flex-1 space-y-6">
+                <div class="text-xs font-mono font-bold text-neonCyan uppercase tracking-widest">Step 01 / Choice</div>
+                <h2 class="text-3xl md:text-4xl font-extrabold">Choose a Skill to Verify</h2>
+                <p class="text-white/70 leading-relaxed font-light">
+                    Browse our interactive Skills Catalog containing multiple software domains (Python, Django, Web3 Development, algorithms, and syntax protocols). Check target passing scores, durations, and details before launching sandboxes.
+                </p>
+                <div class="grid grid-cols-2 gap-4 text-sm text-white/60">
+                    <div class="flex items-center gap-3"><i class="fa-solid fa-gauge text-neonCyan"></i> Difficulty filters</div>
+                    <div class="flex items-center gap-3"><i class="fa-solid fa-clock-rotate-left text-neonCyan"></i> Timed assessments</div>
+                </div>
+            </div>
+            <div class="flex-1 w-full max-w-md">
+                <!-- Skill card mockup -->
+                <div class="glass-panel p-8 rounded-3xl space-y-6 border-neonCyan/25 shadow-neon-cyan">
+                    <div class="flex justify-between items-start">
+                        <div class="w-12 h-12 rounded-2xl bg-neonCyan/15 flex items-center justify-center text-neonCyan text-xl"><i class="fa-brands fa-python"></i></div>
+                        <span class="px-3 py-1 rounded-full bg-neonCyan/10 text-neonCyan text-xs font-mono">Medium</span>
+                    </div>
+                    <div class="space-y-2">
+                        <h4 class="text-xl font-bold">Python Algorithms</h4>
+                        <p class="text-xs text-white/50">Verify algorithmic structures, execution complexity, and syntax optimizations.</p>
+                    </div>
+                    <div class="border-t border-white/5 pt-4 flex justify-between text-xs text-white/60 font-mono">
+                        <span>Duration: 60 mins</span>
+                        <span>Passing: 70/100</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 2 -->
+        <div class="flex flex-col lg:flex-row-reverse items-center gap-16 reveal">
+            <div class="flex-1 space-y-6">
+                <div class="text-xs font-mono font-bold text-neonPurple uppercase tracking-widest">Step 02 / Validation</div>
+                <h2 class="text-3xl md:text-4xl font-extrabold">Review Assessment Rules</h2>
+                <p class="text-white/70 leading-relaxed font-light">
+                    Before starting, you must pass device permissions and read the Zero Tolerance integrity contract. To ensure credible credentials, Consensus AI launches local proctor checks that protect candidates' privacy while securing authentic evaluations.
+                </p>
+                <div class="grid grid-cols-2 gap-4 text-sm text-white/60">
+                    <div class="flex items-center gap-3"><i class="fa-solid fa-video text-neonPurple"></i> Webcam Local Proctor</div>
+                    <div class="flex items-center gap-3"><i class="fa-solid fa-lock text-neonPurple"></i> Sandbox Clipboard Lock</div>
+                </div>
+            </div>
+            <div class="flex-1 w-full max-w-md">
+                <!-- Security Rules Mockup -->
+                <div class="glass-panel p-8 rounded-3xl space-y-6 border-neonPurple/25 shadow-neon-purple text-left">
+                    <h4 class="text-lg font-bold text-white flex items-center gap-2"><i class="fa-solid fa-shield-halved text-neonPurple"></i> Integrity Protocols</h4>
+                    <div class="space-y-3 text-xs text-white/60">
+                        <div class="flex items-center gap-3 p-2 bg-white/5 rounded-xl"><i class="fa-solid fa-circle-exclamation text-rose-500"></i> No Tab Switching / Fullscreen exit</div>
+                        <div class="flex items-center gap-3 p-2 bg-white/5 rounded-xl"><i class="fa-solid fa-circle-exclamation text-rose-500"></i> Clipboard actions are strictly locked</div>
+                        <div class="flex items-center gap-3 p-2 bg-white/5 rounded-xl"><i class="fa-solid fa-circle-exclamation text-rose-500"></i> Local camera focus checks active</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 3 -->
+        <div class="flex flex-col lg:flex-row items-center gap-16 reveal">
+            <div class="flex-1 space-y-6">
+                <div class="text-xs font-mono font-bold text-neonPink uppercase tracking-widest">Step 03 / Practical Code</div>
+                <h2 class="text-3xl md:text-4xl font-extrabold">Complete Practical Assessment</h2>
+                <p class="text-white/70 leading-relaxed font-light">
+                    Solve real-world backend tasks directly in the browser. You are given 5 practical questions evaluated inside sandboxes utilizing the Monaco Editor (the power behind VS Code). No generic multiple-choice questions.
+                </p>
+                <div class="grid grid-cols-2 gap-4 text-sm text-white/60">
+                    <div class="flex items-center gap-3"><i class="fa-solid fa-terminal text-neonPink"></i> Monaco Editor support</div>
+                    <div class="flex items-center gap-3"><i class="fa-solid fa-floppy-disk text-neonPink"></i> Periodic auto-saves</div>
+                </div>
+            </div>
+            <div class="flex-1 w-full max-w-md">
+                <!-- Monaco mockup -->
+                <div class="glass-panel rounded-3xl overflow-hidden shadow-2xl border-neonPink/25 shadow-neon-pink">
+                    <div class="bg-black/60 px-4 py-2 border-b border-white/5 flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                        <span class="text-[10px] text-white/40 font-mono ml-4">solution.py</span>
+                    </div>
+                    <div class="p-4 font-mono text-xs text-white/80 space-y-1 bg-black/80">
+                        <div><span class="text-neonPink">def</span> <span class="text-neonCyan">resolve_matrix</span>(data):</div>
+                        <div class="pl-4 text-white/50"># Write optimized algorithm below</div>
+                        <div class="pl-4"><span class="text-neonPurple">return</span> [x * 2 <span class="text-neonPurple">for</span> x <span class="text-neonPurple">in</span> data]</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 4 -->
+        <div class="flex flex-col lg:flex-row-reverse items-center gap-16 reveal">
+            <div class="flex-1 space-y-6">
+                <div class="text-xs font-mono font-bold text-neonCyan uppercase tracking-widest">Step 04 / Scoring</div>
+                <h2 class="text-3xl md:text-4xl font-extrabold">AI Evaluation Pipeline</h2>
+                <p class="text-white/70 leading-relaxed font-light">
+                    Once submitted, our AI scoring module evaluates candidate code outputs against strict test cases, architectural styling, and edge case parameters using an automated, non-biased rubric calculation.
+                </p>
+            </div>
+            <div class="flex-1 w-full max-w-md">
+                <!-- AI pipeline mockup -->
+                <div class="glass-panel p-6 rounded-3xl border-neonCyan/25 shadow-neon-cyan text-center space-y-4">
+                    <i class="fa-solid fa-gears text-4xl text-neonCyan animate-spin"></i>
+                    <h4 class="font-bold">Evaluating Solution...</h4>
+                    <div class="w-full bg-white/5 h-2 rounded-full overflow-hidden">
+                        <div class="bg-neonCyan h-full w-[85%] animate-pulse"></div>
+                    </div>
+                    <div class="text-xs text-white/40">Test suites passed: 94%</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 5 -->
+        <div class="flex flex-col lg:flex-row items-center gap-16 reveal">
+            <div class="flex-1 space-y-6">
+                <div class="text-xs font-mono font-bold text-neonPurple uppercase tracking-widest">Step 05 / Feedback</div>
+                <h2 class="text-3xl md:text-4xl font-extrabold">Analytical Feedback</h2>
+                <p class="text-white/70 leading-relaxed font-light">
+                    Review your comprehensive results. We break down passing metrics, show compiler debug warnings, calculate exact time taken, and list comprehensive performance summaries for improvement.
+                </p>
+            </div>
+            <div class="flex-1 w-full max-w-md">
+                <!-- Results mockup -->
+                <div class="glass-panel p-8 rounded-3xl border-neonPurple/25 shadow-neon-purple space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-white/50 font-mono">Final Score</span>
+                        <span class="text-emerald-400 text-xs font-bold font-mono">Passed</span>
+                    </div>
+                    <div class="text-4xl font-extrabold">88<span class="text-xs text-white/40">/100</span></div>
+                    <p class="text-xs text-white/60">Excellent runtime optimization. Minor cleanups needed in function exception handling.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 6 -->
+        <div class="flex flex-col lg:flex-row-reverse items-center gap-16 reveal">
+            <div class="flex-1 space-y-6">
+                <div class="text-xs font-mono font-bold text-neonPink uppercase tracking-widest">Step 06 / Minting</div>
+                <h2 class="text-3xl md:text-4xl font-extrabold">Mint Soulbound Certificates</h2>
+                <p class="text-white/70 leading-relaxed font-light">
+                    Every passing evaluation generates an ERC-5192 Soulbound Token (SBT) NFT. These are non-transferable, decentralized certificates permanently linked to your web3 public wallet address.
+                </p>
+            </div>
+            <div class="flex-1 w-full max-w-md">
+                <!-- Certificate NFT mockup -->
+                <div class="glass-panel p-8 rounded-3xl border-neonPink/25 shadow-neon-pink text-center space-y-4 relative overflow-hidden">
+                    <div class="absolute -right-16 -top-16 w-32 h-32 bg-neonPink/10 rounded-full blur-xl"></div>
+                    <i class="fa-solid fa-ribbon text-neonPink text-4xl"></i>
+                    <h4 class="font-bold">Python Expert Certificate</h4>
+                    <div class="text-xs font-mono text-white/40">ID: sbt-py-8429</div>
+                    <div class="p-2 bg-white/5 rounded-xl border border-white/5 text-[10px] font-mono text-neonPink break-all">
+                        0x71C765...B897a
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 7 -->
+        <div class="flex flex-col lg:flex-row items-center gap-16 reveal">
+            <div class="flex-1 space-y-6">
+                <div class="text-xs font-mono font-bold text-neonCyan uppercase tracking-widest">Step 07 / Sharing</div>
+                <h2 class="text-3xl md:text-4xl font-extrabold">Instant Employer Verification</h2>
+                <p class="text-white/70 leading-relaxed font-light">
+                    Employers can verify certificate authenticity with one click using the on-chain smart-contract address, public wallet mappings, or the unique QR verification code generated on the platform.
+                </p>
+            </div>
+            <div class="flex-1 w-full max-w-md">
+                <!-- Verification Flow Mockup -->
+                <div class="glass-panel p-8 rounded-3xl border-neonCyan/25 shadow-neon-cyan text-center space-y-4">
+                    <i class="fa-solid fa-qrcode text-4xl text-white"></i>
+                    <h4 class="font-bold">Scan to Verify</h4>
+                    <p class="text-xs text-white/50">Instant cryptographic proof matching smart contracts on Ethereum EVM.</p>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- SECURITY PROTOCOLS SECTION -->
+    <section class="py-24 px-6 max-w-7xl mx-auto z-10 relative">
+        <div class="glass-panel p-8 md:p-16 rounded-[40px] border-neonPurple/20 shadow-neon-purple reveal space-y-12">
+            <div class="text-center space-y-4 max-w-2xl mx-auto">
+                <span class="text-xs font-mono font-bold text-neonPurple uppercase tracking-widest"><i class="fa-solid fa-lock"></i> Sandbox Encryption</span>
+                <h2 class="text-3xl md:text-5xl font-extrabold">State-Of-The-Art Security</h2>
+                <p class="text-white/60">Strict browser-based anti-cheating mechanisms configure directly client-side, verifying credentials securely.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="glass-panel p-6 rounded-2xl space-y-3">
+                    <div class="w-10 h-10 rounded-xl bg-neonCyan/15 flex items-center justify-center text-neonCyan text-lg"><i class="fa-solid fa-computer"></i></div>
+                    <h4 class="font-bold">Anti-Cheat Checks</h4>
+                    <p class="text-xs text-white/50 leading-relaxed">Tab switching and exit-fullscreen attempts trigger automatic assessment validation failures.</p>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl space-y-3">
+                    <div class="w-10 h-10 rounded-xl bg-neonPurple/15 flex items-center justify-center text-neonPurple text-lg"><i class="fa-solid fa-video"></i></div>
+                    <h4 class="font-bold">Webcam Monitoring</h4>
+                    <p class="text-xs text-white/50 leading-relaxed">Local proctor checks verify face focus and count using browser calculations without cloud asset storage.</p>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl space-y-3">
+                    <div class="w-10 h-10 rounded-xl bg-neonPink/15 flex items-center justify-center text-neonPink text-lg"><i class="fa-solid fa-ban"></i></div>
+                    <h4 class="font-bold">Clipboard Restriction</h4>
+                    <p class="text-xs text-white/50 leading-relaxed">Copy, cut, and paste shortcuts are disabled in sandbox layouts to protect task integrity.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- COMPARISON TABLE SECTION -->
+    <section class="py-24 px-6 max-w-5xl mx-auto z-10 relative space-y-12">
+        <div class="text-center space-y-4 max-w-2xl mx-auto reveal">
+            <h2 class="text-3xl md:text-5xl font-extrabold">Legacy vs Consensus AI</h2>
+            <p class="text-white/60">How our sandbox-evaluated smart credentials stack up against legacy formats.</p>
+        </div>
+
+        <div class="glass-panel rounded-3xl overflow-hidden border-white/5 reveal shadow-2xl">
+            <table class="w-full text-left border-collapse text-sm">
+                <thead>
+                    <tr class="border-b border-white/5 bg-white/5 text-xs font-mono uppercase text-white/60">
+                        <th class="p-6">Feature</th>
+                        <th class="p-6">Traditional Certificates</th>
+                        <th class="p-6 text-neonCyan font-bold">Consensus AI</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5 text-white/70">
+                    <tr>
+                        <td class="p-6 font-bold text-white">Testing Type</td>
+                        <td class="p-6"><i class="fa-solid fa-xmark text-rose-500 mr-2"></i> Theory & Multiple-Choice</td>
+                        <td class="p-6 text-neonCyan font-bold"><i class="fa-solid fa-check text-neonCyan mr-2"></i> Practical Executing Sandbox</td>
+                    </tr>
+                    <tr>
+                        <td class="p-6 font-bold text-white">Audit Authenticity</td>
+                        <td class="p-6"><i class="fa-solid fa-xmark text-rose-500 mr-2"></i> Easy to fake/PDF format</td>
+                        <td class="p-6 text-neonCyan font-bold"><i class="fa-solid fa-check text-neonCyan mr-2"></i> Cryptographic Blockchain Proof</td>
+                    </tr>
+                    <tr>
+                        <td class="p-6 font-bold text-white">Identity Lock</td>
+                        <td class="p-6"><i class="fa-solid fa-xmark text-rose-500 mr-2"></i> Revokable / Transferable</td>
+                        <td class="p-6 text-neonCyan font-bold"><i class="fa-solid fa-check text-neonCyan mr-2"></i> Soulbound Token (SBT) Linked</td>
+                    </tr>
+                    <tr>
+                        <td class="p-6 font-bold text-white">Proctor Evaluation</td>
+                        <td class="p-6"><i class="fa-solid fa-xmark text-rose-500 mr-2"></i> None or Human Scheduled</td>
+                        <td class="p-6 text-neonCyan font-bold"><i class="fa-solid fa-check text-neonCyan mr-2"></i> Real-time Local AI Proctoring</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- FREQUENTLY ASKED QUESTIONS -->
+    <section class="py-24 px-6 max-w-4xl mx-auto z-10 relative space-y-12">
+        <div class="text-center space-y-4 max-w-2xl mx-auto reveal">
+            <h2 class="text-3xl md:text-5xl font-extrabold">FAQ & Troubleshooting</h2>
+            <p class="text-white/60">Everything you need to know about testing, proctor rules, and gasless NFT minting.</p>
+        </div>
+
+        <div class="space-y-4 reveal">
+            <!-- Accordion 1 -->
+            <div class="glass-panel rounded-2xl overflow-hidden">
+                <button class="w-full p-6 text-left font-bold flex justify-between items-center hover:bg-white/5 transition-colors focus:outline-none" onclick="toggleAccordion(this)">
+                    <span>How are skills evaluated?</span>
+                    <i class="fa-solid fa-chevron-down transition-transform"></i>
+                </button>
+                <div class="px-6 pb-6 text-xs text-white/60 hidden leading-relaxed">
+                    Assessments execute your code in isolated sandboxes against functional test cases. The output data is then formatted and scored against performance, design patterns, and efficiency rubrics.
+                </div>
+            </div>
+            <!-- Accordion 2 -->
+            <div class="glass-panel rounded-2xl overflow-hidden">
+                <button class="w-full p-6 text-left font-bold flex justify-between items-center hover:bg-white/5 transition-colors focus:outline-none" onclick="toggleAccordion(this)">
+                    <span>Can I retake an assessment?</span>
+                    <i class="fa-solid fa-chevron-down transition-transform"></i>
+                </button>
+                <div class="px-6 pb-6 text-xs text-white/60 hidden leading-relaxed">
+                    Yes. If you fail to achieve the required passing score, you can review the AI feedback dashboard and attempt the test again after practicing.
+                </div>
+            </div>
+            <!-- Accordion 3 -->
+            <div class="glass-panel rounded-2xl overflow-hidden">
+                <button class="w-full p-6 text-left font-bold flex justify-between items-center hover:bg-white/5 transition-colors focus:outline-none" onclick="toggleAccordion(this)">
+                    <span>How does blockchain verification work?</span>
+                    <i class="fa-solid fa-chevron-down transition-transform"></i>
+                </button>
+                <div class="px-6 pb-6 text-xs text-white/60 hidden leading-relaxed">
+                    When you pass, we publish transaction metadata to the blockchain. This links your score, public keys, and certificate ID. Anyone can use the explorer to verify the contract record without centralized database checks.
+                </div>
+            </div>
+            <!-- Accordion 4 -->
+            <div class="glass-panel rounded-2xl overflow-hidden">
+                <button class="w-full p-6 text-left font-bold flex justify-between items-center hover:bg-white/5 transition-colors focus:outline-none" onclick="toggleAccordion(this)">
+                    <span>Is my certificate permanent?</span>
+                    <i class="fa-solid fa-chevron-down transition-transform"></i>
+                </button>
+                <div class="px-6 pb-6 text-xs text-white/60 hidden leading-relaxed">
+                    Yes, because Soulbound Tokens (SBTs) are non-transferable NFTs mapped directly to your wallet address. They cannot be sold, transferred, or revoked by third parties.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CALL TO ACTION -->
+    <section class="py-24 px-6 max-w-5xl mx-auto z-10 relative text-center reveal">
+        <div class="glass-panel p-12 md:p-24 rounded-[40px] border-neonCyan/20 shadow-neon-cyan">
+            <div class="absolute -left-32 -top-32 w-96 h-96 bg-neonCyan/10 rounded-full filter blur-[80px]"></div>
+            <div class="max-w-3xl mx-auto space-y-8 relative z-10">
+                <h2 class="text-4xl md:text-6xl font-extrabold leading-tight">
+                    Ready to Prove Your Skills?
+                </h2>
+                <p class="text-white/60 text-lg max-w-xl mx-auto">Get your development sandbox instantly and mint your Soulbound credential proofs.</p>
+                <div class="flex justify-center gap-4">
+                    <a href="{% url 'skill_list' %}" class="relative group px-8 py-4 rounded-full text-base font-bold text-darkBg overflow-hidden transition-transform active:scale-95 shadow-lg shadow-neonCyan/25">
+                        <span class="absolute inset-0 bg-gradient-to-r from-neonCyan via-neonIndigo to-neonPurple transition-all group-hover:scale-105"></span>
+                        <span class="relative">Explore Skills</span>
+                    </a>
+                    <a href="{% url 'dashboard' %}" class="px-8 py-4 rounded-full text-base font-bold text-white/90 bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all backdrop-blur-md">
+                        Start First Assessment
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<script>
+    // Reveal animations on scroll
+    document.addEventListener('DOMContentLoaded', () => {
+        const revealElements = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.classList.remove('opacity-0', 'translate-y-8');
+                    e.target.classList.add('opacity-100', 'translate-y-0');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        revealElements.forEach(el => {
+            el.classList.add('opacity-0', 'translate-y-8', 'transition-all', 'duration-1000', 'ease-out');
+            observer.observe(el);
+        });
+    });
+
+    // Accordion Toggle
+    function toggleAccordion(button) {
+        const content = button.nextElementSibling;
+        const icon = button.querySelector('i');
+        
+        content.classList.toggle('hidden');
+        icon.classList.toggle('rotate-180');
+    }
+</script>
+{% endblock %}
